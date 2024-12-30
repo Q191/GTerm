@@ -1,0 +1,31 @@
+{
+  "about": {
+    "name": "关于",
+    "github": "GitHub",
+    "website": "官网"
+  },
+  "add_server_dialog": {
+    "title": "添加服务器",
+    "cancel": "取消",
+    "confirm": "确定",
+    "basic_config": "基础配置",
+    "advanced_config": "高级配置",
+    "label": "标签",
+    "group": "分组",
+    "host": "主机",
+    "port": "端口",
+    "auth_type": "认证方式",
+    "username": "用户名",
+    "password": "密码",
+    "private_key": "私钥",
+    "passphrase": "密钥口令",
+    "charset": "字符编码",
+    "term_type": "终端类型",
+    "validation": {
+      "label_required": "请输入标签名称",
+      "host_required": "请输入主机地址",
+      "port_required": "请输入端口号",
+      "username_required": "请输入用户名"
+    }
+  }
+}

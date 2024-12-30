@@ -1,0 +1,16 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "GTerm",
+  "outputfilename": "GTerm",
+  "frontend:install": "pnpm install",
+  "frontend:build": "pnpm run build",
+  "frontend:dev:watcher": "pnpm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "info": {
+    "companyName": "OpenToolkitLab",
+    "productName": "GTerm",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2024",
+    "comments": ""
+  }
+}
