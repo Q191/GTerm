@@ -4,8 +4,8 @@
     "github": "GitHub",
     "website": "官网"
   },
-  "add_server_dialog": {
-    "title": "添加服务器",
+  "add_host_dialog": {
+    "title": "添加主机",
     "cancel": "取消",
     "confirm": "确定",
     "basic_config": "基础配置",

@@ -14,11 +14,11 @@
 
     <!-- 工具栏 -->
     <div class="toolbar">
-      <NButton size="small" type="primary" ghost @click="dialogStore.openAddServerDialog">
+      <NButton size="small" type="primary" ghost @click="dialogStore.openAddHostDialog">
         <template #icon>
           <Icon icon="ph:plus-circle-duotone" />
         </template>
-        添加服务器
+        添加主机
       </NButton>
       <NButton size="small" ghost>
         <template #icon>

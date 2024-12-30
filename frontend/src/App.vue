@@ -3,7 +3,7 @@
     <router-view />
     <!-- 弹窗组件 -->
     <AboutDialog />
-    <AddServerDialogs />
+    <AddHostDialogs />
     <SettingDialog />
   </NConfigProvider>
 </template>
@@ -12,7 +12,7 @@
 import { usePreferencesStore } from '@/stores/preferences';
 import { darkThemeOverrides, themeOverrides } from '@/themes/naive-theme';
 import AboutDialog from '@/views/dialogs/AboutDialog.vue';
-import AddServerDialogs from '@/views/dialogs/AddServerDialogs.vue';
+import AddHostDialogs from '@/views/dialogs/AddHostDialogs.vue';
 import SettingDialog from '@/views/dialogs/SettingDialog.vue';
 import { darkTheme, NConfigProvider } from 'naive-ui';
 

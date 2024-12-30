@@ -3,17 +3,17 @@ import { defineStore } from 'pinia';
 export const useDialogStore = defineStore('dialog', {
   state: () => {
     return {
-      addServerDialogVisible: false,
+      addHostDialogVisible: false,
       aboutDialogVisible: false,
       settingsDialogVisible: false,
     };
   },
   actions: {
-    openAddServerDialog() {
-      this.addServerDialogVisible = true;
+    openAddHostDialog() {
+      this.addHostDialogVisible = true;
     },
-    closeAddServerDialog() {
-      this.addServerDialogVisible = false;
+    closeAddHostDialog() {
+      this.addHostDialogVisible = false;
     },
     openAboutDialog() {
       this.aboutDialogVisible = true;

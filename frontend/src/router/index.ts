@@ -26,7 +26,7 @@ const routes: Array<RouteRecordRaw> = [
           {
             path: 'host',
             name: 'Host',
-            component: () => import('@/views/body/HostInventory.vue'),
+            component: () => import('@/views/body/Host.vue'),
           },
           {
             path: 'credentials',
