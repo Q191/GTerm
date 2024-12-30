@@ -2,25 +2,22 @@
   <div class="inventory-container">
     <!-- 搜索栏 -->
     <div class="search-bar">
-      <NInput placeholder="搜索主机或用户@主机名..." round>
+      <NInput placeholder="搜索主机或用户@主机名...">
         <template #prefix>
           <Icon icon="ph:magnifying-glass-duotone" />
-        </template>
-        <template #suffix>
-          <NButton size="tiny" type="primary" ghost>连接</NButton>
         </template>
       </NInput>
     </div>
 
     <!-- 工具栏 -->
     <div class="toolbar">
-      <NButton size="small" type="primary" ghost @click="dialogStore.openAddHostDialog">
+      <NButton size="small" type="primary" ghost @click="() => dialogStore.openAddHostDialog()">
         <template #icon>
           <Icon icon="ph:plus-circle-duotone" />
         </template>
         添加主机
       </NButton>
-      <NButton size="small" ghost>
+      <NButton size="small" ghost @click="dialogStore.openAddGroupDialog">
         <template #icon>
           <Icon icon="ph:folder-simple-plus-duotone" />
         </template>
@@ -48,7 +45,7 @@
               </div>
             </div>
             <div class="card-actions">
-              <NButton text circle class="action-btn">
+              <NButton text circle class="action-btn" @click.stop="handleEditHost">
                 <template #icon>
                   <Icon icon="ph:pencil-simple-duotone" />
                 </template>
@@ -79,7 +76,7 @@
               </div>
             </div>
             <div class="card-actions">
-              <NButton text circle class="action-btn">
+              <NButton text circle class="action-btn" @click.stop="handleEditHost">
                 <template #icon>
                   <Icon icon="ph:pencil-simple-duotone" />
                 </template>
@@ -110,6 +107,11 @@ const toTerminal = () => {
 const gtermThemeVars = computed(() => {
   return gtermTheme(prefStore.isDark);
 });
+
+const handleEditHost = (event: MouseEvent) => {
+  event.preventDefault();
+  dialogStore.openAddHostDialog(true);
+};
 </script>
 
 <style lang="less" scoped>
@@ -200,20 +202,36 @@ const gtermThemeVars = computed(() => {
   .card-actions {
     opacity: 0;
     transition: opacity 0.2s ease;
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: v-bind('gtermThemeVars.textColor');
+      opacity: 0.7;
+      transition: all 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+        background-color: v-bind('gtermThemeVars.splitColor');
+        transform: scale(1.05);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      :deep(.n-icon) {
+        font-size: 18px;
+      }
+    }
   }
 
   &:hover .card-actions {
     opacity: 1;
-  }
-
-  .action-btn {
-    color: v-bind('gtermThemeVars.textColor');
-    opacity: 0.7;
-
-    &:hover {
-      opacity: 1;
-      background-color: v-bind('gtermThemeVars.splitColor');
-    }
   }
 }
 

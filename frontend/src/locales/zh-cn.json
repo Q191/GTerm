@@ -4,8 +4,9 @@
     "github": "GitHub",
     "website": "官网"
   },
-  "add_host_dialog": {
+  "host_dialog": {
     "title": "添加主机",
+    "edit_title": "编辑主机",
     "cancel": "取消",
     "confirm": "确定",
     "basic_config": "基础配置",
@@ -26,6 +27,16 @@
       "host_required": "请输入主机地址",
       "port_required": "请输入端口号",
       "username_required": "请输入用户名"
+    }
+  },
+  "group_dialog": {
+    "title": "新建分组",
+    "name": "名称",
+    "description": "描述",
+    "cancel": "取消",
+    "confirm": "确定",
+    "validation": {
+      "name_required": "请输入分组名称"
     }
   }
 }

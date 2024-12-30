@@ -1,9 +1,9 @@
 <template>
   <NConfigProvider :theme="currentTheme" :theme-overrides="currentThemeOverrides">
     <router-view />
-    <!-- 弹窗组件 -->
     <AboutDialog />
-    <AddHostDialogs />
+    <HostDialog />
+    <GroupDialog />
     <SettingDialog />
   </NConfigProvider>
 </template>
@@ -12,9 +12,10 @@
 import { usePreferencesStore } from '@/stores/preferences';
 import { darkThemeOverrides, themeOverrides } from '@/themes/naive-theme';
 import AboutDialog from '@/views/dialogs/AboutDialog.vue';
-import AddHostDialogs from '@/views/dialogs/AddHostDialogs.vue';
+import HostDialog from '@/views/dialogs/HostDialog.vue';
 import SettingDialog from '@/views/dialogs/SettingDialog.vue';
 import { darkTheme, NConfigProvider } from 'naive-ui';
+import GroupDialog from '@/views/dialogs/GroupDialog.vue';
 
 const prefStore = usePreferencesStore();
 
