@@ -16,44 +16,44 @@ import (
 )
 
 var (
-	Q               = new(Query)
-	Connection      *connection
-	ConnectionGroup *connectionGroup
-	Credential      *credential
+	Q          = new(Query)
+	Credential *credential
+	Group      *group
+	Host       *host
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
-	Connection = &Q.Connection
-	ConnectionGroup = &Q.ConnectionGroup
 	Credential = &Q.Credential
+	Group = &Q.Group
+	Host = &Q.Host
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:              db,
-		Connection:      newConnection(db, opts...),
-		ConnectionGroup: newConnectionGroup(db, opts...),
-		Credential:      newCredential(db, opts...),
+		db:         db,
+		Credential: newCredential(db, opts...),
+		Group:      newGroup(db, opts...),
+		Host:       newHost(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Connection      connection
-	ConnectionGroup connectionGroup
-	Credential      credential
+	Credential credential
+	Group      group
+	Host       host
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:              db,
-		Connection:      q.Connection.clone(db),
-		ConnectionGroup: q.ConnectionGroup.clone(db),
-		Credential:      q.Credential.clone(db),
+		db:         db,
+		Credential: q.Credential.clone(db),
+		Group:      q.Group.clone(db),
+		Host:       q.Host.clone(db),
 	}
 }
 
@@ -67,24 +67,24 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:              db,
-		Connection:      q.Connection.replaceDB(db),
-		ConnectionGroup: q.ConnectionGroup.replaceDB(db),
-		Credential:      q.Credential.replaceDB(db),
+		db:         db,
+		Credential: q.Credential.replaceDB(db),
+		Group:      q.Group.replaceDB(db),
+		Host:       q.Host.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Connection      IConnectionDo
-	ConnectionGroup IConnectionGroupDo
-	Credential      ICredentialDo
+	Credential ICredentialDo
+	Group      IGroupDo
+	Host       IHostDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Connection:      q.Connection.WithContext(ctx),
-		ConnectionGroup: q.ConnectionGroup.WithContext(ctx),
-		Credential:      q.Credential.WithContext(ctx),
+		Credential: q.Credential.WithContext(ctx),
+		Group:      q.Group.WithContext(ctx),
+		Host:       q.Host.WithContext(ctx),
 	}
 }
 

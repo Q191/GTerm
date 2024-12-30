@@ -95,6 +95,7 @@ import { NButton, NGi, NGrid, NH3, NInput } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
+// import { CreateGroup } from '@/wailsjs/';
 
 const prefStore = usePreferencesStore();
 const dialogStore = useDialogStore();

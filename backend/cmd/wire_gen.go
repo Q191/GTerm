@@ -14,7 +14,6 @@ import (
 // Injectors from wire.go:
 
 func NewApp() *App {
-	database := initialize.InitDatabase()
 	httpListenerPort := initialize.InitHTTPServer()
 	logger := initialize.InitZap()
 	terminalSrv := &services.TerminalSrv{
@@ -24,12 +23,17 @@ func NewApp() *App {
 	preferencesSrv := &services.PreferencesSrv{
 		Logger: logger,
 	}
+	query := initialize.InitDatabase()
+	groupSrv := &services.GroupSrv{
+		Logger: logger,
+		Query:  query,
+	}
 	app := &App{
-		Database:         database,
 		HTTPListenerPort: httpListenerPort,
 		Logger:           logger,
 		TerminalSrv:      terminalSrv,
 		PreferencesSrv:   preferencesSrv,
+		GroupSrv:         groupSrv,
 	}
 	return app
 }

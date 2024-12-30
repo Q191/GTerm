@@ -13,11 +13,11 @@ var AppSet = wire.NewSet(wire.Struct(new(App), "*"))
 
 type App struct {
 	context          context.Context `wire:"-"`
-	Database         *initialize.Database
 	HTTPListenerPort *initialize.HTTPListenerPort
 	Logger           *zap.Logger
 	TerminalSrv      *services.TerminalSrv
 	PreferencesSrv   *services.PreferencesSrv
+	GroupSrv         *services.GroupSrv
 }
 
 func (a *App) Startup(ctx context.Context) {
@@ -29,5 +29,6 @@ func (a *App) Startup(ctx context.Context) {
 func (a *App) Bind() (services []any) {
 	services = append(services, a.TerminalSrv)
 	services = append(services, a.PreferencesSrv)
+	services = append(services, a.GroupSrv)
 	return
 }

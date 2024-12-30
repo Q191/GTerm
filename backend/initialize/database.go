@@ -15,7 +15,7 @@ type Database struct {
 	Query *query.Query
 }
 
-func InitDatabase() *Database {
+func InitDatabase() *query.Query {
 	database := &Database{}
 	localStorage := storage.NewLocalStorage(fmt.Sprintf("%s.%s", consts.ProjectName, consts.DatabaseDriver))
 	if err := localStorage.CreateDirectory(); err != nil {
@@ -28,12 +28,12 @@ func InitDatabase() *Database {
 		if err := database.autoMigrate(); err != nil {
 			panic(err)
 		}
-		return database
+		return database.Query
 	}
 	if err := database.connect(localStorage.Path); err != nil {
 		panic(err)
 	}
-	return database
+	return database.Query
 }
 
 func (d *Database) connect(dsn string) error {
@@ -48,9 +48,9 @@ func (d *Database) connect(dsn string) error {
 
 func (d *Database) autoMigrate() error {
 	models := []any{
-		model.Connection{},
+		model.Host{},
 		model.Credential{},
-		model.ConnectionGroup{},
+		model.Group{},
 	}
 	return d.db.AutoMigrate(models...)
 }

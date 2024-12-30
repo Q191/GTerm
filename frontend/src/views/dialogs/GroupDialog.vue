@@ -12,13 +12,7 @@
     transform-origin="center"
     @positive-click="handleConfirm"
   >
-    <NForm
-      ref="formRef"
-      :model="formValue"
-      :rules="rules"
-      label-placement="left"
-      label-width="80"
-    >
+    <NForm ref="formRef" :model="formValue" :rules="rules" label-placement="left" label-width="80">
       <NFormItem :label="$t('group_dialog.name')" path="name">
         <NInput v-model:value="formValue.name" clearable />
       </NFormItem>
@@ -82,4 +76,4 @@ const handleConfirm = () => {
 :deep(.n-input) {
   font-size: 13px;
 }
-</style> 
+</style>

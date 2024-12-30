@@ -8,9 +8,9 @@ import (
 
 func models() []any {
 	return []any{
-		model.Connection{},
+		model.Host{},
 		model.Credential{},
-		model.ConnectionGroup{},
+		model.Group{},
 	}
 }
 
