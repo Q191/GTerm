@@ -8,6 +8,8 @@ export const gtermLightTheme = {
   cardHoverColor: '#F8FAFC',
   borderColor: '#E2E8F0',
   primaryColor: '#4098FC',
+  textColor: '#1F2937',
+  secondaryText: '#6B7280',
 };
 
 export const gtermDarkTheme = {
@@ -20,6 +22,8 @@ export const gtermDarkTheme = {
   borderColor: '#1E293B',
   cardHoverColor: '#334155',
   primaryColor: '#60A5FA',
+  textColor: '#F3F4F6',
+  secondaryText: '#9CA3AF',
 };
 
 export const gtermTheme = (isDark: boolean) => {
@@ -28,3 +32,18 @@ export const gtermTheme = (isDark: boolean) => {
     menuHoverColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
   };
 };
+
+export interface GTermTheme {
+  titleColor: string;
+  ribbonColor: string;
+  ribbonActiveColor: string;
+  sidebarColor: string;
+  splitColor: string;
+  cardColor: string;
+  cardHoverColor: string;
+  borderColor: string;
+  primaryColor: string;
+  textColor: string;
+  secondaryText: string;
+  menuHoverColor: string;
+}
