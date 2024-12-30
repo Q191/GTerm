@@ -1,7 +1,7 @@
 <template>
   <NLayout class="content" has-sider>
     <NLayoutSider :width="60">
-      <SiderMenu class="settings" />
+      <Sider class="settings" />
     </NLayoutSider>
     <NLayoutContent>
       <NScrollbar>
@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import SiderMenu from '@/components/SiderMenu.vue';
+import Sider from '@/layouts/Sider.vue';
 import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
 import { NLayout, NLayoutContent, NLayoutSider, NScrollbar } from 'naive-ui';
@@ -26,7 +26,7 @@ const gtermThemeVars = computed(() => {
 
 <style lang="less" scoped>
 .content {
-  height: calc(100vh - 48px);
+  height: calc(100vh - 38px);
   border-top: 1px solid v-bind('gtermThemeVars.splitColor');
 }
 

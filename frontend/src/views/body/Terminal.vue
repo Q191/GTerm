@@ -128,7 +128,7 @@ onUnmounted(() => {
 
 <style lang="less" scoped>
 .xterm-container {
-  height: calc(100vh - 48px);
+  height: calc(100vh - 38px);
   width: 100%;
   display: flex;
 
@@ -139,6 +139,9 @@ onUnmounted(() => {
   }
 
   :deep(.xterm) {
+    .xterm-viewport {
+      overflow: hidden;
+    }
     flex-grow: 1;
     display: flex;
     padding: 8px 0px 8px 8px;

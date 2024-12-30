@@ -7,6 +7,7 @@ export const gtermLightTheme = {
   cardColor: '#FFFFFF',
   cardHoverColor: '#F8FAFC',
   borderColor: '#E2E8F0',
+  primaryColor: '#4098FC',
 };
 
 export const gtermDarkTheme = {
@@ -18,6 +19,7 @@ export const gtermDarkTheme = {
   cardColor: '#1E293B',
   borderColor: '#1E293B',
   cardHoverColor: '#334155',
+  primaryColor: '#60A5FA',
 };
 
 export const gtermTheme = (isDark: boolean) => {

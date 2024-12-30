@@ -6,7 +6,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'Home',
     redirect: 'content/host',
-    component: () => import('@/layouts/Basic.vue'),
+    component: () => import('@/layouts/BasicLayout.vue'),
     children: [
       {
         path: '/terminal',
@@ -21,7 +21,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'content',
         name: 'Content',
-        component: () => import('@/layouts/Content.vue'),
+        component: () => import('@/layouts/Main.vue'),
         children: [
           {
             path: 'host',

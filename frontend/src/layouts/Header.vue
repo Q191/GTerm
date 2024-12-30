@@ -58,6 +58,7 @@ const reduction = () => {
   --wails-draggable: drag;
   background: v-bind('gtermThemeVars.titleColor');
   width: 100%;
+  height: 38px;
 }
 .hover\:bg-custom-hover:hover {
   background-color: v-bind('gtermThemeVars.splitColor');

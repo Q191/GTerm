@@ -10,6 +10,5 @@ declare module 'vue' {
     ConnectionTabs: typeof import('./components/ConnectionTabs.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SiderMenu: typeof import('./components/SiderMenu.vue')['default']
   }
 }
