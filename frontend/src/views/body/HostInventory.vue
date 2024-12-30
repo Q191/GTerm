@@ -1,65 +1,103 @@
 <template>
-  <div class="p-2">
-    <NInput placeholder="Find a host or user@hostname...">
-      <template #suffix>
-        <NButton size="tiny" type="primary" disabled>connect</NButton>
-      </template>
-    </NInput>
-  </div>
-  <div class="mx-2 flex space-x-2">
-    <NButton size="small" strong secondary @click="dialogStore.openAddServerDialog">
-      <Icon icon="ph:hard-drives-duotone" class="mr-1" />
-      添加服务器
-    </NButton>
-  </div>
+  <div class="inventory-container">
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+      <NInput placeholder="搜索主机或用户@主机名..." round>
+        <template #prefix>
+          <Icon icon="ph:magnifying-glass-duotone" />
+        </template>
+        <template #suffix>
+          <NButton size="tiny" type="primary" ghost>连接</NButton>
+        </template>
+      </NInput>
+    </div>
 
-  <NH3 class="mx-5" prefix="bar" align-text>分组</NH3>
+    <!-- 工具栏 -->
+    <div class="toolbar">
+      <NButton size="small" type="primary" ghost @click="dialogStore.openAddServerDialog">
+        <template #icon>
+          <Icon icon="ph:plus-circle-duotone" />
+        </template>
+        添加服务器
+      </NButton>
+      <NButton size="small" ghost>
+        <template #icon>
+          <Icon icon="ph:folder-simple-plus-duotone" />
+        </template>
+        新建分组
+      </NButton>
+    </div>
 
-  <div class="mx-5 mt-2 mp-2">
-    <NGrid x-gap="8" y-gap="8" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
-      <NGi v-for="index in 3" :key="index">
-        <div class="p-2 flex justify-between items-center card-style" @click="toTerminal">
-          <div class="flex items-center">
-            <Icon icon="ph:squares-four-duotone" class="bg-blue-500 rounded-lg p-1" style="font-size: 34px" />
-            <div class="flex flex-col ml-5">
-              <p>测试分组</p>
-              <div class="type-size">7 Hosts</div>
+    <!-- 分组列表 -->
+    <div class="section">
+      <div class="section-header">
+        <NH3 prefix="bar">分组</NH3>
+        <span class="text-count">共 3 个分组</span>
+      </div>
+
+      <NGrid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
+        <NGi v-for="index in 3" :key="index">
+          <div class="card group" @click="toTerminal">
+            <div class="card-content">
+              <div class="card-icon">
+                <Icon icon="ph:folders-duotone" />
+              </div>
+              <div class="card-info">
+                <div class="card-title">测试分组</div>
+                <div class="card-subtitle">7 台主机</div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <NButton text circle class="action-btn">
+                <template #icon>
+                  <Icon icon="ph:pencil-simple-duotone" />
+                </template>
+              </NButton>
             </div>
           </div>
-          <div class="hover:bg-custom-hover rounded-lg p-1"><Edit /></div>
-        </div>
-      </NGi>
-    </NGrid>
-  </div>
+        </NGi>
+      </NGrid>
+    </div>
 
-  <NH3 class="mx-5" prefix="bar" align-text>主机列表</NH3>
+    <!-- 主机列表 -->
+    <div class="section">
+      <div class="section-header">
+        <NH3 prefix="bar">主机列表</NH3>
+        <span class="text-count">共 100 台主机</span>
+      </div>
 
-  <div class="mx-5 mt-2 mb-5">
-    <NGrid x-gap="8" y-gap="8" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
-      <NGi v-for="index in 100" :key="index">
-        <div class="p-2 flex justify-between items-center card-style" @click="toTerminal">
-          <div class="flex items-center">
-            <Centos size="34" color="#FFF" class="bg-blue-500 rounded-lg p-1" />
-            <div class="flex flex-col ml-5">
-              <p>测试服务器</p>
-              <div class="type-size">ssh,root</div>
+      <NGrid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
+        <NGi v-for="index in 100" :key="index">
+          <div class="card group" @click="toTerminal">
+            <div class="card-content">
+              <div class="card-icon">
+                <Icon icon="ph:linux-logo-duotone" />
+              </div>
+              <div class="card-info">
+                <div class="card-title">测试服务器</div>
+                <div class="card-subtitle">ssh://root@192.168.1.100</div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <NButton text circle class="action-btn">
+                <template #icon>
+                  <Icon icon="ph:pencil-simple-duotone" />
+                </template>
+              </NButton>
             </div>
           </div>
-          <div class="hover:bg-custom-hover rounded-lg p-1"><Edit /></div>
-        </div>
-      </NGi>
-    </NGrid>
+        </NGi>
+      </NGrid>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Centos from '@/assets/icons/Centos.vue';
-import Edit from '@/assets/icons/Edit.vue';
+import { Icon } from '@iconify/vue';
+import { NButton, NGi, NGrid, NH3, NInput } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
-import { Icon } from '@iconify/vue';
-import { NButton, NGi, NGrid, NH3, NInput } from 'naive-ui';
 
 const prefStore = usePreferencesStore();
 const dialogStore = useDialogStore();
@@ -75,28 +113,115 @@ const gtermThemeVars = computed(() => {
 </script>
 
 <style lang="less" scoped>
-.card-style {
-  height: 60px;
-  border-radius: 1rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
+.inventory-container {
+  padding: 16px 24px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.search-bar {
+  margin-bottom: 16px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.section {
+  margin-bottom: 24px;
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    :deep(.n-h3) {
+      margin: 0;
+    }
+  }
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 8px;
   background-color: v-bind('gtermThemeVars.cardColor');
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border: 1px solid v-bind('gtermThemeVars.borderColor');
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: v-bind('gtermThemeVars.cardHoverColor');
+    border-color: v-bind('gtermThemeVars.splitColor');
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: v-bind('gtermThemeVars.primaryColor');
+    color: white;
+    font-size: 24px;
+
+    :deep(svg) {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .card-info {
+    .card-title {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: v-bind('gtermThemeVars.secondaryText');
+      opacity: 0.7;
+    }
+  }
+
+  .card-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover .card-actions {
+    opacity: 1;
+  }
+
+  .action-btn {
+    color: v-bind('gtermThemeVars.textColor');
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+      background-color: v-bind('gtermThemeVars.splitColor');
+    }
+  }
 }
 
-.card-style:hover {
-  background-color: v-bind('gtermThemeVars.cardHoverColor');
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-  border-color: v-bind('gtermThemeVars.splitColor');
-}
-
-.type-size {
+.text-count {
   font-size: 12px;
-  color: #666;
-}
-
-.hover\:bg-custom-hover:hover {
-  background-color: v-bind('gtermThemeVars.splitColor');
+  color: v-bind('gtermThemeVars.secondaryText');
+  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 </style>
