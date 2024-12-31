@@ -1,11 +1,12 @@
 <template>
   <div ref="widthRef" class="flex items-center justify-between h-12 header rounded-t-lg">
     <div
-      class="flex items-center"
+      class="flex items-center absolute transition-all duration-300 ease-in-out"
       :class="{
-        'justify-center flex-1': !hasConnections,
         'pl-2': !isDarwin,
         'pl-20': isDarwin,
+        'left-1/2 -translate-x-1/2': !hasConnections,
+        'left-0 translate-x-0': hasConnections,
       }"
     >
       <div class="flex items-center" @click="toHost">
@@ -83,11 +84,8 @@ onMounted(async () => {
   width: 100%;
   height: 38px;
 }
+
 .hover\:bg-custom-hover:hover {
   background-color: v-bind('gtermThemeVars.splitColor');
-}
-
-:deep(.connection-tabs) {
-  --wails-draggable: none;
 }
 </style>
