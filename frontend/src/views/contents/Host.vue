@@ -59,7 +59,7 @@
     <!-- 主机列表 -->
     <div class="section">
       <div class="section-header">
-        <NH3 prefix="bar">主机列表</NH3>
+        <NH3 prefix="bar">主机</NH3>
         <span class="text-count">共 {{ hosts?.length }} 台主机</span>
       </div>
 
@@ -119,20 +119,26 @@ const handleEditHost = (event: MouseEvent) => {
   dialogStore.openAddHostDialog(true);
 };
 
-onMounted(async () => {
-  const groupResp = await ListGroup();
-  if (!groupResp.ok) {
-    message.error(groupResp.msg);
-    return;
+const fetchGroups = async () => {
+  const resp = await ListGroup();
+  if (!resp.ok) {
+    message.error(resp.msg);
   }
-  groups.value = groupResp.data;
+  return resp.data;
+};
 
-  const hostResp = await ListHost();
-  if (!hostResp.ok) {
-    message.error(hostResp.msg);
-    return;
+const fetchHosts = async () => {
+  const resp = await ListHost();
+  if (!resp.ok) {
+    message.error(resp.msg);
   }
-  hosts.value = hostResp.data;
+  return resp.data;
+};
+
+onMounted(async () => {
+  const [groupsData, hostsData] = await Promise.all([fetchGroups(), fetchHosts()]);
+  groups.value = groupsData;
+  hosts.value = hostsData;
 });
 </script>
 

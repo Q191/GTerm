@@ -7,8 +7,8 @@
         <template #trigger>
           <div
             class="w-11 h-9 mb-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
-            :class="{ 'bg-active': selectedKey === 'host' }"
-            @click="handleSelect('host')"
+            :class="{ 'bg-active': selectedKey === 'Host' }"
+            @click="handleSelect('Host')"
           >
             <NIcon size="large" class="icon-hover">
               <Icon icon="ph:hard-drives-duotone" />
@@ -23,8 +23,8 @@
         <template #trigger>
           <div
             class="w-11 h-9 mb-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
-            :class="{ 'bg-active': selectedKey === 'credentials' }"
-            @click="handleSelect('credentials')"
+            :class="{ 'bg-active': selectedKey === 'Credentials' }"
+            @click="handleSelect('Credentials')"
           >
             <NIcon size="large" class="icon-hover">
               <Icon icon="ph:key-duotone" />
@@ -32,54 +32,6 @@
           </div>
         </template>
         登录凭证
-      </NTooltip>
-
-      <!-- 端口转发 -->
-      <NTooltip placement="right" trigger="hover">
-        <template #trigger>
-          <div
-            class="w-11 h-9 mb-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
-            :class="{ 'bg-active': selectedKey === 'port-forwarding' }"
-            @click="handleSelect('port-forwarding')"
-          >
-            <NIcon size="large" class="icon-hover">
-              <Icon icon="ph:arrows-left-right-duotone" />
-            </NIcon>
-          </div>
-        </template>
-        端口转发
-      </NTooltip>
-
-      <!-- 代码片段 -->
-      <NTooltip placement="right" trigger="hover">
-        <template #trigger>
-          <div
-            class="w-11 h-9 mb-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
-            :class="{ 'bg-active': selectedKey === 'snippets' }"
-            @click="handleSelect('snippets')"
-          >
-            <NIcon size="large" class="icon-hover">
-              <Icon icon="ph:code-duotone" />
-            </NIcon>
-          </div>
-        </template>
-        代码片段
-      </NTooltip>
-
-      <!-- 历史记录 -->
-      <NTooltip placement="right" trigger="hover">
-        <template #trigger>
-          <div
-            class="w-11 h-9 mb-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
-            :class="{ 'bg-active': selectedKey === 'history' }"
-            @click="handleSelect('history')"
-          >
-            <NIcon size="large" class="icon-hover">
-              <Icon icon="ph:clock-counter-clockwise-duotone" />
-            </NIcon>
-          </div>
-        </template>
-        历史记录
       </NTooltip>
     </div>
 
@@ -117,7 +69,10 @@
       <!-- Github链接 -->
       <NTooltip placement="right" trigger="hover">
         <template #trigger>
-          <div class="w-11 h-9 mt-2 flex justify-center items-center cursor-pointer" @click="openGithub">
+          <div
+            class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
+            @click="openGithub"
+          >
             <NIcon size="large" class="icon-hover">
               <Icon icon="ph:github-logo-duotone" />
             </NIcon>
@@ -141,7 +96,7 @@ import { useDialogStore } from '@/stores/dialog';
 const router = useRouter();
 const prefStore = usePreferencesStore();
 const dialogStore = useDialogStore();
-const selectedKey = ref('host');
+const selectedKey = ref('Host');
 
 const gtermThemeVars = computed(() => {
   return gtermTheme(prefStore.isDark);
@@ -194,7 +149,7 @@ const handleSettingsSelect = (key: string) => {
 
 // 切换主题
 const toggleTheme = () => {
-  prefStore.toDark();
+  prefStore.isDark ? prefStore.toLight() : prefStore.toDark();
 };
 
 // 打开 Github
@@ -206,7 +161,7 @@ const openGithub = () => {
 <style lang="less" scoped>
 .menu-background {
   background-color: v-bind('gtermThemeVars.sidebarColor');
-  height: 100vh;
+  height: calc(100vh - 38px);
 }
 
 .hover\:bg-custom-hover:hover {

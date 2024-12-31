@@ -60,9 +60,9 @@ const rules: FormRules = {
 const handleConfirm = async () => {
   try {
     await formRef.value?.validate();
-    const { ok, msg, data } = await CreateGroup(formValue.value);
-    if (!ok) {
-      message.error(msg);
+    const resp = await CreateGroup(formValue.value);
+    if (!resp.ok) {
+      message.error(resp.msg);
     } else {
       message.success('创建成功');
     }

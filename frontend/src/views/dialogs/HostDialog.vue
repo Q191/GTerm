@@ -175,23 +175,27 @@ const rules = computed<FormRules>(() => ({
 const groupOptions = ref<SelectMixedOption[]>([]);
 
 onMounted(async () => {
-  const { ok, msg, data } = await ListGroup();
-  if (!ok) {
-    message.error(msg);
-    return;
-  }
-  groupOptions.value = data.map((group: model.Group) => ({
+  const groups = await fetchGroups();
+  groupOptions.value = groups.map((group: model.Group) => ({
     label: group.name,
     value: group.id,
   }));
 });
 
+const fetchGroups = async () => {
+  const resp = await ListGroup();
+  if (!resp.ok) {
+    message.error(resp.msg);
+  }
+  return resp.data;
+};
+
 const handleConfirm = async () => {
   try {
     await formRef.value?.validate();
-    const { ok, msg, data } = await CreateHost(formValue.value);
-    if (!ok) {
-      message.error(msg);
+    const resp = await CreateHost(formValue.value);
+    if (!resp.ok) {
+      message.error(resp.msg);
     } else {
       message.success('创建成功');
     }
