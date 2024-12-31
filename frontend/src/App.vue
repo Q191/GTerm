@@ -1,11 +1,13 @@
 <template>
-  <NConfigProvider :theme="currentTheme" :theme-overrides="currentThemeOverrides">
-    <router-view />
-    <AboutDialog />
-    <HostDialog />
-    <GroupDialog />
-    <SettingDialog />
-  </NConfigProvider>
+  <NMessageProvider placement="bottom-right">
+    <NConfigProvider :theme="currentTheme" :theme-overrides="currentThemeOverrides">
+      <router-view />
+      <AboutDialog />
+      <HostDialog />
+      <GroupDialog />
+      <SettingDialog />
+    </NConfigProvider>
+  </NMessageProvider>
 </template>
 
 <script lang="ts" setup>
@@ -14,7 +16,7 @@ import { darkThemeOverrides, themeOverrides } from '@/themes/naive-theme';
 import AboutDialog from '@/views/dialogs/AboutDialog.vue';
 import HostDialog from '@/views/dialogs/HostDialog.vue';
 import SettingDialog from '@/views/dialogs/SettingDialog.vue';
-import { darkTheme, NConfigProvider } from 'naive-ui';
+import { darkTheme, NConfigProvider, NMessageProvider } from 'naive-ui';
 import GroupDialog from '@/views/dialogs/GroupDialog.vue';
 
 const prefStore = usePreferencesStore();

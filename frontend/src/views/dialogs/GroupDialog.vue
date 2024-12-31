@@ -31,20 +31,18 @@
 
 <script lang="ts" setup>
 import { useDialogStore } from '@/stores/dialog';
-import { FormInst, FormRules, NForm, NFormItem, NInput, NModal } from 'naive-ui';
+import { FormInst, FormRules, NForm, NFormItem, NInput, NModal, useMessage } from 'naive-ui';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { CreateGroup } from '@wailsApp/go/services/GroupSrv';
+import { model } from '@wailsApp/go/models';
 
 const { t } = useI18n();
 const dialogStore = useDialogStore();
 const formRef = ref<FormInst | null>(null);
+const message = useMessage();
 
-interface FormState {
-  name: string;
-  description: string;
-}
-
-const formValue = ref<FormState>({
+const formValue = ref<model.Group>({
   name: '',
   description: '',
 });
@@ -57,11 +55,15 @@ const rules: FormRules = {
   },
 };
 
-const handleConfirm = () => {
-  formRef.value?.validate(errors => {
+const handleConfirm = async () => {
+  formRef.value?.validate(async errors => {
     if (!errors) {
-      console.log('验证通过');
-      // TODO: 处理表单提交
+      const { ok, msg, data } = await CreateGroup(formValue.value);
+      if (!ok) {
+        message.error(msg);
+      } else {
+        message.success('创建成功');
+      }
       dialogStore.closeAddGroupDialog();
     }
   });

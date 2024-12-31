@@ -8,13 +8,13 @@ import (
 type Credential struct {
 	gorm.Model
 	Name                   string `gorm:"uniqueIndex;not null"`
-	Username               string `gorm:"not null"`
-	Password               string `gorm:"not null"`
-	PrivateKey             string `gorm:"not null"`
-	KeyPassword            string `gorm:"not null"`
-	Comment                string `gorm:"not null"`
-	PasswordLoginPreferred bool   `gorm:"not null"`
-	IsCommonCredential     bool   `gorm:"not null"`
+	Username               string
+	Password               string
+	PrivateKey             string
+	KeyPassword            string
+	Comment                string
+	PasswordLoginPreferred bool
+	IsCommonCredential     bool
 }
 
 func (c *Credential) TableName() string {

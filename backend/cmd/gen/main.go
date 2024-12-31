@@ -22,7 +22,7 @@ func main() {
 
 	g := gen.NewGenerator(gen.Config{
 		OutPath: "./backend/dal/query",
-		Mode:    gen.WithDefaultQuery | gen.WithQueryInterface,
+		Mode:    gen.WithDefaultQuery | gen.WithQueryInterface | gen.WithoutContext,
 	})
 
 	g.ApplyBasic(models()...)

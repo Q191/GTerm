@@ -32,6 +32,7 @@ func newGroup(db *gorm.DB, opts ...gen.DOOption) group {
 	_group.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_group.DeletedAt = field.NewField(tableName, "deleted_at")
 	_group.Name = field.NewString(tableName, "name")
+	_group.Description = field.NewString(tableName, "description")
 	_group.Hosts = groupHasManyHosts{
 		db: db.Session(&gorm.Session{}),
 
@@ -49,15 +50,16 @@ func newGroup(db *gorm.DB, opts ...gen.DOOption) group {
 }
 
 type group struct {
-	groupDo groupDo
+	groupDo
 
-	ALL       field.Asterisk
-	ID        field.Uint
-	CreatedAt field.Time
-	UpdatedAt field.Time
-	DeletedAt field.Field
-	Name      field.String
-	Hosts     groupHasManyHosts
+	ALL         field.Asterisk
+	ID          field.Uint
+	CreatedAt   field.Time
+	UpdatedAt   field.Time
+	DeletedAt   field.Field
+	Name        field.String
+	Description field.String
+	Hosts       groupHasManyHosts
 
 	fieldMap map[string]field.Expr
 }
@@ -79,19 +81,12 @@ func (g *group) updateTableName(table string) *group {
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.DeletedAt = field.NewField(table, "deleted_at")
 	g.Name = field.NewString(table, "name")
+	g.Description = field.NewString(table, "description")
 
 	g.fillFieldMap()
 
 	return g
 }
-
-func (g *group) WithContext(ctx context.Context) IGroupDo { return g.groupDo.WithContext(ctx) }
-
-func (g group) TableName() string { return g.groupDo.TableName() }
-
-func (g group) Alias() string { return g.groupDo.Alias() }
-
-func (g group) Columns(cols ...field.Expr) gen.Columns { return g.groupDo.Columns(cols...) }
 
 func (g *group) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := g.fieldMap[fieldName]
@@ -103,12 +98,13 @@ func (g *group) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *group) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 6)
+	g.fieldMap = make(map[string]field.Expr, 7)
 	g.fieldMap["id"] = g.ID
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["deleted_at"] = g.DeletedAt
 	g.fieldMap["name"] = g.Name
+	g.fieldMap["description"] = g.Description
 
 }
 

@@ -49,7 +49,7 @@ func newHost(db *gorm.DB, opts ...gen.DOOption) host {
 }
 
 type host struct {
-	hostDo hostDo
+	hostDo
 
 	ALL          field.Asterisk
 	ID           field.Uint
@@ -94,14 +94,6 @@ func (h *host) updateTableName(table string) *host {
 
 	return h
 }
-
-func (h *host) WithContext(ctx context.Context) IHostDo { return h.hostDo.WithContext(ctx) }
-
-func (h host) TableName() string { return h.hostDo.TableName() }
-
-func (h host) Alias() string { return h.hostDo.Alias() }
-
-func (h host) Columns(cols ...field.Expr) gen.Columns { return h.hostDo.Columns(cols...) }
 
 func (h *host) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := h.fieldMap[fieldName]

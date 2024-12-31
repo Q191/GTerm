@@ -5,10 +5,10 @@ import "gorm.io/gorm"
 type Host struct {
 	gorm.Model
 	Label        string `gorm:"uniqueIndex;not null"`
-	Address      string `gorm:"not null"`
-	Port         uint32 `gorm:"not null"`
-	Comment      string `gorm:"not null"`
-	CredentialID uint   `gorm:"not null"`
+	Address      string
+	Port         uint32
+	Comment      string
+	CredentialID uint
 	Credential   *Credential
 	GroupID      *uint
 }

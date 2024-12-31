@@ -46,7 +46,7 @@ func newCredential(db *gorm.DB, opts ...gen.DOOption) credential {
 }
 
 type credential struct {
-	credentialDo credentialDo
+	credentialDo
 
 	ALL                    field.Asterisk
 	ID                     field.Uint
@@ -94,16 +94,6 @@ func (c *credential) updateTableName(table string) *credential {
 
 	return c
 }
-
-func (c *credential) WithContext(ctx context.Context) ICredentialDo {
-	return c.credentialDo.WithContext(ctx)
-}
-
-func (c credential) TableName() string { return c.credentialDo.TableName() }
-
-func (c credential) Alias() string { return c.credentialDo.Alias() }
-
-func (c credential) Columns(cols ...field.Expr) gen.Columns { return c.credentialDo.Columns(cols...) }
 
 func (c *credential) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := c.fieldMap[fieldName]

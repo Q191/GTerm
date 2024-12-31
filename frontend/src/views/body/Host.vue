@@ -29,23 +29,23 @@
     <div class="section">
       <div class="section-header">
         <NH3 prefix="bar">分组</NH3>
-        <span class="text-count">共 3 个分组</span>
+        <span class="text-count">共 {{ groups?.length }} 个分组</span>
       </div>
 
       <NGrid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
-        <NGi v-for="index in 3" :key="index">
-          <div class="card group" @click="toTerminal">
+        <NGi v-for="v in groups" :key="v.name">
+          <div class="card group">
             <div class="card-content">
               <div class="card-icon">
                 <Icon icon="ph:folders-duotone" />
               </div>
               <div class="card-info">
-                <div class="card-title">测试分组</div>
-                <div class="card-subtitle">7 台主机</div>
+                <div class="card-title">{{ v.name }}</div>
+                <div class="card-subtitle">1 台主机</div>
               </div>
             </div>
             <div class="card-actions">
-              <NButton text circle class="action-btn" @click.stop="handleEditHost">
+              <NButton text circle class="action-btn">
                 <template #icon>
                   <Icon icon="ph:pencil-simple-duotone" />
                 </template>
@@ -91,15 +91,19 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NGi, NGrid, NH3, NInput } from 'naive-ui';
+import { NButton, NGi, NGrid, NH3, NInput, useMessage } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
-// import { CreateGroup } from '@/wailsjs/';
+import { ListGroup } from '@wailsApp/go/services/GroupSrv';
+import { model } from '@wailsApp/go/models';
 
 const prefStore = usePreferencesStore();
 const dialogStore = useDialogStore();
 const router = useRouter();
+const message = useMessage();
+
+const groups = ref<model.Group[]>();
 
 const toTerminal = () => {
   router.push({ name: 'Terminal' });
@@ -113,6 +117,15 @@ const handleEditHost = (event: MouseEvent) => {
   event.preventDefault();
   dialogStore.openAddHostDialog(true);
 };
+
+onMounted(async () => {
+  const { ok, msg, data } = await ListGroup();
+  if (!ok) {
+    message.error(msg);
+    return;
+  }
+  groups.value = data;
+});
 </script>
 
 <style lang="less" scoped>
