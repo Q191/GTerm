@@ -65,7 +65,7 @@
 
       <NGrid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
         <NGi v-for="v in hosts" :key="v.id">
-          <div class="card group" @click="toTerminal">
+          <div class="card group" @click="toTerminal(v)">
             <div class="card-content">
               <div class="card-icon">
                 <Icon icon="ph:linux-logo-duotone" />
@@ -97,16 +97,25 @@ import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
 import { ListGroup, ListHost } from '@wailsApp/go/services/GroupSrv';
 import { model } from '@wailsApp/go/models';
+import { useConnectionStore } from '@/stores/connection';
 
 const prefStore = usePreferencesStore();
 const dialogStore = useDialogStore();
 const router = useRouter();
 const message = useMessage();
+const connectionStore = useConnectionStore();
 
 const groups = ref<model.Group[]>();
 const hosts = ref<model.Host[]>();
 
-const toTerminal = () => {
+const toTerminal = (host: model.Host) => {
+  const connection = {
+    id: Date.now(),
+    name: host.name,
+    host: host.host,
+    username: host.credential?.username || '',
+  };
+  connectionStore.addConnection(connection);
   router.push({ name: 'Terminal' });
 };
 

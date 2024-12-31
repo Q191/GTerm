@@ -1,10 +1,18 @@
 <template>
   <div ref="widthRef" class="flex items-center justify-between h-12 header rounded-t-lg">
-    <div class="pl-2 flex-1 flex justify-center items-center">
+    <div
+      class="flex items-center"
+      :class="{
+        'justify-center flex-1': !hasConnections,
+        'pl-2': !IsDarwin(),
+        'pl-20': IsDarwin(),
+      }"
+    >
       <div class="flex items-center">
         <img src="@/assets/images/icon.png" alt="Logo" class="w-6 h-6" />
-        <span class="pl-2 text-base font-semibold">GTerm</span>
+        <span class="pl-2 text-base font-semibold" :class="{ hidden: hasConnections }">GTerm</span>
       </div>
+      <ConnectionTabs v-if="hasConnections" class="ml-4" />
     </div>
 
     <div v-if="!IsDarwin()" class="flex items-center mt-0">
@@ -31,8 +39,12 @@ import { NIcon } from 'naive-ui';
 import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
 import { IsDarwin } from '@wailsApp/go/services/PreferencesSrv';
+import ConnectionTabs from '@/components/ConnectionTabs.vue';
+import { useConnectionStore } from '@/stores/connection';
 
 const prefStore = usePreferencesStore();
+const connectionStore = useConnectionStore();
+const hasConnections = computed(() => connectionStore.hasConnections);
 
 const gtermThemeVars = computed(() => {
   return gtermTheme(prefStore.isDark);
@@ -62,5 +74,9 @@ const reduction = () => {
 }
 .hover\:bg-custom-hover:hover {
   background-color: v-bind('gtermThemeVars.splitColor');
+}
+
+:deep(.connection-tabs) {
+  --wails-draggable: none;
 }
 </style>
