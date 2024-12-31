@@ -34,10 +34,10 @@ func newCredential(db *gorm.DB, opts ...gen.DOOption) credential {
 	_credential.Name = field.NewString(tableName, "name")
 	_credential.Username = field.NewString(tableName, "username")
 	_credential.Password = field.NewString(tableName, "password")
+	_credential.AuthType = field.NewInt(tableName, "auth_type")
 	_credential.PrivateKey = field.NewString(tableName, "private_key")
 	_credential.KeyPassword = field.NewString(tableName, "key_password")
-	_credential.Comment = field.NewString(tableName, "comment")
-	_credential.PasswordLoginPreferred = field.NewBool(tableName, "password_login_preferred")
+	_credential.Description = field.NewString(tableName, "description")
 	_credential.IsCommonCredential = field.NewBool(tableName, "is_common_credential")
 
 	_credential.fillFieldMap()
@@ -48,19 +48,19 @@ func newCredential(db *gorm.DB, opts ...gen.DOOption) credential {
 type credential struct {
 	credentialDo
 
-	ALL                    field.Asterisk
-	ID                     field.Uint
-	CreatedAt              field.Time
-	UpdatedAt              field.Time
-	DeletedAt              field.Field
-	Name                   field.String
-	Username               field.String
-	Password               field.String
-	PrivateKey             field.String
-	KeyPassword            field.String
-	Comment                field.String
-	PasswordLoginPreferred field.Bool
-	IsCommonCredential     field.Bool
+	ALL                field.Asterisk
+	ID                 field.Uint
+	CreatedAt          field.Time
+	UpdatedAt          field.Time
+	DeletedAt          field.Field
+	Name               field.String
+	Username           field.String
+	Password           field.String
+	AuthType           field.Int
+	PrivateKey         field.String
+	KeyPassword        field.String
+	Description        field.String
+	IsCommonCredential field.Bool
 
 	fieldMap map[string]field.Expr
 }
@@ -84,10 +84,10 @@ func (c *credential) updateTableName(table string) *credential {
 	c.Name = field.NewString(table, "name")
 	c.Username = field.NewString(table, "username")
 	c.Password = field.NewString(table, "password")
+	c.AuthType = field.NewInt(table, "auth_type")
 	c.PrivateKey = field.NewString(table, "private_key")
 	c.KeyPassword = field.NewString(table, "key_password")
-	c.Comment = field.NewString(table, "comment")
-	c.PasswordLoginPreferred = field.NewBool(table, "password_login_preferred")
+	c.Description = field.NewString(table, "description")
 	c.IsCommonCredential = field.NewBool(table, "is_common_credential")
 
 	c.fillFieldMap()
@@ -113,10 +113,10 @@ func (c *credential) fillFieldMap() {
 	c.fieldMap["name"] = c.Name
 	c.fieldMap["username"] = c.Username
 	c.fieldMap["password"] = c.Password
+	c.fieldMap["auth_type"] = c.AuthType
 	c.fieldMap["private_key"] = c.PrivateKey
 	c.fieldMap["key_password"] = c.KeyPassword
-	c.fieldMap["comment"] = c.Comment
-	c.fieldMap["password_login_preferred"] = c.PasswordLoginPreferred
+	c.fieldMap["description"] = c.Description
 	c.fieldMap["is_common_credential"] = c.IsCommonCredential
 }
 

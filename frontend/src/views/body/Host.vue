@@ -33,7 +33,7 @@
       </div>
 
       <NGrid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
-        <NGi v-for="v in groups" :key="v.name">
+        <NGi v-for="v in groups" :key="v.id">
           <div class="card group">
             <div class="card-content">
               <div class="card-icon">
@@ -60,19 +60,19 @@
     <div class="section">
       <div class="section-header">
         <NH3 prefix="bar">主机列表</NH3>
-        <span class="text-count">共 100 台主机</span>
+        <span class="text-count">共 {{ hosts?.length }} 台主机</span>
       </div>
 
       <NGrid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
-        <NGi v-for="index in 100" :key="index">
+        <NGi v-for="v in hosts" :key="v.id">
           <div class="card group" @click="toTerminal">
             <div class="card-content">
               <div class="card-icon">
                 <Icon icon="ph:linux-logo-duotone" />
               </div>
               <div class="card-info">
-                <div class="card-title">测试服务器</div>
-                <div class="card-subtitle">ssh://root@192.168.1.100</div>
+                <div class="card-title">{{ v.name }}</div>
+                <div class="card-subtitle">ssh://{{ v.credential?.username }}@{{ v.host }}</div>
               </div>
             </div>
             <div class="card-actions">
@@ -95,7 +95,7 @@ import { NButton, NGi, NGrid, NH3, NInput, useMessage } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
-import { ListGroup } from '@wailsApp/go/services/GroupSrv';
+import { ListGroup, ListHost } from '@wailsApp/go/services/GroupSrv';
 import { model } from '@wailsApp/go/models';
 
 const prefStore = usePreferencesStore();
@@ -104,6 +104,7 @@ const router = useRouter();
 const message = useMessage();
 
 const groups = ref<model.Group[]>();
+const hosts = ref<model.Host[]>();
 
 const toTerminal = () => {
   router.push({ name: 'Terminal' });
@@ -119,12 +120,19 @@ const handleEditHost = (event: MouseEvent) => {
 };
 
 onMounted(async () => {
-  const { ok, msg, data } = await ListGroup();
-  if (!ok) {
-    message.error(msg);
+  const groupResp = await ListGroup();
+  if (!groupResp.ok) {
+    message.error(groupResp.msg);
     return;
   }
-  groups.value = data;
+  groups.value = groupResp.data;
+
+  const hostResp = await ListHost();
+  if (!hostResp.ok) {
+    message.error(hostResp.msg);
+    return;
+  }
+  hosts.value = hostResp.data;
 });
 </script>
 

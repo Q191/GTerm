@@ -8,31 +8,31 @@ import (
 	"go.uber.org/zap"
 )
 
-var GroupSrvSet = wire.NewSet(wire.Struct(new(GroupSrv), "*"))
+var HostSrvSet = wire.NewSet(wire.Struct(new(HostSrv), "*"))
 
-type GroupSrv struct {
+type HostSrv struct {
 	Logger *zap.Logger
 	Query  *query.Query
 }
 
-func (s *GroupSrv) CreateGroup(group *model.Group) *resp.Resp {
-	t := s.Query.Group
-	if err := t.Create(group); err != nil {
+func (s *GroupSrv) CreateHost(host *model.Host) *resp.Resp {
+	t := s.Query.Host
+	if err := t.Create(host); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
 	return resp.Ok()
 }
 
-func (s *GroupSrv) UpdateGroup(group *model.Host) *resp.Resp {
-	t := s.Query.Group
-	if _, err := t.Where(t.ID.Eq(group.ID)).Updates(group); err != nil {
+func (s *GroupSrv) UpdateHost(host *model.Host) *resp.Resp {
+	t := s.Query.Host
+	if _, err := t.Where(t.ID.Eq(host.ID)).Updates(host); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
 	return resp.Ok()
 }
 
-func (s *GroupSrv) DeleteGroup(id uint) *resp.Resp {
-	t := s.Query.Group
+func (s *GroupSrv) DeleteHost(id uint) *resp.Resp {
+	t := s.Query.Host
 	_, err := t.Where(t.ID.Eq(id)).Delete()
 	if err != nil {
 		return resp.FailWithMsg(err.Error())
@@ -40,11 +40,11 @@ func (s *GroupSrv) DeleteGroup(id uint) *resp.Resp {
 	return resp.Ok()
 }
 
-func (s *GroupSrv) ListGroup() *resp.Resp {
-	t := s.Query.Group
-	groups, err := t.Find()
+func (s *GroupSrv) ListHost() *resp.Resp {
+	t := s.Query.Host
+	hosts, err := t.Find()
 	if err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.OkWithData(groups)
+	return resp.OkWithData(hosts)
 }

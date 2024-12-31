@@ -15,12 +15,12 @@
     <NTabs animated type="line" v-model:value="activeTab">
       <NTabPane name="basic" :tab="$t('host_dialog.basic_config')">
         <NForm ref="formRef" :model="formValue" :rules="rules" label-placement="left" label-width="80">
-          <NFormItem :label="$t('host_dialog.label')" path="label">
-            <NInput v-model:value="formValue.label" clearable />
+          <NFormItem :label="$t('host_dialog.name')" path="name">
+            <NInput v-model:value="formValue.name" clearable />
           </NFormItem>
 
-          <NFormItem :label="$t('host_dialog.group')" path="group">
-            <NSelect v-model:value="formValue.group" :options="groupOptions" clearable tag />
+          <NFormItem :label="$t('host_dialog.group')" path="group_id">
+            <NSelect v-model:value="formValue.group_id" :options="groupOptions" clearable tag />
           </NFormItem>
 
           <div class="flex items-center w-full gap-2">
@@ -32,52 +32,64 @@
             </NFormItem>
           </div>
 
-          <NFormItem :label="$t('host_dialog.auth_type')" path="authType">
-            <NRadioGroup v-model:value="formValue.authType">
+          <NFormItem :label="$t('host_dialog.auth_type')" path="credential.auth_type">
+            <NRadioGroup v-model:value="formValue.credential!.auth_type">
               <NSpace>
-                <NRadio value="password">{{ $t('host_dialog.password') }}</NRadio>
-                <NRadio value="privateKey">{{ $t('host_dialog.private_key') }}</NRadio>
+                <NRadio :value="0">{{ $t('host_dialog.password') }}</NRadio>
+                <NRadio :value="1">{{ $t('host_dialog.private_key') }}</NRadio>
               </NSpace>
             </NRadioGroup>
           </NFormItem>
 
-          <NFormItem :label="$t('host_dialog.username')" path="username">
-            <NInput v-model:value="formValue.username" clearable />
+          <NFormItem :label="$t('host_dialog.username')" path="credential.username">
+            <NInput v-model:value="formValue.credential!.username" clearable />
           </NFormItem>
 
-          <template v-if="formValue.authType === 'password'">
-            <NFormItem :label="$t('host_dialog.password')" path="password">
-              <NInput v-model:value="formValue.password" type="password" show-password-on="click" clearable />
+          <template v-if="formValue.credential!.auth_type === 0">
+            <NFormItem :label="$t('host_dialog.password')" path="credential.password">
+              <NInput
+                v-model:value="formValue.credential!.password"
+                type="password"
+                show-password-on="click"
+                clearable
+              />
             </NFormItem>
           </template>
 
           <template v-else>
-            <NFormItem :label="$t('host_dialog.private_key')" path="privateKey">
-              <NInput v-model:value="formValue.privateKey" type="textarea" :rows="3" clearable />
+            <NFormItem :label="$t('host_dialog.private_key')" path="credential.private_key">
+              <NInput v-model:value="formValue.credential!.private_key" type="textarea" :rows="3" clearable />
             </NFormItem>
-            <NFormItem :label="$t('host_dialog.passphrase')" path="passphrase">
-              <NInput v-model:value="formValue.passphrase" type="password" show-password-on="click" clearable />
+            <NFormItem :label="$t('host_dialog.passphrase')" path="credential.key_password">
+              <NInput
+                v-model:value="formValue.credential!.key_password"
+                type="password"
+                show-password-on="click"
+                clearable
+              />
             </NFormItem>
           </template>
+
+          <NFormItem :label="$t('host_dialog.description')" path="description">
+            <NInput
+              v-model:value="formValue.description"
+              type="textarea"
+              :autosize="{ minRows: 3, maxRows: 5 }"
+              clearable
+            />
+          </NFormItem>
         </NForm>
       </NTabPane>
 
-      <NTabPane name="advanced" :tab="$t('host_dialog.advanced_config')">
-        <NForm :model="formValue" label-placement="left" label-width="100">
-          <NFormItem :label="$t('host_dialog.charset')" path="charset">
-            <NSelect v-model:value="formValue.charset" :options="charsetOptions" />
-          </NFormItem>
-          <NFormItem :label="$t('host_dialog.term_type')" path="termType">
-            <NSelect v-model:value="formValue.termType" :options="termTypeOptions" />
-          </NFormItem>
-        </NForm>
-      </NTabPane>
+      <NTabPane name="advanced" :tab="$t('host_dialog.advanced_config')"> </NTabPane>
     </NTabs>
   </NModal>
 </template>
 
 <script lang="ts" setup>
 import { useDialogStore } from '@/stores/dialog';
+import { model } from '@wailsApp/go/models';
+import { CreateGroup, CreateHost, ListGroup } from '@wailsApp/go/services/GroupSrv';
 import {
   FormInst,
   FormRules,
@@ -92,47 +104,39 @@ import {
   NSpace,
   NTabPane,
   NTabs,
+  useMessage,
 } from 'naive-ui';
-import { ref } from 'vue';
+import { SelectMixedOption } from 'naive-ui/es/select/src/interface';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 const dialogStore = useDialogStore();
 const formRef = ref<FormInst | null>(null);
 const activeTab = ref('basic');
+const message = useMessage();
 
-interface FormState {
-  label: string;
-  group: string;
-  host: string;
-  port: number;
-  authType: 'password' | 'privateKey';
-  username: string;
-  password: string;
-  privateKey: string;
-  passphrase: string;
-  charset: string;
-  termType: string;
-}
+const formValue = ref(
+  model.Host.createFrom({
+    name: '',
+    host: '',
+    port: 22,
+    description: '',
+    credential: model.Credential.createFrom({
+      username: '',
+      password: '',
+      auth_type: 0,
+      private_key: '',
+      key_password: '',
+      is_common_credential: false,
+    }),
+  }),
+);
 
-const formValue = ref<FormState>({
-  label: '',
-  group: '',
-  host: '',
-  port: 22,
-  authType: 'password',
-  username: '',
-  password: '',
-  privateKey: '',
-  passphrase: '',
-  charset: 'UTF-8',
-  termType: 'xterm-256color',
-});
-
-const rules: FormRules = {
-  label: {
+const rules = computed<FormRules>(() => ({
+  name: {
     required: true,
-    message: t('host_dialog.validation.label_required'),
+    message: t('host_dialog.validation.name_required'),
     trigger: 'blur',
   },
   host: {
@@ -142,40 +146,59 @@ const rules: FormRules = {
   },
   port: {
     required: true,
+    type: 'number',
     message: t('host_dialog.validation.port_required'),
-    trigger: 'blur',
+    trigger: ['blur', 'change'],
+    validator: (rule, value) => {
+      if (typeof value !== 'number' || value < 1 || value > 65535) {
+        return new Error(t('host_dialog.validation.port_invalid'));
+      }
+    },
   },
-  username: {
+  'credential.username': {
     required: true,
     message: t('host_dialog.validation.username_required'),
     trigger: 'blur',
   },
-};
+  'credential.password': {
+    required: formValue.value.credential?.auth_type === 0,
+    message: t('host_dialog.validation.password_required'),
+    trigger: 'blur',
+  },
+  'credential.private_key': {
+    required: formValue.value.credential?.auth_type === 1,
+    message: t('host_dialog.validation.private_key_required'),
+    trigger: 'blur',
+  },
+}));
 
-const groupOptions = [
-  { label: '开发环境', value: 'dev' },
-  { label: '测试环境', value: 'test' },
-  { label: '生产环境', value: 'prod' },
-];
+const groupOptions = ref<SelectMixedOption[]>([]);
 
-const charsetOptions = [
-  { label: 'UTF-8', value: 'UTF-8' },
-  { label: 'GBK', value: 'GBK' },
-];
+onMounted(async () => {
+  const { ok, msg, data } = await ListGroup();
+  if (!ok) {
+    message.error(msg);
+    return;
+  }
+  groupOptions.value = data.map((group: model.Group) => ({
+    label: group.name,
+    value: group.id,
+  }));
+});
 
-const termTypeOptions = [
-  { label: 'xterm', value: 'xterm' },
-  { label: 'xterm-256color', value: 'xterm-256color' },
-];
-
-const handleConfirm = () => {
-  formRef.value?.validate(errors => {
-    if (!errors) {
-      console.log('验证通过');
-      // TODO: 处理表单提交
-      dialogStore.closeAddHostDialog();
+const handleConfirm = async () => {
+  try {
+    await formRef.value?.validate();
+    const { ok, msg, data } = await CreateHost(formValue.value);
+    if (!ok) {
+      message.error(msg);
+    } else {
+      message.success('创建成功');
     }
-  });
+    dialogStore.closeAddHostDialog();
+  } catch (errors) {
+    return false;
+  }
 };
 </script>
 

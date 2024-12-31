@@ -2,28 +2,20 @@ package model
 
 import (
 	"github.com/OpenToolkitLab/GTerm/backend/enums"
-	"gorm.io/gorm"
 )
 
 type Credential struct {
-	gorm.Model
-	Name                   string `gorm:"uniqueIndex;not null"`
-	Username               string
-	Password               string
-	PrivateKey             string
-	KeyPassword            string
-	Comment                string
-	PasswordLoginPreferred bool
-	IsCommonCredential     bool
+	Common
+	Name               string         `gorm:"uniqueIndex;not null" json:"name"`
+	Username           string         `json:"username"`
+	Password           string         `json:"password"`
+	AuthType           enums.AuthType `json:"auth_type"`
+	PrivateKey         string         `json:"private_key"`
+	KeyPassword        string         `json:"key_password"`
+	Description        string         `json:"description"`
+	IsCommonCredential bool           `json:"is_common_credential"`
 }
 
 func (c *Credential) TableName() string {
 	return "credentials"
-}
-
-func (c *Credential) AuthType() enums.AuthType {
-	if !c.PasswordLoginPreferred && c.PrivateKey != "" {
-		return enums.PrivateKey
-	}
-	return enums.Password
 }

@@ -11,7 +11,8 @@
     "confirm": "确定",
     "basic_config": "基础配置",
     "advanced_config": "高级配置",
-    "label": "标签",
+    "name": "名称",
+    "description": "描述",
     "group": "分组",
     "host": "主机",
     "port": "端口",
@@ -26,7 +27,11 @@
       "label_required": "请输入标签名称",
       "host_required": "请输入主机地址",
       "port_required": "请输入端口号",
-      "username_required": "请输入用户名"
+      "username_required": "请输入用户名",
+      "name_required": "请输入名称",
+      "password_required": "请输入密码",
+      "private_key_required": "请输入私钥",
+      "port_invalid": "端口号必须在 1-65535 之间"
     }
   },
   "group_dialog": {

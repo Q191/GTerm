@@ -1,11 +1,9 @@
 package model
 
-import "gorm.io/gorm"
-
 type Group struct {
-	gorm.Model
+	Common
 	Name        string `json:"name" gorm:"uniqueIndex;not null"`
-	Description string `json:"description"`
+	Description string `json:"description" gorm:"not null"`
 	Hosts       []*Host
 }
 

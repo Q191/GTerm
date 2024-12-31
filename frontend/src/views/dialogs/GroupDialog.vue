@@ -42,10 +42,12 @@ const dialogStore = useDialogStore();
 const formRef = ref<FormInst | null>(null);
 const message = useMessage();
 
-const formValue = ref<model.Group>({
-  name: '',
-  description: '',
-});
+const formValue = ref(
+  model.Group.createFrom({
+    name: '',
+    description: '',
+  }),
+);
 
 const rules: FormRules = {
   name: {
@@ -56,17 +58,18 @@ const rules: FormRules = {
 };
 
 const handleConfirm = async () => {
-  formRef.value?.validate(async errors => {
-    if (!errors) {
-      const { ok, msg, data } = await CreateGroup(formValue.value);
-      if (!ok) {
-        message.error(msg);
-      } else {
-        message.success('创建成功');
-      }
-      dialogStore.closeAddGroupDialog();
+  try {
+    await formRef.value?.validate();
+    const { ok, msg, data } = await CreateGroup(formValue.value);
+    if (!ok) {
+      message.error(msg);
+    } else {
+      message.success('创建成功');
     }
-  });
+    dialogStore.closeAddHostDialog();
+  } catch (errors) {
+    return false;
+  }
 };
 </script>
 
