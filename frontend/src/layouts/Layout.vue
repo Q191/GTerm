@@ -4,8 +4,8 @@
       <Header />
     </NLayoutHeader>
 
-    <NLayout has-sider>
-      <NLayoutSider bordered :width="60">
+    <NLayout :has-sider="!isTerminal">
+      <NLayoutSider v-if="!isTerminal" bordered :width="60">
         <Sider />
       </NLayoutSider>
       <NLayoutContent>
@@ -20,5 +20,10 @@
 <script lang="ts" setup>
 import Header from '@/layouts/Header.vue';
 import Sider from '@/layouts/Sider.vue';
-import { NLayout, NLayoutContent, NLayoutSider, NScrollbar } from 'naive-ui';
+import { NLayout, NLayoutContent, NLayoutHeader, NLayoutSider, NScrollbar } from 'naive-ui';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+const route = useRoute();
+const isTerminal = computed(() => route.name === 'Terminal');
 </script>

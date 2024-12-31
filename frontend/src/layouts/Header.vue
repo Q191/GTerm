@@ -8,7 +8,7 @@
         'pl-20': IsDarwin(),
       }"
     >
-      <div class="flex items-center">
+      <div class="flex items-center" @click="toHost">
         <img src="@/assets/images/icon.png" alt="Logo" class="w-6 h-6" />
         <span class="pl-2 text-base font-semibold" :class="{ hidden: hasConnections }">GTerm</span>
       </div>
@@ -45,6 +45,11 @@ import { useConnectionStore } from '@/stores/connection';
 const prefStore = usePreferencesStore();
 const connectionStore = useConnectionStore();
 const hasConnections = computed(() => connectionStore.hasConnections);
+const router = useRouter();
+
+const toHost = () => {
+  router.push({ name: 'Host' });
+};
 
 const gtermThemeVars = computed(() => {
   return gtermTheme(prefStore.isDark);
