@@ -20,7 +20,7 @@
         <NText class="about-link" @click="onOpenWebsite">{{ $t('about.website') }}</NText>
       </NSpace>
       <div :style="{ color: themeVars.textColor3 }" class="about-copyright">
-        Copyright © 2024 OpenToolkitLab All rights reserved
+        Copyright © 2024 MisakaTAT All rights reserved
       </div>
     </NSpace>
   </NModal>
@@ -43,11 +43,11 @@ const dialogStore = useDialogStore();
 const themeVars = useThemeVars();
 
 const onOpenSource = () => {
-  BrowserOpenURL('https://github.com/OpenToolkitLab/GTerm');
+  BrowserOpenURL('https://github.com/MisakaTAT/GTerm');
 };
 
 const onOpenWebsite = () => {
-  BrowserOpenURL('https://github.com/OpenToolkitLab');
+  BrowserOpenURL('https://github.com/MisakaTAT');
 };
 </script>
 
