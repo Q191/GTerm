@@ -4,8 +4,8 @@
       class="flex items-center"
       :class="{
         'justify-center flex-1': !hasConnections,
-        'pl-2': !IsDarwin(),
-        'pl-20': IsDarwin(),
+        'pl-2': !isDarwin,
+        'pl-20': isDarwin,
       }"
     >
       <div class="flex items-center" @click="toHost">
@@ -15,7 +15,7 @@
       <ConnectionTabs v-if="hasConnections" class="ml-4" />
     </div>
 
-    <div v-if="!IsDarwin()" class="flex items-center mt-0">
+    <div v-if="!isDarwin" class="flex items-center mt-0">
       <div class="w-12 h-12 flex items-center justify-center hover:bg-custom-hover" @click="WindowMinimise">
         <NIcon size="20"><Remove /></NIcon>
       </div>
@@ -47,6 +47,8 @@ const connectionStore = useConnectionStore();
 const hasConnections = computed(() => connectionStore.hasConnections);
 const router = useRouter();
 
+const isDarwin = ref(false);
+
 const toHost = () => {
   router.push({ name: 'Host' });
 };
@@ -68,6 +70,10 @@ const reduction = () => {
     }
   });
 };
+
+onMounted(async () => {
+  isDarwin.value = await IsDarwin();
+});
 </script>
 
 <style lang="less" scoped>
