@@ -1,5 +1,5 @@
 <template>
-  <NModal
+  <n-modal
     v-model:show="dialogStore.hostDialogVisible"
     :close-on-esc="true"
     :negative-text="$t('host_dialog.cancel')"
@@ -12,78 +12,78 @@
     transform-origin="center"
     @positive-click="handleConfirm"
   >
-    <NTabs animated type="line" v-model:value="activeTab">
-      <NTabPane name="basic" :tab="$t('host_dialog.basic_config')">
-        <NForm ref="formRef" :model="formValue" :rules="rules" label-placement="left" label-width="80">
-          <NFormItem :label="$t('host_dialog.name')" path="name">
-            <NInput v-model:value="formValue.name" clearable />
-          </NFormItem>
+    <n-tabs animated type="line" v-model:value="activeTab">
+      <n-tab-pane name="basic" :tab="$t('host_dialog.basic_config')">
+        <n-form ref="formRef" :model="formValue" :rules="rules" label-placement="left" label-width="80">
+          <n-form-item :label="$t('host_dialog.name')" path="name">
+            <n-input v-model:value="formValue.name" clearable />
+          </n-form-item>
 
-          <NFormItem :label="$t('host_dialog.group')" path="group_id">
-            <NSelect v-model:value="formValue.group_id" :options="groupOptions" clearable tag />
-          </NFormItem>
+          <n-form-item :label="$t('host_dialog.group')" path="group_id">
+            <n-select v-model:value="formValue.group_id" :options="groupOptions" clearable tag />
+          </n-form-item>
 
           <div class="flex items-center w-full gap-2">
-            <NFormItem :label="$t('host_dialog.host')" path="host" class="flex-1">
-              <NInput v-model:value="formValue.host" clearable />
-            </NFormItem>
-            <NFormItem path="port" class="port-input">
-              <NInputNumber v-model:value="formValue.port" :min="1" :max="65535" />
-            </NFormItem>
+            <n-form-item :label="$t('host_dialog.host')" path="host" class="flex-1">
+              <n-input v-model:value="formValue.host" clearable />
+            </n-form-item>
+            <n-form-item path="port" class="port-input">
+              <n-input-number v-model:value="formValue.port" :min="1" :max="65535" />
+            </n-form-item>
           </div>
 
-          <NFormItem :label="$t('host_dialog.auth_type')" path="credential.auth_type">
-            <NRadioGroup v-model:value="formValue.credential!.auth_type">
-              <NSpace>
-                <NRadio :value="0">{{ $t('host_dialog.password') }}</NRadio>
-                <NRadio :value="1">{{ $t('host_dialog.private_key') }}</NRadio>
-              </NSpace>
-            </NRadioGroup>
-          </NFormItem>
+          <n-form-item :label="$t('host_dialog.auth_type')" path="credential.auth_type">
+            <n-radio-group v-model:value="formValue.credential!.auth_type">
+              <n-space>
+                <n-radio :value="0">{{ $t('host_dialog.password') }}</n-radio>
+                <n-radio :value="1">{{ $t('host_dialog.private_key') }}</n-radio>
+              </n-space>
+            </n-radio-group>
+          </n-form-item>
 
-          <NFormItem :label="$t('host_dialog.username')" path="credential.username">
-            <NInput v-model:value="formValue.credential!.username" clearable />
-          </NFormItem>
+          <n-form-item :label="$t('host_dialog.username')" path="credential.username">
+            <n-input v-model:value="formValue.credential!.username" clearable />
+          </n-form-item>
 
           <template v-if="formValue.credential!.auth_type === 0">
-            <NFormItem :label="$t('host_dialog.password')" path="credential.password">
-              <NInput
+            <n-form-item :label="$t('host_dialog.password')" path="credential.password">
+              <n-input
                 v-model:value="formValue.credential!.password"
                 type="password"
                 show-password-on="click"
                 clearable
               />
-            </NFormItem>
+            </n-form-item>
           </template>
 
           <template v-else>
-            <NFormItem :label="$t('host_dialog.private_key')" path="credential.private_key">
-              <NInput v-model:value="formValue.credential!.private_key" type="textarea" :rows="3" clearable />
-            </NFormItem>
-            <NFormItem :label="$t('host_dialog.passphrase')" path="credential.key_password">
-              <NInput
+            <n-form-item :label="$t('host_dialog.private_key')" path="credential.private_key">
+              <n-input v-model:value="formValue.credential!.private_key" type="textarea" :rows="3" clearable />
+            </n-form-item>
+            <n-form-item :label="$t('host_dialog.passphrase')" path="credential.key_password">
+              <n-input
                 v-model:value="formValue.credential!.key_password"
                 type="password"
                 show-password-on="click"
                 clearable
               />
-            </NFormItem>
+            </n-form-item>
           </template>
 
-          <NFormItem :label="$t('host_dialog.description')" path="description">
-            <NInput
+          <n-form-item :label="$t('host_dialog.description')" path="description">
+            <n-input
               v-model:value="formValue.description"
               type="textarea"
               :autosize="{ minRows: 3, maxRows: 5 }"
               clearable
             />
-          </NFormItem>
-        </NForm>
-      </NTabPane>
+          </n-form-item>
+        </n-form>
+      </n-tab-pane>
 
-      <NTabPane name="advanced" :tab="$t('host_dialog.advanced_config')"> </NTabPane>
-    </NTabs>
-  </NModal>
+      <n-tab-pane name="advanced" :tab="$t('host_dialog.advanced_config')"> </n-tab-pane>
+    </n-tabs>
+  </n-modal>
 </template>
 
 <script lang="ts" setup>

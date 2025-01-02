@@ -3,83 +3,83 @@
     <!-- 主导航按钮组 -->
     <div class="flex-grow flex flex-col items-center pt-2">
       <!-- 资产清单 -->
-      <NTooltip placement="right" trigger="hover">
+      <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
             class="w-11 h-9 mb-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
             :class="{ 'bg-active': selectedKey === 'Host' }"
             @click="handleSelect('Host')"
           >
-            <NIcon size="large" class="icon-hover">
-              <Icon icon="ph:hard-drives-duotone" />
-            </NIcon>
+            <n-icon size="large" class="icon-hover">
+              <icon icon="ph:hard-drives-duotone" />
+            </n-icon>
           </div>
         </template>
         资产清单
-      </NTooltip>
+      </n-tooltip>
 
       <!-- 登录凭证 -->
-      <NTooltip placement="right" trigger="hover">
+      <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
             class="w-11 h-9 mb-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
             :class="{ 'bg-active': selectedKey === 'Credentials' }"
             @click="handleSelect('Credentials')"
           >
-            <NIcon size="large" class="icon-hover">
-              <Icon icon="ph:key-duotone" />
-            </NIcon>
+            <n-icon size="large" class="icon-hover">
+              <icon icon="ph:key-duotone" />
+            </n-icon>
           </div>
         </template>
         登录凭证
-      </NTooltip>
+      </n-tooltip>
     </div>
 
     <!-- 底部功能按钮区 -->
     <div class="pb-2 flex flex-col justify-center items-center">
       <!-- 设置下拉菜单 -->
-      <NDropdown :options="settingsOptions" trigger="click" :width="150" @select="handleSettingsSelect">
-        <NTooltip placement="right" trigger="hover">
+      <n-dropdown :options="settingsOptions" trigger="click" :width="150" @select="handleSettingsSelect">
+        <n-tooltip placement="right" trigger="hover">
           <template #trigger>
             <div class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer">
-              <NIcon size="large" class="icon-hover">
-                <Icon icon="ph:gear-six-duotone" />
-              </NIcon>
+              <n-icon size="large" class="icon-hover">
+                <icon icon="ph:gear-six-duotone" />
+              </n-icon>
             </div>
           </template>
           设置
-        </NTooltip>
-      </NDropdown>
+        </n-tooltip>
+      </n-dropdown>
 
       <!-- 主题切换按钮 -->
-      <NTooltip placement="right" trigger="hover">
+      <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
             class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
             @click="toggleTheme"
           >
-            <NIcon size="large" class="icon-hover">
-              <Icon :icon="prefStore.isDark ? 'ph:sun-duotone' : 'ph:moon-duotone'" />
-            </NIcon>
+            <n-icon size="large" class="icon-hover">
+              <icon :icon="prefStore.isDark ? 'ph:sun-duotone' : 'ph:moon-duotone'" />
+            </n-icon>
           </div>
         </template>
         {{ prefStore.isDark ? '切换亮色主题' : '切换暗色主题' }}
-      </NTooltip>
+      </n-tooltip>
 
       <!-- Github链接 -->
-      <NTooltip placement="right" trigger="hover">
+      <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
             class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
             @click="openGithub"
           >
-            <NIcon size="large" class="icon-hover">
-              <Icon icon="ph:github-logo-duotone" />
-            </NIcon>
+            <n-icon size="large" class="icon-hover">
+              <icon icon="ph:github-logo-duotone" />
+            </n-icon>
           </div>
         </template>
         访问 Github
-      </NTooltip>
+      </n-tooltip>
     </div>
   </div>
 </template>

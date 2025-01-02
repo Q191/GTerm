@@ -1,5 +1,5 @@
 <template>
-  <NModal
+  <n-modal
     v-model:show="dialogStore.groupDialogVisible"
     :close-on-esc="true"
     :negative-text="$t('group_dialog.cancel')"
@@ -12,21 +12,21 @@
     transform-origin="center"
     @positive-click="handleConfirm"
   >
-    <NForm ref="formRef" :model="formValue" :rules="rules" label-placement="left" label-width="80">
-      <NFormItem :label="$t('group_dialog.name')" path="name">
-        <NInput v-model:value="formValue.name" clearable />
-      </NFormItem>
+    <n-form ref="formRef" :model="formValue" :rules="rules" label-placement="left" label-width="80">
+      <n-form-item :label="$t('group_dialog.name')" path="name">
+        <n-input v-model:value="formValue.name" clearable />
+      </n-form-item>
 
-      <NFormItem :label="$t('group_dialog.description')" path="description">
-        <NInput
+      <n-form-item :label="$t('group_dialog.description')" path="description">
+        <n-input
           v-model:value="formValue.description"
           type="textarea"
           :autosize="{ minRows: 3, maxRows: 5 }"
           clearable
         />
-      </NFormItem>
-    </NForm>
-  </NModal>
+      </n-form-item>
+    </n-form>
+  </n-modal>
 </template>
 
 <script lang="ts" setup>

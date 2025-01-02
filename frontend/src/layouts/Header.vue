@@ -18,16 +18,16 @@
 
     <div v-if="!isDarwin" class="flex items-center mt-0">
       <div class="w-12 h-12 flex items-center justify-center hover:bg-custom-hover" @click="WindowMinimise">
-        <NIcon size="20"><Remove /></NIcon>
+        <n-icon size="20"><Remove /></n-icon>
       </div>
       <div class="w-12 h-12 flex items-center justify-center hover:bg-custom-hover" @click="reduction">
-        <NIcon size="20">
+        <n-icon size="20">
           <span v-if="windowIsMaximised"><Contract /></span>
           <span v-else><Expand /></span>
-        </NIcon>
+        </n-icon>
       </div>
       <div class="w-12 h-12 flex items-center justify-center hover:bg-custom-hover hover:rounded-tr-lg" @click="Quit">
-        <NIcon size="20"><Close /></NIcon>
+        <n-icon size="20"><Close /></n-icon>
       </div>
     </div>
   </div>

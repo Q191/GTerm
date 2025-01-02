@@ -34,7 +34,7 @@ import { Terminal } from '@xterm/xterm';
 import { throttle } from 'lodash';
 import '@xterm/xterm/css/xterm.css';
 import { useConnectionStore } from '@/stores/connection';
-import { NCode, NCollapse, NCollapseItem } from 'naive-ui';
+import { NCode, NCollapse, NCollapseItem, NResult, NSpin, NButton } from 'naive-ui';
 
 const xterm = ref<HTMLElement>();
 const socket = ref<WebSocket>();

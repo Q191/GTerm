@@ -7,15 +7,15 @@
       :class="{ active: tab.id === activeTab }"
       @click="switchTab(tab.id)"
     >
-      <NIcon size="16" class="mr-1">
-        <Icon icon="ph:terminal-duotone" />
-      </NIcon>
+      <n-icon size="16" class="mr-1">
+        <icon icon="ph:terminal-duotone" />
+      </n-icon>
       <span class="text-sm">{{ tab.name }}</span>
-      <NButton circle text size="tiny" class="ml-1 close-btn" @click.stop="closeTab(tab.id)">
+      <n-button circle text size="tiny" class="ml-1 close-btn" @click.stop="closeTab(tab.id)">
         <template #icon>
-          <Icon icon="ph:x-bold" />
+          <icon icon="ph:x-bold" />
         </template>
-      </NButton>
+      </n-button>
     </div>
   </div>
 </template>

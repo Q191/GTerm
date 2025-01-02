@@ -2,42 +2,42 @@
   <div class="inventory-container">
     <!-- 搜索栏 -->
     <div class="search-bar">
-      <NInput placeholder="搜索主机或用户@主机名...">
+      <n-input placeholder="搜索主机或用户@主机名...">
         <template #prefix>
-          <Icon icon="ph:magnifying-glass-duotone" />
+          <icon icon="ph:magnifying-glass-duotone" />
         </template>
-      </NInput>
+      </n-input>
     </div>
 
     <!-- 工具栏 -->
     <div class="toolbar">
-      <NButton size="small" type="primary" ghost @click="() => dialogStore.openAddHostDialog()">
+      <n-button size="small" type="primary" ghost @click="() => dialogStore.openAddHostDialog()">
         <template #icon>
-          <Icon icon="ph:plus-circle-duotone" />
+          <icon icon="ph:plus-circle-duotone" />
         </template>
         添加主机
-      </NButton>
-      <NButton size="small" ghost @click="dialogStore.openAddGroupDialog">
+      </n-button>
+      <n-button size="small" ghost @click="dialogStore.openAddGroupDialog">
         <template #icon>
-          <Icon icon="ph:folder-simple-plus-duotone" />
+          <icon icon="ph:folder-simple-plus-duotone" />
         </template>
         新建分组
-      </NButton>
+      </n-button>
     </div>
 
     <!-- 分组列表 -->
     <div class="section">
       <div class="section-header">
-        <NH3 prefix="bar">分组</NH3>
+        <n-h3 prefix="bar">分组</n-h3>
         <span class="text-count">共 {{ groups?.length }} 个分组</span>
       </div>
 
-      <NGrid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
-        <NGi v-for="v in groups" :key="v.id">
+      <n-grid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
+        <n-gi v-for="v in groups" :key="v.id">
           <div class="card group">
             <div class="card-content">
               <div class="card-icon">
-                <Icon icon="ph:folders-duotone" />
+                <icon icon="ph:folders-duotone" />
               </div>
               <div class="card-info">
                 <div class="card-title">{{ v.name }}</div>
@@ -45,30 +45,30 @@
               </div>
             </div>
             <div class="card-actions">
-              <NButton text circle class="action-btn">
+              <n-button text circle class="action-btn">
                 <template #icon>
-                  <Icon icon="ph:pencil-simple-duotone" />
+                  <icon icon="ph:pencil-simple-duotone" />
                 </template>
-              </NButton>
+              </n-button>
             </div>
           </div>
-        </NGi>
-      </NGrid>
+        </n-gi>
+      </n-grid>
     </div>
 
     <!-- 主机列表 -->
     <div class="section">
       <div class="section-header">
-        <NH3 prefix="bar">主机</NH3>
+        <n-h3 prefix="bar">主机</n-h3>
         <span class="text-count">共 {{ hosts?.length }} 台主机</span>
       </div>
 
-      <NGrid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
-        <NGi v-for="v in hosts" :key="v.id">
+      <n-grid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
+        <n-gi v-for="v in hosts" :key="v.id">
           <div class="card group" @click="toTerminal(v)">
             <div class="card-content">
               <div class="card-icon">
-                <Icon icon="ph:linux-logo-duotone" />
+                <icon icon="ph:linux-logo-duotone" />
               </div>
               <div class="card-info">
                 <div class="card-title">{{ v.name }}</div>
@@ -76,15 +76,15 @@
               </div>
             </div>
             <div class="card-actions">
-              <NButton text circle class="action-btn" @click.stop="handleEditHost">
+              <n-button text circle class="action-btn" @click.stop="handleEditHost">
                 <template #icon>
-                  <Icon icon="ph:pencil-simple-duotone" />
+                  <icon icon="ph:pencil-simple-duotone" />
                 </template>
-              </NButton>
+              </n-button>
             </div>
           </div>
-        </NGi>
-      </NGrid>
+        </n-gi>
+      </n-grid>
     </div>
   </div>
 </template>
@@ -99,6 +99,7 @@ import { ListGroup } from '@wailsApp/go/services/GroupSrv';
 import { ListHost } from '@wailsApp/go/services/HostSrv';
 import { model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
+import { useRouter } from 'vue-router';
 
 const prefStore = usePreferencesStore();
 const dialogStore = useDialogStore();

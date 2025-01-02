@@ -1,20 +1,20 @@
 <template>
-  <NLayout class="h-screen">
-    <NLayoutHeader bordered>
+  <n-layout class="h-screen">
+    <n-layout-header bordered>
       <Header ref="headerRef" />
-    </NLayoutHeader>
+    </n-layout-header>
 
-    <NLayout :has-sider="!isTerminal">
-      <NLayoutSider v-if="!isTerminal" bordered :width="60">
+    <n-layout :has-sider="!isTerminal">
+      <n-layout-sider v-if="!isTerminal" bordered :width="60">
         <Sider />
-      </NLayoutSider>
-      <NLayoutContent>
-        <NScrollbar>
+      </n-layout-sider>
+      <n-layout-content>
+        <n-scrollbar>
           <router-view />
-        </NScrollbar>
-      </NLayoutContent>
-    </NLayout>
-  </NLayout>
+        </n-scrollbar>
+      </n-layout-content>
+    </n-layout>
+  </n-layout>
 </template>
 
 <script lang="ts" setup>

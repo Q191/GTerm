@@ -1,5 +1,5 @@
 <template>
-  <NModal
+  <n-modal
     v-model:show="dialogStore.aboutDialogVisible"
     preset="dialog"
     :close-on-esc="true"
@@ -10,20 +10,20 @@
     :on-close="dialogStore.closeAboutDialog"
     :auto-focus="false"
   >
-    <NSpace :size="10" :wrap="false" :wrap-item="false" align="center" vertical>
-      <NAvatar :size="80" :src="iconUrl" color="#0000" />
+    <n-space :size="10" :wrap="false" :wrap-item="false" align="center" vertical>
+      <n-avatar :size="80" :src="iconUrl" color="#0000" />
       <div class="about-app-title">GTerm</div>
-      <NText>{{ gTermVer }}</NText>
-      <NSpace :size="5" :wrap="false" :wrap-item="false" align="center">
-        <NText class="about-link" @click="onOpenSource">{{ $t('about.github') }}</NText>
-        <NDivider vertical />
-        <NText class="about-link" @click="onOpenWebsite">{{ $t('about.website') }}</NText>
-      </NSpace>
+      <n-text>{{ gTermVer }}</n-text>
+      <n-space :size="5" :wrap="false" :wrap-item="false" align="center">
+        <n-text class="about-link" @click="onOpenSource">{{ $t('about.github') }}</n-text>
+        <n-divider vertical />
+        <n-text class="about-link" @click="onOpenWebsite">{{ $t('about.website') }}</n-text>
+      </n-space>
       <div :style="{ color: themeVars.textColor3 }" class="about-copyright">
         Copyright © 2024 MisakaTAT All rights reserved
       </div>
-    </NSpace>
-  </NModal>
+    </n-space>
+  </n-modal>
 </template>
 
 <script setup lang="ts">
@@ -50,7 +50,6 @@ const onOpenWebsite = () => {
   BrowserOpenURL('https://github.com/MisakaTAT');
 };
 </script>
-
 <style lang="less" scoped>
 .about-app-title {
   font-weight: bold;
