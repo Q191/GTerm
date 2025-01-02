@@ -16,14 +16,19 @@ import (
 func NewApp() *App {
 	httpListenerPort := initialize.InitHTTPServer()
 	logger := initialize.InitZap()
+	query := initialize.InitDatabase()
+	hostSrv := &services.HostSrv{
+		Logger: logger,
+		Query:  query,
+	}
 	terminalSrv := &services.TerminalSrv{
 		HTTPListenerPort: httpListenerPort,
 		Logger:           logger,
+		HostSrv:          hostSrv,
 	}
 	preferencesSrv := &services.PreferencesSrv{
 		Logger: logger,
 	}
-	query := initialize.InitDatabase()
 	groupSrv := &services.GroupSrv{
 		Logger: logger,
 		Query:  query,
@@ -34,6 +39,7 @@ func NewApp() *App {
 		TerminalSrv:      terminalSrv,
 		PreferencesSrv:   preferencesSrv,
 		GroupSrv:         groupSrv,
+		HostSrv:          hostSrv,
 	}
 	return app
 }

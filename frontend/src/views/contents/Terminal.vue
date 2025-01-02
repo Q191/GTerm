@@ -8,7 +8,7 @@
         <div class="error-details">
           <n-collapse v-if="activeConnection.errorDetails" class="error-collapse">
             <n-collapse-item title="详细信息" name="details">
-              <n-code :code="activeConnection.errorDetails" language="bash" />
+              <n-code :code="activeConnection.errorDetails" language="bash" :word-wrap="true" />
             </n-collapse-item>
           </n-collapse>
         </div>
@@ -124,11 +124,10 @@ const initializeXterm = async () => {
 const initializeWebsocket = async () => {
   try {
     const port = await WebSocketPort();
-    socket.value = new WebSocket(`ws://localhost:${port}/ws/terminal`);
+    socket.value = new WebSocket(`ws://localhost:${port}/ws/terminal?hostId=${activeConnection.value?.hostId}`);
     if (!socket.value) return;
 
     socket.value.onopen = () => {
-      socket.value?.send('\n');
       terminal.value?.focus();
       fitXterm();
     };
@@ -147,6 +146,7 @@ const initializeWebsocket = async () => {
           break;
         case 'connected':
           updateStatus({ isConnecting: false });
+          terminal.value?.focus();
           fitXterm();
           break;
         case 'data':

@@ -17,10 +17,6 @@ type Handler interface {
 	Wait(quitSignal chan bool)
 }
 
-type Config struct {
-	WebSocket *websocket.Conn
-}
-
 type Payload struct {
 	Type string `json:"type"`
 	Cmd  string `json:"cmd"`
@@ -30,13 +26,13 @@ type Payload struct {
 
 type Terminal struct {
 	handler  Handler
-	conf     *Config
+	ws       *websocket.Conn
 	stopFunc func(ws *websocket.Conn)
 }
 
-func NewTerminal(conf *Config, handler Handler, stopFunc func(ws *websocket.Conn)) *Terminal {
+func NewTerminal(ws *websocket.Conn, handler Handler, stopFunc func(ws *websocket.Conn)) *Terminal {
 	return &Terminal{
-		conf:     conf,
+		ws:       ws,
 		handler:  handler,
 		stopFunc: stopFunc,
 	}
@@ -69,7 +65,7 @@ func (t *Terminal) Start() {
 		// ensure flush write buffer before close
 		// must output handler close before with websocket close
 		<-outputClosed
-		t.stopFunc(t.conf.WebSocket)
+		t.stopFunc(t.ws)
 	}()
 
 	wg.Wait()
@@ -80,7 +76,7 @@ func (t *Terminal) Write(p []byte) (n int, err error) {
 		Type:    types.MessageTypeData,
 		Content: string(p),
 	}
-	err = t.conf.WebSocket.WriteJSON(msg)
+	err = t.ws.WriteJSON(msg)
 	if err != nil {
 		return 0, err
 	}

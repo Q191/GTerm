@@ -15,7 +15,7 @@ type HostSrv struct {
 	Query  *query.Query
 }
 
-func (s *GroupSrv) CreateHost(host *model.Host) *resp.Resp {
+func (s *HostSrv) CreateHost(host *model.Host) *resp.Resp {
 	t := s.Query.Host
 	if err := t.Create(host); err != nil {
 		return resp.FailWithMsg(err.Error())
@@ -23,7 +23,7 @@ func (s *GroupSrv) CreateHost(host *model.Host) *resp.Resp {
 	return resp.Ok()
 }
 
-func (s *GroupSrv) UpdateHost(host *model.Host) *resp.Resp {
+func (s *HostSrv) UpdateHost(host *model.Host) *resp.Resp {
 	t := s.Query.Host
 	if _, err := t.Where(t.ID.Eq(host.ID)).Updates(host); err != nil {
 		return resp.FailWithMsg(err.Error())
@@ -31,7 +31,12 @@ func (s *GroupSrv) UpdateHost(host *model.Host) *resp.Resp {
 	return resp.Ok()
 }
 
-func (s *GroupSrv) DeleteHost(id uint) *resp.Resp {
+func (s *HostSrv) FindByID(id uint) (*model.Host, error) {
+	t := s.Query.Host
+	return t.Where(t.ID.Eq(id)).Preload(t.Credential).First()
+}
+
+func (s *HostSrv) DeleteHost(id uint) *resp.Resp {
 	t := s.Query.Host
 	_, err := t.Where(t.ID.Eq(id)).Delete()
 	if err != nil {
@@ -40,7 +45,7 @@ func (s *GroupSrv) DeleteHost(id uint) *resp.Resp {
 	return resp.Ok()
 }
 
-func (s *GroupSrv) ListHost() *resp.Resp {
+func (s *HostSrv) ListHost() *resp.Resp {
 	t := s.Query.Host
 	hosts, err := t.Find()
 	if err != nil {

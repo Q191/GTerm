@@ -95,7 +95,8 @@ import { NButton, NGi, NGrid, NH3, NInput, useMessage } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
-import { ListGroup, ListHost } from '@wailsApp/go/services/GroupSrv';
+import { ListGroup } from '@wailsApp/go/services/GroupSrv';
+import { ListHost } from '@wailsApp/go/services/HostSrv';
 import { model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
 
@@ -111,6 +112,7 @@ const hosts = ref<model.Host[]>();
 const toTerminal = (host: model.Host) => {
   const connection = {
     id: Date.now(),
+    hostId: host.id,
     name: `${host.name} (${connectionStore.connections.filter(c => c.host === host.host).length + 1})`,
     host: host.host,
     username: host.credential?.username || '',

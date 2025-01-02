@@ -12,7 +12,9 @@ import (
 	"github.com/google/wire"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -20,8 +22,10 @@ import (
 var TerminalSrvSet = wire.NewSet(wire.Struct(new(TerminalSrv), "*"))
 
 type TerminalSrv struct {
+	DB               *gorm.DB
 	HTTPListenerPort *initialize.HTTPListenerPort
 	Logger           *zap.Logger
+	HostSrv          *HostSrv
 }
 
 var ug = websocket.Upgrader{
@@ -51,6 +55,17 @@ func (s *TerminalSrv) closeWsWrapper(ws *websocket.Conn) {
 }
 
 func (s *TerminalSrv) Startup(w http.ResponseWriter, r *http.Request) {
+	hostIDStr := r.URL.Query().Get("hostId")
+	if hostIDStr == "" {
+		http.Error(w, "missing host id", http.StatusBadRequest)
+		return
+	}
+	hostID, err := strconv.ParseUint(hostIDStr, 10, 32)
+	if err != nil {
+		http.Error(w, "invalid host id", http.StatusBadRequest)
+		return
+	}
+
 	ws, err := ug.Upgrade(w, r, nil)
 	if err != nil {
 		s.Logger.Error("Failed to upgrade connection",
@@ -60,7 +75,7 @@ func (s *TerminalSrv) Startup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = s.SSH(ws); err != nil {
+	if err = s.SSH(ws, uint(hostID)); err != nil {
 		s.handleError(ws, err)
 		s.closeWs(ws, s.formatError(err).Error)
 		return
@@ -144,18 +159,24 @@ func (s *TerminalSrv) handleError(ws *websocket.Conn, err error) {
 	}
 }
 
-func (s *TerminalSrv) SSH(ws *websocket.Conn) error {
-	// test code
+func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
+	host, err := s.HostSrv.FindByID(hostID)
+	if err != nil {
+		return fmt.Errorf("failed to find host: %v", err)
+	}
 	sshConf := &adapter.SSHConfig{
-		Host:     "192.168.100.77",
-		Port:     22,
-		User:     "root",
-		AuthType: enums.Password,
-		Password: "Admin@123",
+		Host:     host.Host,
+		Port:     host.Port,
+		User:     host.Credential.Username,
+		AuthType: host.Credential.AuthType,
 	}
 
-	termConf := &terminal.Config{
-		WebSocket: ws,
+	switch host.Credential.AuthType {
+	case enums.Password:
+		sshConf.Password = host.Credential.Password
+	case enums.PrivateKey:
+		sshConf.PrivateKey = host.Credential.PrivateKey
+		sshConf.KeyPassword = host.Credential.KeyPassword
 	}
 
 	ssh, err := adapter.NewSSH(sshConf, ws, s.Logger).Connect()
@@ -171,7 +192,7 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn) error {
 		return err
 	}
 
-	term := terminal.NewTerminal(termConf, ssh, s.closeWsWrapper)
+	term := terminal.NewTerminal(ws, ssh, s.closeWsWrapper)
 	term.Start()
 
 	return nil
@@ -193,11 +214,7 @@ func (s *TerminalSrv) Serial(ws *websocket.Conn) error {
 		return fmt.Errorf("failed to open serial port: %v", err)
 	}
 
-	termConf := &terminal.Config{
-		WebSocket: ws,
-	}
-
-	term := terminal.NewTerminal(termConf, serial, s.closeWsWrapper)
+	term := terminal.NewTerminal(ws, serial, s.closeWsWrapper)
 	term.Start()
 
 	return nil

@@ -33,7 +33,7 @@ func newHost(db *gorm.DB, opts ...gen.DOOption) host {
 	_host.DeletedAt = field.NewField(tableName, "deleted_at")
 	_host.Name = field.NewString(tableName, "name")
 	_host.Host = field.NewString(tableName, "host")
-	_host.Port = field.NewUint32(tableName, "port")
+	_host.Port = field.NewUint(tableName, "port")
 	_host.Description = field.NewString(tableName, "description")
 	_host.CredentialID = field.NewUint(tableName, "credential_id")
 	_host.GroupID = field.NewUint(tableName, "group_id")
@@ -58,7 +58,7 @@ type host struct {
 	DeletedAt    field.Field
 	Name         field.String
 	Host         field.String
-	Port         field.Uint32
+	Port         field.Uint
 	Description  field.String
 	CredentialID field.Uint
 	GroupID      field.Uint
@@ -85,7 +85,7 @@ func (h *host) updateTableName(table string) *host {
 	h.DeletedAt = field.NewField(table, "deleted_at")
 	h.Name = field.NewString(table, "name")
 	h.Host = field.NewString(table, "host")
-	h.Port = field.NewUint32(table, "port")
+	h.Port = field.NewUint(table, "port")
 	h.Description = field.NewString(table, "description")
 	h.CredentialID = field.NewUint(table, "credential_id")
 	h.GroupID = field.NewUint(table, "group_id")

@@ -89,7 +89,9 @@
 <script lang="ts" setup>
 import { useDialogStore } from '@/stores/dialog';
 import { model } from '@wailsApp/go/models';
-import { CreateGroup, CreateHost, ListGroup } from '@wailsApp/go/services/GroupSrv';
+import { ListGroup } from '@wailsApp/go/services/GroupSrv';
+import { CreateHost } from '@wailsApp/go/services/HostSrv';
+
 import {
   FormInst,
   FormRules,

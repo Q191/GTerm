@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 
 interface Connection {
   id: number;
+  hostId: number;
   name: string;
   host: string;
   username: string;
