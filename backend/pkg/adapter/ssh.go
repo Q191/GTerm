@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/OpenToolkitLab/GTerm/backend/enums"
-	"github.com/OpenToolkitLab/GTerm/backend/pkg/terminal"
+	"github.com/MisakaTAT/GTerm/backend/enums"
+	"github.com/MisakaTAT/GTerm/backend/pkg/terminal"
+	"github.com/MisakaTAT/GTerm/backend/pkg/types"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/ssh"
@@ -51,6 +52,7 @@ func (w *writer) Bytes() []byte {
 	defer w.mu.Unlock()
 	return w.buffer.Bytes()
 }
+
 func (w *writer) Reset() {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -210,4 +212,16 @@ func (s *SSH) Wait(quitSignal chan bool) {
 
 func (s *SSH) setQuit(ch chan bool) {
 	ch <- true
+}
+
+func (s *SSH) Write(p []byte) (int, error) {
+	if err := s.ws.WriteJSON(
+		&types.Message{
+			Type:    types.MessageTypeData,
+			Content: string(p),
+		},
+	); err != nil {
+		return 0, err
+	}
+	return len(p), nil
 }

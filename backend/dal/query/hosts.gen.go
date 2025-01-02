@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/OpenToolkitLab/GTerm/backend/dal/model"
+	"github.com/MisakaTAT/GTerm/backend/dal/model"
 )
 
 func newHost(db *gorm.DB, opts ...gen.DOOption) host {

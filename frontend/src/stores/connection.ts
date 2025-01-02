@@ -5,6 +5,10 @@ interface Connection {
   name: string;
   host: string;
   username: string;
+  isConnecting?: boolean;
+  connectionError?: boolean;
+  errorMessage?: string;
+  errorDetails?: string;
 }
 
 export const useConnectionStore = defineStore('connection', () => {
@@ -12,8 +16,20 @@ export const useConnectionStore = defineStore('connection', () => {
   const activeConnectionId = ref<number | null>(null);
 
   const addConnection = (connection: Connection) => {
-    connections.value.push(connection);
+    connections.value.push({
+      ...connection,
+      isConnecting: true,
+      connectionError: false,
+      errorMessage: '',
+    });
     activeConnectionId.value = connection.id;
+  };
+
+  const updateConnectionStatus = (id: number, status: Partial<Connection>) => {
+    const connection = connections.value.find(c => c.id === id);
+    if (connection) {
+      Object.assign(connection, status);
+    }
   };
 
   const removeConnection = (id: number) => {
@@ -32,12 +48,16 @@ export const useConnectionStore = defineStore('connection', () => {
 
   const hasConnections = computed(() => connections.value.length > 0);
 
+  const activeConnection = computed(() => connections.value.find(c => c.id === activeConnectionId.value));
+
   return {
     connections,
     activeConnectionId,
+    activeConnection,
     hasConnections,
     addConnection,
     removeConnection,
     setActiveConnection,
+    updateConnectionStatus,
   };
 });

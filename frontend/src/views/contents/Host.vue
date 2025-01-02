@@ -111,7 +111,7 @@ const hosts = ref<model.Host[]>();
 const toTerminal = (host: model.Host) => {
   const connection = {
     id: Date.now(),
-    name: host.name,
+    name: `${host.name} (${connectionStore.connections.filter(c => c.host === host.host).length + 1})`,
     host: host.host,
     username: host.credential?.username || '',
   };

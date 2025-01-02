@@ -1,4 +1,4 @@
-module github.com/OpenToolkitLab/GTerm
+module github.com/MisakaTAT/GTerm
 
 go 1.23
 

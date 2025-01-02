@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/OpenToolkitLab/GTerm/backend/enums"
+	"github.com/MisakaTAT/GTerm/backend/enums"
 )
 
 type Credential struct {

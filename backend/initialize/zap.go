@@ -2,7 +2,7 @@ package initialize
 
 import (
 	"fmt"
-	"github.com/OpenToolkitLab/GTerm/backend/consts"
+	"github.com/MisakaTAT/GTerm/backend/consts"
 	rotateLogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/vrischmann/userdir"
 	"go.uber.org/zap"

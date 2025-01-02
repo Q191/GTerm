@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/OpenToolkitLab/GTerm/backend/dal/model"
+	"github.com/MisakaTAT/GTerm/backend/dal/model"
 	"gorm.io/gen"
 	"os"
 )

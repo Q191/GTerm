@@ -1,6 +1,6 @@
 <template>
   <NMessageProvider placement="bottom-right">
-    <NConfigProvider :theme="currentTheme" :theme-overrides="currentThemeOverrides">
+    <NConfigProvider :theme="currentTheme" :theme-overrides="currentThemeOverrides" :hljs="hljs">
       <router-view />
       <AboutDialog />
       <HostDialog />
@@ -18,12 +18,14 @@ import HostDialog from '@/views/dialogs/HostDialog.vue';
 import SettingDialog from '@/views/dialogs/SettingDialog.vue';
 import { darkTheme, NConfigProvider, NMessageProvider } from 'naive-ui';
 import GroupDialog from '@/views/dialogs/GroupDialog.vue';
+import hljs from 'highlight.js/lib/core';
+import bash from 'highlight.js/lib/languages/bash';
+
+hljs.registerLanguage('bash', bash);
 
 const prefStore = usePreferencesStore();
 
-// 使用计算属性来动态设置主题
 const currentTheme = computed(() => (prefStore.isDark ? darkTheme : null));
 
-// 使用计算属性来动态设置主题覆盖
 const currentThemeOverrides = computed(() => (prefStore.isDark ? darkThemeOverrides : themeOverrides));
 </script>

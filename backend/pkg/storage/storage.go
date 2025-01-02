@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"github.com/OpenToolkitLab/GTerm/backend/consts"
+	"github.com/MisakaTAT/GTerm/backend/consts"
 	"github.com/vrischmann/userdir"
 	"os"
 	"path"

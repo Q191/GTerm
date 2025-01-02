@@ -13,7 +13,7 @@
         <img src="@/assets/images/icon.png" alt="Logo" class="w-6 h-6" />
         <span class="pl-2 text-base font-semibold" :class="{ hidden: hasConnections }">GTerm</span>
       </div>
-      <ConnectionTabs v-if="hasConnections" class="ml-4" />
+      <ConnectionTabs v-if="hasConnections" ref="connectionTabsRef" class="ml-4" />
     </div>
 
     <div v-if="!isDarwin" class="flex items-center mt-0">
@@ -42,6 +42,12 @@ import { gtermTheme } from '@/themes/gterm-theme';
 import { IsDarwin } from '@wailsApp/go/services/PreferencesSrv';
 import ConnectionTabs from '@/components/ConnectionTabs.vue';
 import { useConnectionStore } from '@/stores/connection';
+
+const connectionTabsRef = ref();
+
+defineExpose({
+  connectionTabsRef,
+});
 
 const prefStore = usePreferencesStore();
 const connectionStore = useConnectionStore();

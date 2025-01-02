@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"github.com/MisakaTAT/GTerm/backend/pkg/types"
 	"github.com/gorilla/websocket"
 	"sync"
 )
@@ -72,4 +73,16 @@ func (t *Terminal) Start() {
 	}()
 
 	wg.Wait()
+}
+
+func (t *Terminal) Write(p []byte) (n int, err error) {
+	msg := types.Message{
+		Type:    types.MessageTypeData,
+		Content: string(p),
+	}
+	err = t.conf.WebSocket.WriteJSON(msg)
+	if err != nil {
+		return 0, err
+	}
+	return len(p), nil
 }

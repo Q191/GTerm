@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"context"
-	"github.com/OpenToolkitLab/GTerm/backend/initialize"
-	"github.com/OpenToolkitLab/GTerm/backend/services"
+	"github.com/MisakaTAT/GTerm/backend/initialize"
+	"github.com/MisakaTAT/GTerm/backend/services"
 	"github.com/google/wire"
 	"go.uber.org/zap"
 	"net/http"

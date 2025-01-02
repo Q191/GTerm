@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/OpenToolkitLab/GTerm/backend/pkg/base"
+	"github.com/MisakaTAT/GTerm/backend/pkg/base"
 	"github.com/google/wire"
 	"go.uber.org/zap"
 	"runtime"
