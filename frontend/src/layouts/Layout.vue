@@ -9,9 +9,7 @@
         <Sider />
       </n-layout-sider>
       <n-layout-content>
-        <n-scrollbar>
-          <router-view />
-        </n-scrollbar>
+        <router-view />
       </n-layout-content>
     </n-layout>
   </n-layout>

@@ -53,6 +53,12 @@ func (w *writer) Bytes() []byte {
 	return w.buffer.Bytes()
 }
 
+func (w *writer) String() string {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.buffer.String()
+}
+
 func (w *writer) Reset() {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -144,8 +150,11 @@ func (s *SSH) signer() (ssh.Signer, error) {
 }
 
 func (s *SSH) flushWriter() {
-	if len(s.writer.Bytes()) != 0 {
-		if err := s.ws.WriteMessage(websocket.BinaryMessage, s.writer.Bytes()); err != nil {
+	if len(s.writer.String()) != 0 {
+		if err := s.ws.WriteJSON(&types.Message{
+			Type:    types.MessageTypeData,
+			Content: s.writer.String(),
+		}); err != nil {
 			s.logger.Error("failed write data to websocket", zap.Error(err))
 		}
 		s.writer.Reset()
@@ -212,16 +221,4 @@ func (s *SSH) Wait(quitSignal chan bool) {
 
 func (s *SSH) setQuit(ch chan bool) {
 	ch <- true
-}
-
-func (s *SSH) Write(p []byte) (int, error) {
-	if err := s.ws.WriteJSON(
-		&types.Message{
-			Type:    types.MessageTypeData,
-			Content: string(p),
-		},
-	); err != nil {
-		return 0, err
-	}
-	return len(p), nil
 }

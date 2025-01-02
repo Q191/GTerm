@@ -6,39 +6,9 @@ body {
   background-color: rgba(0, 0, 0, 0);
 }
 
-.no-drag {
-  --webkit-app-region: no-drag;
-}
-
-// 自定义滚动条样式，模仿 Naive UI 样式
-// 针对 WebKit 浏览器
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(144, 147, 153, 0.4); // 滚动条颜色
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(144, 147, 153, 0.6); // 滚动条悬停颜色
-}
-
-// 隐藏窗体滚动条
-.n-layout .n-layout-scroll-container {
+* {
   overflow-x: hidden;
   overflow-y: hidden;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(144, 147, 153, 0.4) transparent;
 
   // 解决参数 "--walls draggable: drag" 拖动窗口时，鼠标不是处于指针状态，而是处于字符 "I"。
   -webkit-touch-callout: none;

@@ -3,6 +3,7 @@ package adapter
 import (
 	"encoding/json"
 	"github.com/MisakaTAT/GTerm/backend/pkg/terminal"
+	"github.com/MisakaTAT/GTerm/backend/pkg/types"
 	"github.com/gorilla/websocket"
 	"go.bug.st/serial"
 	"go.uber.org/zap"
@@ -94,7 +95,10 @@ func (s *Serial) Output(quitSignal chan bool) {
 				if n == 0 || len(buff[:n]) == 0 {
 					continue
 				}
-				if err = s.ws.WriteMessage(websocket.BinaryMessage, buff[:n]); err != nil {
+				if err = s.ws.WriteJSON(&types.Message{
+					Type:    types.MessageTypeData,
+					Content: string(buff[:n]),
+				}); err != nil {
 					s.logger.Error("write message failed", zap.Error(err))
 				}
 			}

@@ -1,25 +1,25 @@
 <template>
   <div class="xterm-container">
-    <n-result v-if="activeConnection?.connectionError" status="error" :title="activeConnection.errorMessage">
+    <n-result v-if="activeConn?.connectionError" status="error" :title="activeConn.errorMessage">
       <template #footer>
         <n-button @click="reconnect" type="primary">重新连接</n-button>
       </template>
       <template #default>
         <div class="error-details">
-          <n-collapse v-if="activeConnection.errorDetails" class="error-collapse">
+          <n-collapse v-if="activeConn.errorDetails" class="error-collapse">
             <n-collapse-item title="详细信息" name="details">
-              <n-code :code="activeConnection.errorDetails" language="bash" :word-wrap="true" />
+              <n-code :code="activeConn.errorDetails" language="bash" :word-wrap="true" />
             </n-collapse-item>
           </n-collapse>
         </div>
       </template>
     </n-result>
-    <n-result v-else-if="activeConnection?.isConnecting" status="info" title="正在连接" description="少女祈祷中...">
+    <n-result v-else-if="activeConn?.isConnecting" status="info" title="正在连接" description="少女祈祷中...">
       <template #icon>
         <n-spin size="large" />
       </template>
     </n-result>
-    <div v-else ref="xterm" class="xterm-wrapper" />
+    <div v-show="isConnected" ref="xterm" class="xterm-wrapper" />
   </div>
 </template>
 
@@ -43,10 +43,10 @@ const webLinksAddon = ref<WebLinksAddon>();
 const webglAddon = ref<WebglAddon>();
 const canvasAddon = ref<CanvasAddon>();
 const terminal = ref<Terminal>();
-
+const isConnected = ref(false);
 const connectionStore = useConnectionStore();
 const connectionTabs = inject<any>('connectionTabs');
-const activeConnection = computed(() => connectionStore.activeConnection);
+const activeConn = computed(() => connectionStore.activeConnection);
 
 const updateStatus = (
   status: Partial<{
@@ -56,8 +56,8 @@ const updateStatus = (
     errorDetails: string;
   }>,
 ) => {
-  if (activeConnection.value?.id) {
-    connectionStore.updateConnectionStatus(activeConnection.value.id, status);
+  if (activeConn.value?.id) {
+    connectionStore.updateConnectionStatus(activeConn.value.id, status);
   }
 };
 
@@ -80,25 +80,22 @@ const fitXterm = throttle(() => {
   }
 }, 50);
 
-const loadAddon = async (addonFactory: () => any, addonName: string): Promise<any> => {
-  try {
-    const addon = addonFactory();
-    terminal.value?.loadAddon(addon);
-    return addon;
-  } catch (e) {
-    console.warn(`Failed to load ${addonName} addon:`, e);
-    return null;
-  }
-};
-
 const initializeXterm = async () => {
   if (!xterm.value || !terminal.value) return;
 
-  fitAddon.value = await loadAddon(() => new FitAddon(), 'Fit');
-  webLinksAddon.value = await loadAddon(() => new WebLinksAddon(), 'WebLinks');
-  webglAddon.value = await loadAddon(() => new WebglAddon(), 'WebGL');
-  if (!webglAddon.value) {
-    canvasAddon.value = await loadAddon(() => new CanvasAddon(), 'Canvas');
+  fitAddon.value = new FitAddon();
+  webLinksAddon.value = new WebLinksAddon();
+  webglAddon.value = new WebglAddon();
+
+  try {
+    fitAddon.value.activate(terminal.value);
+    webLinksAddon.value.activate(terminal.value);
+    webglAddon.value.activate(terminal.value);
+  } catch (e) {
+    console.warn('Failed to activate WebGL addon, falling back to Canvas:', e);
+    webglAddon.value = undefined;
+    canvasAddon.value = new CanvasAddon();
+    canvasAddon.value.activate(terminal.value);
   }
 
   terminal.value.attachCustomKeyEventHandler(arg => {
@@ -124,15 +121,14 @@ const initializeXterm = async () => {
 const initializeWebsocket = async () => {
   try {
     const port = await WebSocketPort();
-    socket.value = new WebSocket(`ws://localhost:${port}/ws/terminal?hostId=${activeConnection.value?.hostId}`);
+    socket.value = new WebSocket(`ws://localhost:${port}/ws/terminal?hostId=${activeConn.value?.hostId}`);
     if (!socket.value) return;
 
     socket.value.onopen = () => {
       terminal.value?.focus();
-      fitXterm();
     };
 
-    socket.value.onmessage = (event: MessageEvent) => {
+    socket.value.onmessage = async (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       switch (data.type) {
         case 'error':
@@ -146,8 +142,11 @@ const initializeWebsocket = async () => {
           break;
         case 'connected':
           updateStatus({ isConnecting: false });
-          terminal.value?.focus();
-          fitXterm();
+          isConnected.value = true;
+          nextTick(() => {
+            terminal.value?.focus();
+            fitXterm();
+          });
           break;
         case 'data':
           terminal.value?.write(data.content);
@@ -167,7 +166,7 @@ const initializeWebsocket = async () => {
     };
 
     socket.value.onclose = event => {
-      if (!activeConnection.value?.connectionError) {
+      if (!activeConn.value?.connectionError) {
         updateStatus({
           isConnecting: false,
           connectionError: true,
@@ -198,23 +197,38 @@ const reconnect = async () => {
 };
 
 const closeTerminal = () => {
-  socket.value?.close();
-  socket.value = undefined;
-  if (terminal.value) {
-    fitAddon.value?.dispose();
-    webLinksAddon.value?.dispose();
-    webglAddon.value?.dispose();
-    canvasAddon.value?.dispose();
-    terminal.value.dispose();
-    terminal.value = undefined;
-  }
-  if (activeConnection.value?.id) {
-    updateStatus({
-      isConnecting: false,
-      connectionError: false,
-      errorMessage: '',
-      errorDetails: '',
-    });
+  try {
+    socket.value?.close();
+    socket.value = undefined;
+
+    if (terminal.value) {
+      terminal.value.onData(() => {});
+      terminal.value.onResize(() => {});
+      try {
+        terminal.value.dispose();
+      } catch (e) {
+        console.warn('Error disposing terminal:', e);
+      }
+      terminal.value = undefined;
+    }
+
+    fitAddon.value = undefined;
+    webLinksAddon.value = undefined;
+    webglAddon.value = undefined;
+    canvasAddon.value = undefined;
+
+    isConnected.value = false;
+
+    if (activeConn.value?.id) {
+      updateStatus({
+        isConnecting: false,
+        connectionError: false,
+        errorMessage: '',
+        errorDetails: '',
+      });
+    }
+  } catch (e) {
+    console.error('Error in closeTerminal:', e);
   }
 };
 
@@ -235,7 +249,7 @@ onMounted(async () => {
   await registerToTabs();
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   closeTerminal();
   window.removeEventListener('resize', fitXterm);
 });
