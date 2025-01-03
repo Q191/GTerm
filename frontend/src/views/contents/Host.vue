@@ -158,7 +158,6 @@ onMounted(async () => {
 .inventory-container {
   padding: 16px 24px;
   height: 100%;
-  overflow-y: auto;
 }
 
 .search-bar {

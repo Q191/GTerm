@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import Header from '@/layouts/Header.vue';
 import Sider from '@/layouts/Sider.vue';
-import { NLayout, NLayoutContent, NLayoutHeader, NLayoutSider, NScrollbar } from 'naive-ui';
+import { NLayout, NLayoutContent, NLayoutHeader, NLayoutSider } from 'naive-ui';
 import { useRoute } from 'vue-router';
 import { computed, ref, provide } from 'vue';
 

@@ -2,22 +2,21 @@
 @import 'tailwindcss/components.css';
 @import 'tailwindcss/utilities.css';
 
-body {
-  background-color: rgba(0, 0, 0, 0);
+body,
+html {
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.n-layout .n-layout-scroll-container {
+  overflow-y: hidden;
 }
 
 * {
-  overflow-x: hidden;
-  overflow-y: hidden;
-
   // 解决参数 "--walls draggable: drag" 拖动窗口时，鼠标不是处于指针状态，而是处于字符 "I"。
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-*::-webkit-scrollbar-corner {
-  background-color: transparent;
 }
