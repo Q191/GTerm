@@ -16,7 +16,29 @@ export const useConnectionStore = defineStore('connection', () => {
   const connections = ref<Connection[]>([]);
   const activeConnectionId = ref<number | null>(null);
 
+  const getNextNumberForName = (baseName: string) => {
+    const existingNumbers = connections.value
+      .filter(conn => conn.name.startsWith(baseName))
+      .map(conn => {
+        const match = conn.name.match(new RegExp(`^${baseName}\\s*\\((\\d+)\\)$`));
+        return match ? parseInt(match[1]) : 0;
+      })
+      .filter(num => !isNaN(num));
+
+    if (existingNumbers.length === 0) return 1;
+    return Math.max(...existingNumbers) + 1;
+  };
+
   const addConnection = (connection: Connection) => {
+    // 检查是否已经存在相同的基础名称
+    const baseName = connection.name;
+    const existingSameName = connections.value.some(conn => conn.name === baseName);
+
+    if (existingSameName) {
+      const nextNumber = getNextNumberForName(baseName);
+      connection.name = `${baseName} (${nextNumber})`;
+    }
+
     connections.value.push({
       ...connection,
       isConnecting: true,

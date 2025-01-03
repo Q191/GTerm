@@ -79,6 +79,15 @@ const updateStatus = (
   }>,
 ) => {
   connectionStore.updateConnectionStatus(id, status);
+  if (connectionTabs?.value) {
+    let tabStatus = 'connecting';
+    if (status.connectionError) {
+      tabStatus = 'error';
+    } else if (!status.isConnecting && connectedTerminals.value[id]) {
+      tabStatus = 'connected';
+    }
+    connectionTabs.value.updateTabStatus(id, tabStatus);
+  }
 };
 
 const fitXterm = throttle((id: number) => {
@@ -192,6 +201,9 @@ const initializeWebsocket = async (id: number, hostId: number) => {
         case 'connected':
           updateStatus(id, { isConnecting: false });
           connectedTerminals.value[id] = true;
+          if (connectionTabs?.value) {
+            connectionTabs.value.updateTabStatus(id, 'connected');
+          }
           nextTick(() => {
             terminals.value[id]?.focus();
             fitXterm(id);
@@ -284,8 +296,14 @@ const closeTerminal = (id: number) => {
 const registerToTabs = async () => {
   await nextTick();
   if (connectionTabs?.value && activeConn.value?.id) {
-    connectionTabs.value.registerTerminal(activeConn.value!.id, {
-      closeTerminal: () => closeTerminal(activeConn.value!.id),
+    const id = activeConn.value.id;
+    const isConnected =
+      !connectionStore.connections.find(c => c.id === id)?.connectionError &&
+      !connectionStore.connections.find(c => c.id === id)?.isConnecting &&
+      connectedTerminals.value[id];
+    connectionTabs.value.registerTerminal(id, {
+      closeTerminal: () => closeTerminal(id),
+      status: isConnected ? 'connected' : 'error',
     });
   }
 };
@@ -293,7 +311,7 @@ const registerToTabs = async () => {
 watchEffect(async () => {
   const connections = connectionStore.connections;
   for (const conn of connections) {
-    if (!terminals.value[conn.id] || !sockets.value[conn.id]) {
+    if (!terminals.value[conn.id]) {
       initializeTerminal(conn.id);
       await nextTick();
       await initializeXterm(conn.id);

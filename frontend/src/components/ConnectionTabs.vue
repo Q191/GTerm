@@ -7,6 +7,7 @@
       :class="{ active: tab.id === activeTab }"
       @click="switchTab(tab.id)"
     >
+      <div class="status-dot mr-1" :class="tabStatus[tab.id]" />
       <n-icon size="16" class="mr-1">
         <icon icon="ph:terminal-duotone" />
       </n-icon>
@@ -40,8 +41,17 @@ const gtermThemeVars = computed(() => {
 
 const terminalRefs = ref<Map<number, any>>(new Map());
 
+const tabStatus = ref<Record<number, string>>({});
+
+const updateTabStatus = (id: number, status: 'connected' | 'error' | 'connecting') => {
+  tabStatus.value[id] = status;
+};
+
 const registerTerminal = (id: number, terminal: any) => {
   terminalRefs.value.set(id, terminal);
+  if (terminal.status) {
+    tabStatus.value[id] = terminal.status;
+  }
 };
 
 const switchTab = (id: number) => {
@@ -66,6 +76,7 @@ const closeTab = (id: number) => {
 
 defineExpose({
   registerTerminal,
+  updateTabStatus,
 });
 </script>
 
@@ -87,6 +98,37 @@ defineExpose({
   }
 
   &:hover .close-btn {
+    opacity: 1;
+  }
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  &.connected {
+    background-color: #18a058;
+  }
+
+  &.error {
+    background-color: #d03050;
+  }
+
+  &.connecting {
+    background-color: #2080f0;
+    animation: pulse 1.5s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
     opacity: 1;
   }
 }
