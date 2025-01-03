@@ -335,26 +335,9 @@ defineOptions({ name: 'Terminal' });
 <style lang="less" scoped>
 .xterm-container {
   height: calc(100vh - 38px);
-  width: 100%;
-  display: flex;
-
-  :deep(.n-spin-container),
-  :deep(.n-spin-content) {
-    width: 100%;
-    height: 100%;
-    display: flex;
-  }
-
-  .xterm-wrapper {
-    flex-grow: 1;
-    display: flex;
-    width: 100%;
-    height: 100%;
-  }
 
   :deep(.xterm) {
-    flex-grow: 1;
-    display: flex;
+    height: calc(100vh - 38px);
     padding: 8px 0px 8px 8px;
 
     .xterm-viewport {
@@ -362,7 +345,7 @@ defineOptions({ name: 'Terminal' });
     }
   }
 
-  :deep(.n-result) {
+  .n-result {
     margin: auto;
     width: 100%;
     height: 100%;
@@ -370,45 +353,11 @@ defineOptions({ name: 'Terminal' });
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
 
-    .n-result-header {
-      margin-bottom: 12px;
-    }
-
-    .n-result-icon {
-      font-size: 48px;
-    }
-
-    .n-result-title {
-      font-size: 16px;
-      margin-top: 12px;
-    }
-
-    .error-details {
-      width: 100%;
-      max-width: 600px;
-      margin-top: 12px;
-      font-size: 13px;
-    }
-
-    .error-collapse {
-      width: 100%;
-      background-color: transparent;
-
-      :deep(.n-collapse-item .n-collapse-item__header) {
-        font-size: 13px;
-        padding: 8px 0;
-      }
-
-      :deep(.n-code) {
-        font-size: 12px;
-      }
-    }
-
-    .n-button {
-      min-width: 120px;
-      margin-top: 16px;
-    }
+  .n-button {
+    min-width: 120px;
+    margin-top: 16px;
   }
 }
 </style>
