@@ -28,7 +28,10 @@
     <!-- 分组列表 -->
     <div class="section">
       <div class="section-header">
-        <n-h3 prefix="bar">分组</n-h3>
+        <n-h3 prefix="bar">
+          <icon icon="ph:folders-duotone" class="section-icon" />
+          分组
+        </n-h3>
         <span class="text-count">共 {{ groups?.length }} 个分组</span>
       </div>
 
@@ -59,7 +62,10 @@
     <!-- 主机列表 -->
     <div class="section">
       <div class="section-header">
-        <n-h3 prefix="bar">主机</n-h3>
+        <n-h3 prefix="bar">
+          <icon icon="ph:computer-tower-duotone" class="section-icon" />
+          主机
+        </n-h3>
         <span class="text-count">共 {{ hosts?.length }} 台主机</span>
       </div>
 
@@ -68,7 +74,7 @@
           <div class="card group" @click="toTerminal(v)">
             <div class="card-content">
               <div class="card-icon">
-                <icon icon="ph:linux-logo-duotone" />
+                <icon icon="ph:computer-tower-duotone" />
               </div>
               <div class="card-info">
                 <div class="card-title">{{ v.name }}</div>
@@ -181,6 +187,14 @@ onMounted(async () => {
 
     :deep(.n-h3) {
       margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .section-icon {
+        font-size: 20px;
+        opacity: 0.8;
+      }
     }
   }
 }
@@ -198,8 +212,6 @@ onMounted(async () => {
   &:hover {
     background-color: v-bind('gtermThemeVars.cardHoverColor');
     border-color: v-bind('gtermThemeVars.splitColor');
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 
   .card-content {
