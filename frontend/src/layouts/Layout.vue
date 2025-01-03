@@ -9,7 +9,11 @@
         <Sider />
       </n-layout-sider>
       <n-layout-content>
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <keep-alive :include="['Terminal']">
+            <component :is="Component" />
+          </keep-alive>
+        </router-view>
       </n-layout-content>
     </n-layout>
   </n-layout>

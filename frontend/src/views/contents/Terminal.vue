@@ -1,25 +1,44 @@
 <template>
   <div class="xterm-container">
-    <n-result v-if="activeConn?.connectionError" status="error" :title="activeConn.errorMessage">
-      <template #footer>
-        <n-button @click="reconnect" type="primary">重新连接</n-button>
-      </template>
-      <template #default>
-        <div class="error-details">
-          <n-collapse v-if="activeConn.errorDetails" class="error-collapse">
-            <n-collapse-item title="详细信息" name="details">
-              <n-code :code="activeConn.errorDetails" language="bash" :word-wrap="true" />
-            </n-collapse-item>
-          </n-collapse>
-        </div>
-      </template>
-    </n-result>
-    <n-result v-else-if="activeConn?.isConnecting" status="info" title="正在连接" description="少女祈祷中...">
-      <template #icon>
-        <n-spin size="large" />
-      </template>
-    </n-result>
-    <div v-show="isConnected" ref="xterm" class="xterm-wrapper" />
+    <template v-for="conn in connectionStore.connections" :key="conn.id">
+      <n-result
+        v-if="conn.connectionError"
+        status="error"
+        :title="conn.errorMessage"
+        v-show="conn.id === activeConn?.id"
+      >
+        <template #footer>
+          <n-button @click="() => reconnect(conn.id)" type="primary">重新连接</n-button>
+        </template>
+        <template #default>
+          <div class="error-details" v-if="conn.errorDetails">
+            <n-collapse class="error-collapse">
+              <n-collapse-item title="详细信息" name="details">
+                <n-code :code="conn.errorDetails" language="bash" :word-wrap="true" />
+              </n-collapse-item>
+            </n-collapse>
+          </div>
+        </template>
+      </n-result>
+      <n-result
+        v-else-if="conn.isConnecting || !connectedTerminals[conn.id]"
+        status="info"
+        title="正在连接"
+        description="少女祈祷中..."
+        v-show="conn.id === activeConn?.id"
+      >
+        <template #icon>
+          <n-spin size="large" />
+        </template>
+      </n-result>
+      <div
+        v-show="
+          conn.id === activeConn?.id && !conn.connectionError && !conn.isConnecting && connectedTerminals[conn.id]
+        "
+        :ref="el => el && (terminalRefs[conn.id] = el as HTMLElement)"
+        class="xterm-wrapper"
+      />
+    </template>
   </div>
 </template>
 
@@ -35,20 +54,23 @@ import { throttle } from 'lodash';
 import '@xterm/xterm/css/xterm.css';
 import { useConnectionStore } from '@/stores/connection';
 import { NCode, NCollapse, NCollapseItem, NResult, NSpin, NButton } from 'naive-ui';
+import { onActivated } from 'vue';
 
-const xterm = ref<HTMLElement>();
-const socket = ref<WebSocket>();
-const fitAddon = ref<FitAddon>();
-const webLinksAddon = ref<WebLinksAddon>();
-const webglAddon = ref<WebglAddon>();
-const canvasAddon = ref<CanvasAddon>();
-const terminal = ref<Terminal>();
-const isConnected = ref(false);
 const connectionStore = useConnectionStore();
 const connectionTabs = inject<any>('connectionTabs');
 const activeConn = computed(() => connectionStore.activeConnection);
 
+const terminalRefs = ref<Record<number, HTMLElement | null>>({});
+const terminals = ref<Record<number, Terminal | undefined>>({});
+const sockets = ref<Record<number, WebSocket | undefined>>({});
+const fitAddons = ref<Record<number, FitAddon | undefined>>({});
+const webLinksAddons = ref<Record<number, WebLinksAddon | undefined>>({});
+const webglAddons = ref<Record<number, WebglAddon | undefined>>({});
+const canvasAddons = ref<Record<number, CanvasAddon | undefined>>({});
+const connectedTerminals = ref<Record<number, boolean>>({});
+
 const updateStatus = (
+  id: number,
   status: Partial<{
     isConnecting: boolean;
     connectionError: boolean;
@@ -56,13 +78,21 @@ const updateStatus = (
     errorDetails: string;
   }>,
 ) => {
-  if (activeConn.value?.id) {
-    connectionStore.updateConnectionStatus(activeConn.value.id, status);
-  }
+  connectionStore.updateConnectionStatus(id, status);
 };
 
-const initializeTerminal = () => {
-  terminal.value = new Terminal({
+const fitXterm = throttle((id: number) => {
+  const dims = fitAddons.value[id]?.proposeDimensions();
+  if (!dims || !terminals.value[id] || !dims.cols || !dims.rows) return;
+  if (terminals.value[id].rows !== dims.rows || terminals.value[id].cols !== dims.cols) {
+    terminals.value[id].resize(dims.cols, dims.rows);
+  }
+}, 50);
+
+const initializeTerminal = (id: number) => {
+  if (terminals.value[id]) return;
+
+  terminals.value[id] = new Terminal({
     convertEol: true,
     disableStdin: false,
     fontSize: 16,
@@ -72,161 +102,180 @@ const initializeTerminal = () => {
   });
 };
 
-const fitXterm = throttle(() => {
-  const dims = fitAddon.value?.proposeDimensions();
-  if (!dims || !terminal.value || !dims.cols || !dims.rows) return;
-  if (terminal.value.rows !== dims.rows || terminal.value.cols !== dims.cols) {
-    terminal.value.resize(dims.cols, dims.rows);
-  }
-}, 50);
+const initializeXterm = async (id: number) => {
+  const terminalEl = terminalRefs.value[id] as HTMLElement;
+  const terminal = terminals.value[id];
+  if (!terminalEl || !terminal) return;
 
-const initializeXterm = async () => {
-  if (!xterm.value || !terminal.value) return;
-
-  fitAddon.value = new FitAddon();
-  webLinksAddon.value = new WebLinksAddon();
-  webglAddon.value = new WebglAddon();
+  fitAddons.value[id] = new FitAddon();
+  webLinksAddons.value[id] = new WebLinksAddon();
+  webglAddons.value[id] = new WebglAddon();
 
   try {
-    fitAddon.value.activate(terminal.value);
-    webLinksAddon.value.activate(terminal.value);
-    webglAddon.value.activate(terminal.value);
+    fitAddons.value[id].activate(terminal);
+    webLinksAddons.value[id].activate(terminal);
+    webglAddons.value[id].activate(terminal);
   } catch (e) {
     console.warn('Failed to activate WebGL addon, falling back to Canvas:', e);
-    webglAddon.value = undefined;
-    canvasAddon.value = new CanvasAddon();
-    canvasAddon.value.activate(terminal.value);
+    webglAddons.value[id] = undefined;
+    canvasAddons.value[id] = new CanvasAddon();
+    canvasAddons.value[id].activate(terminal);
   }
 
-  terminal.value.attachCustomKeyEventHandler(arg => {
+  terminal.attachCustomKeyEventHandler(arg => {
     if (arg.code === 'PageUp' && arg.type === 'keydown') {
-      terminal.value?.scrollPages(-1);
+      terminal?.scrollPages(-1);
       return false;
     } else if (arg.code === 'PageDown' && arg.type === 'keydown') {
-      terminal.value?.scrollPages(1);
+      terminal?.scrollPages(1);
       return false;
     }
     return true;
   });
 
-  terminal.value.open(xterm.value);
-  terminal.value.onData(data => socket.value?.send(JSON.stringify({ type: 'cmd', cmd: data })));
-  terminal.value.onResize(({ cols, rows }) => {
-    if (socket.value?.readyState === WebSocket.OPEN) {
-      socket.value?.send(JSON.stringify({ type: 'resize', cols, rows }));
+  terminal.open(terminalEl);
+  terminal.onData(data => sockets.value[id]?.send(JSON.stringify({ type: 'cmd', cmd: data })));
+  terminal.onResize(({ cols, rows }) => {
+    if (sockets.value[id]?.readyState === WebSocket.OPEN) {
+      sockets.value[id]?.send(JSON.stringify({ type: 'resize', cols, rows }));
     }
   });
+
+  nextTick(() => fitXterm(id));
 };
 
-const initializeWebsocket = async () => {
+const initializeWebsocket = async (id: number, hostId: number) => {
   try {
-    const port = await WebSocketPort();
-    socket.value = new WebSocket(`ws://localhost:${port}/ws/terminal?hostId=${activeConn.value?.hostId}`);
-    if (!socket.value) return;
+    if (sockets.value[id]?.readyState === WebSocket.OPEN) {
+      updateStatus(id, { isConnecting: false });
+      return;
+    }
 
-    socket.value.onopen = () => {
-      terminal.value?.focus();
+    if (sockets.value[id]) {
+      sockets.value[id].close();
+      sockets.value[id] = undefined;
+    }
+
+    updateStatus(id, {
+      isConnecting: true,
+      connectionError: false,
+      errorMessage: '',
+      errorDetails: '',
+    });
+
+    const port = await WebSocketPort();
+    sockets.value[id] = new WebSocket(`ws://localhost:${port}/ws/terminal?hostId=${hostId}`);
+    const socket = sockets.value[id];
+    if (!socket) return;
+
+    socket.onopen = () => {
+      updateStatus(id, { isConnecting: false });
+      nextTick(() => {
+        terminals.value[id]?.focus();
+        fitXterm(id);
+      });
     };
 
-    socket.value.onmessage = async (event: MessageEvent) => {
+    socket.onmessage = async (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       switch (data.type) {
         case 'error':
-          updateStatus({
+          updateStatus(id, {
             isConnecting: false,
             connectionError: true,
             errorMessage: data.error,
             errorDetails: data.details,
           });
-          socket.value?.close();
+          connectedTerminals.value[id] = false;
+          socket?.close();
           break;
         case 'connected':
-          updateStatus({ isConnecting: false });
-          isConnected.value = true;
+          updateStatus(id, { isConnecting: false });
+          connectedTerminals.value[id] = true;
           nextTick(() => {
-            terminal.value?.focus();
-            fitXterm();
+            terminals.value[id]?.focus();
+            fitXterm(id);
           });
           break;
         case 'data':
-          terminal.value?.write(data.content);
+          terminals.value[id]?.write(data.content);
           break;
-        default:
-          console.warn('Unknown message type:', data.type);
       }
     };
 
-    socket.value.onerror = () => {
-      updateStatus({
+    socket.onerror = () => {
+      updateStatus(id, {
         isConnecting: false,
         connectionError: true,
         errorMessage: '连接发生错误，请检查应用是否正常运行',
       });
-      socket.value?.close();
+      connectedTerminals.value[id] = false;
+      socket?.close();
     };
 
-    socket.value.onclose = event => {
-      if (!activeConn.value?.connectionError) {
-        updateStatus({
+    socket.onclose = event => {
+      if (!connectionStore.connections.find(c => c.id === id)?.connectionError) {
+        updateStatus(id, {
           isConnecting: false,
           connectionError: true,
           errorMessage: event.reason || '连接已断开',
         });
       }
-      socket.value = undefined;
+      connectedTerminals.value[id] = false;
+      sockets.value[id] = undefined;
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '无法建立连接';
-    updateStatus({
+    updateStatus(id, {
       isConnecting: false,
       connectionError: true,
       errorMessage,
     });
-    socket.value?.close();
-    socket.value = undefined;
+    sockets.value[id]?.close();
+    sockets.value[id] = undefined;
   }
 };
 
-const reconnect = async () => {
-  updateStatus({
+const reconnect = async (id: number) => {
+  const conn = connectionStore.connections.find(c => c.id === id);
+  if (!conn) return;
+
+  updateStatus(id, {
     connectionError: false,
     isConnecting: true,
     errorMessage: '',
   });
-  await initializeWebsocket();
+  await initializeWebsocket(id, conn.hostId);
 };
 
-const closeTerminal = () => {
+const closeTerminal = (id: number) => {
   try {
-    socket.value?.close();
-    socket.value = undefined;
+    sockets.value[id]?.close();
+    sockets.value[id] = undefined;
+    connectedTerminals.value[id] = false;
 
-    if (terminal.value) {
-      terminal.value.onData(() => {});
-      terminal.value.onResize(() => {});
+    if (terminals.value[id]) {
+      terminals.value[id].onData(() => {});
+      terminals.value[id].onResize(() => {});
       try {
-        terminal.value.dispose();
+        terminals.value[id].dispose();
       } catch (e) {
         console.warn('Error disposing terminal:', e);
       }
-      terminal.value = undefined;
+      terminals.value[id] = undefined;
     }
 
-    fitAddon.value = undefined;
-    webLinksAddon.value = undefined;
-    webglAddon.value = undefined;
-    canvasAddon.value = undefined;
+    fitAddons.value[id] = undefined;
+    webLinksAddons.value[id] = undefined;
+    webglAddons.value[id] = undefined;
+    canvasAddons.value[id] = undefined;
 
-    isConnected.value = false;
-
-    if (activeConn.value?.id) {
-      updateStatus({
-        isConnecting: false,
-        connectionError: false,
-        errorMessage: '',
-        errorDetails: '',
-      });
-    }
+    updateStatus(id, {
+      isConnecting: false,
+      connectionError: false,
+      errorMessage: '',
+      errorDetails: '',
+    });
   } catch (e) {
     console.error('Error in closeTerminal:', e);
   }
@@ -234,29 +283,53 @@ const closeTerminal = () => {
 
 const registerToTabs = async () => {
   await nextTick();
-  if (connectionTabs?.value && connectionStore.activeConnectionId) {
-    connectionTabs.value.registerTerminal(connectionStore.activeConnectionId, {
-      closeTerminal,
+  if (connectionTabs?.value && activeConn.value?.id) {
+    connectionTabs.value.registerTerminal(activeConn.value!.id, {
+      closeTerminal: () => closeTerminal(activeConn.value!.id),
     });
   }
 };
 
+watchEffect(async () => {
+  const connections = connectionStore.connections;
+  for (const conn of connections) {
+    if (!terminals.value[conn.id] || !sockets.value[conn.id]) {
+      initializeTerminal(conn.id);
+      await nextTick();
+      await initializeXterm(conn.id);
+      if (!sockets.value[conn.id]) {
+        await initializeWebsocket(conn.id, conn.hostId);
+      }
+    }
+  }
+});
+
 onMounted(async () => {
-  initializeTerminal();
-  await initializeXterm();
-  await initializeWebsocket();
-  window.addEventListener('resize', fitXterm);
+  window.addEventListener('resize', () => activeConn.value && fitXterm(activeConn.value.id));
   await registerToTabs();
 });
 
-onBeforeUnmount(() => {
-  closeTerminal();
-  window.removeEventListener('resize', fitXterm);
+onUnmounted(() => {
+  Object.keys(terminals.value).forEach(id => closeTerminal(Number(id)));
+  window.removeEventListener('resize', () => activeConn.value && fitXterm(activeConn.value.id));
 });
 
-defineExpose({
-  closeTerminal,
+onActivated(() => {
+  Object.keys(terminals.value).forEach(id => {
+    const numId = Number(id);
+    if (terminals.value[numId]) {
+      nextTick(() => {
+        fitXterm(numId);
+        if (activeConn.value?.id === numId) {
+          terminals.value[numId]?.focus();
+        }
+      });
+    }
+  });
 });
+
+defineExpose({ closeTerminal });
+defineOptions({ name: 'Terminal' });
 </script>
 
 <style lang="less" scoped>
@@ -265,12 +338,7 @@ defineExpose({
   width: 100%;
   display: flex;
 
-  :deep(.n-spin-container) {
-    width: 100%;
-    height: 100%;
-    display: flex;
-  }
-
+  :deep(.n-spin-container),
   :deep(.n-spin-content) {
     width: 100%;
     height: 100%;
@@ -285,12 +353,13 @@ defineExpose({
   }
 
   :deep(.xterm) {
-    .xterm-viewport {
-      overflow: hidden;
-    }
     flex-grow: 1;
     display: flex;
     padding: 8px 0px 8px 8px;
+
+    .xterm-viewport {
+      overflow: hidden;
+    }
   }
 
   :deep(.n-result) {
