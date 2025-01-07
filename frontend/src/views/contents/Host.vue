@@ -71,20 +71,43 @@
 
       <n-grid x-gap="12" y-gap="12" cols="2 s:2 m:3 l:4 xl:6" responsive="screen">
         <n-gi v-for="v in hosts" :key="v.id">
-          <div class="card group" @click="toTerminal(v)">
+          <div class="card host" @click="toTerminal(v)">
             <div class="card-content">
-              <div class="card-icon">
-                <icon icon="ph:computer-tower-duotone" />
+              <div class="card-left">
+                <div class="card-icon">
+                  <icon icon="ph:computer-tower-duotone" />
+                </div>
+                <div class="card-info">
+                  <div class="card-header">
+                    <div class="card-title">{{ v.name }}</div>
+                  </div>
+                  <div class="card-subtitle">
+                    <span>ssh://{{ v.credential?.username }}@{{ v.host }}</span>
+                  </div>
+                </div>
               </div>
-              <div class="card-info">
-                <div class="card-title">{{ v.name }}</div>
-                <div class="card-subtitle">ssh://{{ v.credential?.username }}@{{ v.host }}</div>
+              <div class="card-stats">
+                <div class="stat-item">
+                  <div class="stat-label">CPU</div>
+                  <div class="stat-value">
+                    <icon icon="ph:cpu-duotone" class="stat-icon" />
+                    <span>4 核心</span>
+                  </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                  <div class="stat-label">内存</div>
+                  <div class="stat-value">
+                    <icon icon="ph:memory-duotone" class="stat-icon" />
+                    <span>16GB</span>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="card-actions">
               <n-button text circle class="action-btn" @click.stop="handleEditHost">
                 <template #icon>
-                  <icon icon="ph:pencil-simple-duotone" />
+                  <icon icon="ph:dots-three-outline-duotone" />
                 </template>
               </n-button>
             </div>
@@ -97,7 +120,7 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NGi, NGrid, NH3, NInput, useMessage } from 'naive-ui';
+import { NButton, NGi, NGrid, NH3, NInput, NTag, useMessage } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
@@ -199,19 +222,20 @@ onMounted(async () => {
   }
 }
 
-.card {
+// 分组卡片样式
+.card.group {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: v-bind('gtermThemeVars.cardColor');
   border: 1px solid v-bind('gtermThemeVars.borderColor');
   transition: all 0.2s ease;
 
   &:hover {
     background-color: v-bind('gtermThemeVars.cardHoverColor');
-    border-color: v-bind('gtermThemeVars.splitColor');
+    border-color: v-bind('gtermThemeVars.primaryColor');
   }
 
   .card-content {
@@ -224,16 +248,18 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
+    min-width: 52px;
+    height: 52px;
+    border-radius: 10px;
     background-color: v-bind('gtermThemeVars.primaryColor');
     color: white;
     font-size: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
     :deep(svg) {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
   }
 
@@ -268,6 +294,181 @@ onMounted(async () => {
       &:hover {
         opacity: 1;
         background-color: v-bind('gtermThemeVars.splitColor');
+        transform: scale(1.05);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      :deep(.n-icon) {
+        font-size: 18px;
+      }
+    }
+  }
+
+  &:hover .card-actions {
+    opacity: 1;
+  }
+}
+
+// 主机卡片样式
+.card.host {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: v-bind('gtermThemeVars.cardColor');
+  border: 1px solid v-bind('gtermThemeVars.borderColor');
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    background-color: v-bind('gtermThemeVars.cardHoverColor');
+    border-color: v-bind('gtermThemeVars.primaryColor');
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: v-bind('gtermThemeVars.primaryColor');
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    :deep(svg) {
+      width: 28px;
+      height: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+  }
+
+  .card-info {
+    flex: 1;
+    min-width: 0;
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: v-bind('gtermThemeVars.textColor');
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: v-bind('gtermThemeVars.secondaryText');
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .info-icon {
+        font-size: 14px;
+        opacity: 0.7;
+      }
+
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .card-stats {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    background-color: v-bind('gtermThemeVars.cardHoverColor');
+    border-radius: 8px;
+    border: 1px solid v-bind('gtermThemeVars.borderColor');
+
+    .stat-item {
+      flex: 1;
+
+      .stat-label {
+        font-size: 12px;
+        color: v-bind('gtermThemeVars.secondaryText');
+        margin-bottom: 4px;
+      }
+
+      .stat-value {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: v-bind('gtermThemeVars.textColor');
+        font-weight: 500;
+
+        .stat-icon {
+          font-size: 16px;
+          color: v-bind('gtermThemeVars.primaryColor');
+        }
+      }
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 32px;
+      background-color: v-bind('gtermThemeVars.borderColor');
+      opacity: 0.6;
+    }
+  }
+
+  .card-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    opacity: 0;
+    transition: all 0.2s ease;
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: v-bind('gtermThemeVars.textColor');
+      background-color: v-bind('gtermThemeVars.cardColor');
+      border: 1px solid v-bind('gtermThemeVars.borderColor');
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: v-bind('gtermThemeVars.primaryColor');
+        background-color: v-bind('gtermThemeVars.cardHoverColor');
+        border-color: v-bind('gtermThemeVars.primaryColor');
         transform: scale(1.05);
       }
 
