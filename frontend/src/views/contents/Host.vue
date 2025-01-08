@@ -73,41 +73,18 @@
         <n-gi v-for="v in hosts" :key="v.id">
           <div class="card host" @click="toTerminal(v)">
             <div class="card-content">
-              <div class="card-left">
-                <div class="card-icon">
-                  <icon :icon="getDeviceIcon(v)" />
-                </div>
-                <div class="card-info">
-                  <div class="card-header">
-                    <div class="card-title">{{ v.name }}</div>
-                  </div>
-                  <div class="card-subtitle">
-                    <span>ssh://{{ v.credential?.username }}@{{ v.host }}</span>
-                  </div>
-                </div>
+              <div class="os-icon">
+                <icon :icon="getDeviceIcon(v)" />
               </div>
-              <div class="card-stats">
-                <div class="stat-item">
-                  <div class="stat-label">CPU</div>
-                  <div class="stat-value">
-                    <icon icon="ph:cpu-duotone" class="stat-icon" />
-                    <span>{{ v.metadata?.processors }} 核心</span>
-                  </div>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                  <div class="stat-label">内存</div>
-                  <div class="stat-value">
-                    <icon icon="ph:memory-duotone" class="stat-icon" />
-                    <span>{{ v.metadata?.mem_total }} GB</span>
-                  </div>
-                </div>
+              <div class="host-info">
+                <div class="host-name">{{ v.name }}</div>
+                <div class="host-addr">{{ v.credential?.username }}@{{ v.host }}</div>
               </div>
             </div>
             <div class="card-actions">
               <n-button text circle class="action-btn" @click.stop="handleEditHost">
                 <template #icon>
-                  <icon icon="ph:dots-three-outline-duotone" />
+                  <icon icon="ph:pencil-simple-duotone" />
                 </template>
               </n-button>
             </div>
@@ -266,263 +243,206 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 12px;
   background-color: v-bind('gtermThemeVars.cardColor');
   border: 1px solid v-bind('gtermThemeVars.borderColor');
   transition: all 0.2s ease;
+  cursor: pointer;
 
   &:hover {
-    background-color: v-bind('gtermThemeVars.cardHoverColor');
     border-color: v-bind('gtermThemeVars.primaryColor');
+    background-color: v-bind('`${gtermThemeVars.primaryColor}08`');
+
+    .card-icon {
+      color: white;
+      background: v-bind('gtermThemeVars.primaryColor');
+    }
+
+    .card-actions {
+      opacity: 1;
+    }
   }
 
   .card-content {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex: 1;
+    min-width: 0;
   }
 
   .card-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 52px;
-    height: 52px;
+    min-width: 44px;
+    height: 44px;
     border-radius: 10px;
-    background-color: v-bind('gtermThemeVars.primaryColor');
-    color: white;
-    font-size: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: v-bind('`${gtermThemeVars.primaryColor}15`');
+    color: v-bind('gtermThemeVars.primaryColor');
+    font-size: 22px;
+    transition: all 0.2s ease;
 
     :deep(svg) {
-      width: 28px;
-      height: 28px;
       filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
   }
 
   .card-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
     .card-title {
-      font-weight: 500;
-      margin-bottom: 2px;
+      font-size: 14px;
+      font-weight: 600;
+      color: v-bind('gtermThemeVars.textColor');
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
     }
 
     .card-subtitle {
       font-size: 12px;
       color: v-bind('gtermThemeVars.secondaryText');
-      opacity: 0.7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
     }
   }
 
   .card-actions {
     opacity: 0;
     transition: opacity 0.2s ease;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
 
     .action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
       display: flex;
       align-items: center;
       justify-content: center;
       color: v-bind('gtermThemeVars.textColor');
-      opacity: 0.7;
+      background: v-bind('gtermThemeVars.cardHoverColor');
       transition: all 0.2s ease;
 
       &:hover {
-        opacity: 1;
-        background-color: v-bind('gtermThemeVars.splitColor');
-        transform: scale(1.05);
-      }
-
-      &:active {
-        transform: scale(0.95);
-      }
-
-      :deep(.n-icon) {
-        font-size: 18px;
+        background-color: v-bind('gtermThemeVars.primaryColor');
+        color: white;
       }
     }
-  }
-
-  &:hover .card-actions {
-    opacity: 1;
   }
 }
 
 // 主机卡片样式
 .card.host {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 10px 12px;
   border-radius: 12px;
   background-color: v-bind('gtermThemeVars.cardColor');
   border: 1px solid v-bind('gtermThemeVars.borderColor');
   transition: all 0.2s ease;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
 
   &:hover {
-    background-color: v-bind('gtermThemeVars.cardHoverColor');
     border-color: v-bind('gtermThemeVars.primaryColor');
+    background-color: v-bind('`${gtermThemeVars.primaryColor}08`');
+
+    .os-icon {
+      color: white;
+      background: v-bind('gtermThemeVars.primaryColor');
+    }
+
+    .card-actions {
+      opacity: 1;
+    }
   }
 
   .card-content {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    align-items: center;
+    gap: 12px;
     flex: 1;
     min-width: 0;
   }
 
-  .card-left {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .card-icon {
+  .os-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 52px;
-    height: 52px;
+    min-width: 44px;
+    height: 44px;
     border-radius: 10px;
-    background: v-bind('gtermThemeVars.primaryColor');
-    color: white;
-    font-size: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: v-bind('`${gtermThemeVars.primaryColor}15`');
+    color: v-bind('gtermThemeVars.primaryColor');
+    font-size: 22px;
+    transition: all 0.2s ease;
 
     :deep(svg) {
-      width: 28px;
-      height: 28px;
       filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
   }
 
-  .card-info {
+  .host-info {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-
-    .card-title {
+    .host-name {
+      font-size: 14px;
       font-weight: 600;
-      font-size: 16px;
+      color: v-bind('gtermThemeVars.textColor');
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: v-bind('gtermThemeVars.textColor');
+      line-height: 1.2;
     }
 
-    .card-subtitle {
-      font-size: 13px;
+    .host-addr {
+      font-size: 12px;
       color: v-bind('gtermThemeVars.secondaryText');
-      margin-bottom: 0;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-
-      .info-icon {
-        font-size: 14px;
-        opacity: 0.7;
-      }
-
-      span {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-  }
-
-  .card-stats {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px;
-    background-color: v-bind('gtermThemeVars.cardHoverColor');
-    border-radius: 8px;
-    border: 1px solid v-bind('gtermThemeVars.borderColor');
-
-    .stat-item {
-      flex: 1;
-
-      .stat-label {
-        font-size: 12px;
-        color: v-bind('gtermThemeVars.secondaryText');
-        margin-bottom: 4px;
-      }
-
-      .stat-value {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 14px;
-        color: v-bind('gtermThemeVars.textColor');
-        font-weight: 500;
-
-        .stat-icon {
-          font-size: 16px;
-          color: v-bind('gtermThemeVars.primaryColor');
-        }
-      }
-    }
-
-    .stat-divider {
-      width: 1px;
-      height: 32px;
-      background-color: v-bind('gtermThemeVars.borderColor');
-      opacity: 0.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
     }
   }
 
   .card-actions {
-    position: absolute;
-    top: 12px;
-    right: 12px;
     opacity: 0;
-    transition: all 0.2s ease;
+    transition: opacity 0.2s ease;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
 
     .action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
       display: flex;
       align-items: center;
       justify-content: center;
       color: v-bind('gtermThemeVars.textColor');
-      background-color: v-bind('gtermThemeVars.cardColor');
-      border: 1px solid v-bind('gtermThemeVars.borderColor');
+      background: v-bind('gtermThemeVars.cardHoverColor');
       transition: all 0.2s ease;
 
       &:hover {
-        color: v-bind('gtermThemeVars.primaryColor');
-        background-color: v-bind('gtermThemeVars.cardHoverColor');
-        border-color: v-bind('gtermThemeVars.primaryColor');
-        transform: scale(1.05);
-      }
-
-      &:active {
-        transform: scale(0.95);
-      }
-
-      :deep(.n-icon) {
-        font-size: 18px;
+        background-color: v-bind('gtermThemeVars.primaryColor');
+        color: white;
       }
     }
-  }
-
-  &:hover .card-actions {
-    opacity: 1;
   }
 }
 

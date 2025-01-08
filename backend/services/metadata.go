@@ -48,15 +48,9 @@ func (s *MetadataSrv) UpdateByHost(host *model.Host) {
 		return
 	}
 
-	info := metadata.NewMetadata(client).Fetch()
-	if info.CPU != nil {
-		meta.Processors = info.CPU.Cores
-	}
-	if info.Memory != nil {
-		meta.MemTotal = info.Memory.Total
-	}
-	if info.OSRelease != nil {
-		meta.OS = info.OSRelease.PrettyName
+	osRelease := metadata.NewMetadata(client).GetOSRelease()
+	if osRelease != nil {
+		meta.OS = osRelease.PrettyName
 	}
 
 	if err = t.Save(meta); err != nil {

@@ -59,7 +59,7 @@ func (s *HostSrv) DeleteHost(id uint) *resp.Resp {
 
 func (s *HostSrv) ListHost() *resp.Resp {
 	t := s.Query.Host
-	hosts, err := t.Preload(t.Metadata).Find()
+	hosts, err := t.Preload(t.Metadata, t.Credential).Find()
 	if err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
