@@ -25,8 +25,10 @@ func main() {
 
 	if err := wails.Run(&options.App{
 		Title:     consts.ProjectName,
-		Width:     1266,
-		Height:    768,
+		Width:     1200,
+		Height:    760,
+		MinWidth:  800,
+		MinHeight: 600,
 		Frameless: !app.PreferencesSrv.IsDarwin(),
 		AssetServer: &assetserver.Options{
 			Assets: assets,
