@@ -7,4 +7,5 @@ var SetProvider = wire.NewSet(
 	PreferencesSrvSet,
 	GroupSrvSet,
 	HostSrvSet,
+	MetadataSrvSet,
 )

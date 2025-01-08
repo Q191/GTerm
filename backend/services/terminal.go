@@ -12,7 +12,6 @@ import (
 	"github.com/google/wire"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 	"strings"
@@ -22,10 +21,10 @@ import (
 var TerminalSrvSet = wire.NewSet(wire.Struct(new(TerminalSrv), "*"))
 
 type TerminalSrv struct {
-	DB               *gorm.DB
 	HTTPListenerPort *initialize.HTTPListenerPort
 	Logger           *zap.Logger
 	HostSrv          *HostSrv
+	MetadataSrv      *MetadataSrv
 }
 
 var ug = websocket.Upgrader{
@@ -164,6 +163,11 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 	if err != nil {
 		return fmt.Errorf("failed to find host: %v", err)
 	}
+
+	if host.Metadata == nil {
+		s.MetadataSrv.UpdateByHost(host)
+	}
+
 	sshConf := &adapter.SSHConfig{
 		Host:     host.Host,
 		Port:     host.Port,

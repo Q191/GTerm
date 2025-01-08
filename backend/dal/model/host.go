@@ -8,9 +8,10 @@ type Host struct {
 	Description  string      `gorm:"not null" json:"description"`
 	CredentialID uint        `gorm:"not null" json:"credential_id"`
 	Credential   *Credential `json:"credential"`
+	Metadata     *Metadata   `json:"metadata"`
 	GroupID      *uint       `json:"group_id"`
 }
 
-func (c *Host) TableName() string {
+func (h *Host) TableName() string {
 	return "hosts"
 }

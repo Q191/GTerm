@@ -11,6 +11,7 @@ func models() []any {
 		model.Host{},
 		model.Credential{},
 		model.Group{},
+		model.Metadata{},
 	}
 }
 

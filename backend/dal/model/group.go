@@ -7,6 +7,6 @@ type Group struct {
 	Hosts       []*Host
 }
 
-func (c *Group) TableName() string {
+func (g *Group) TableName() string {
 	return "groups"
 }

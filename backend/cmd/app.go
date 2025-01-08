@@ -19,6 +19,7 @@ type App struct {
 	PreferencesSrv   *services.PreferencesSrv
 	GroupSrv         *services.GroupSrv
 	HostSrv          *services.HostSrv
+	MetadataSrv      *services.MetadataSrv
 }
 
 func (a *App) Startup(ctx context.Context) {
@@ -32,5 +33,6 @@ func (a *App) Bind() (services []any) {
 	services = append(services, a.PreferencesSrv)
 	services = append(services, a.GroupSrv)
 	services = append(services, a.HostSrv)
+	services = append(services, a.MetadataSrv)
 	return
 }

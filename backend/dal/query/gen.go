@@ -20,6 +20,7 @@ var (
 	Credential *credential
 	Group      *group
 	Host       *host
+	Metadata   *metadata
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
@@ -27,6 +28,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	Credential = &Q.Credential
 	Group = &Q.Group
 	Host = &Q.Host
+	Metadata = &Q.Metadata
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
@@ -35,6 +37,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Credential: newCredential(db, opts...),
 		Group:      newGroup(db, opts...),
 		Host:       newHost(db, opts...),
+		Metadata:   newMetadata(db, opts...),
 	}
 }
 
@@ -44,6 +47,7 @@ type Query struct {
 	Credential credential
 	Group      group
 	Host       host
+	Metadata   metadata
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -54,6 +58,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Credential: q.Credential.clone(db),
 		Group:      q.Group.clone(db),
 		Host:       q.Host.clone(db),
+		Metadata:   q.Metadata.clone(db),
 	}
 }
 
@@ -71,6 +76,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Credential: q.Credential.replaceDB(db),
 		Group:      q.Group.replaceDB(db),
 		Host:       q.Host.replaceDB(db),
+		Metadata:   q.Metadata.replaceDB(db),
 	}
 }
 
@@ -78,6 +84,7 @@ type queryCtx struct {
 	Credential ICredentialDo
 	Group      IGroupDo
 	Host       IHostDo
+	Metadata   IMetadataDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
@@ -85,6 +92,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Credential: q.Credential.WithContext(ctx),
 		Group:      q.Group.WithContext(ctx),
 		Host:       q.Host.WithContext(ctx),
+		Metadata:   q.Metadata.WithContext(ctx),
 	}
 }
 

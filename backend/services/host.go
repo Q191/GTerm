@@ -33,7 +33,7 @@ func (s *HostSrv) UpdateHost(host *model.Host) *resp.Resp {
 
 func (s *HostSrv) FindByID(id uint) (*model.Host, error) {
 	t := s.Query.Host
-	return t.Where(t.ID.Eq(id)).Preload(t.Credential).First()
+	return t.Where(t.ID.Eq(id)).Preload(t.Credential, t.Metadata).First()
 }
 
 func (s *HostSrv) DeleteHost(id uint) *resp.Resp {
@@ -47,7 +47,7 @@ func (s *HostSrv) DeleteHost(id uint) *resp.Resp {
 
 func (s *HostSrv) ListHost() *resp.Resp {
 	t := s.Query.Host
-	hosts, err := t.Find()
+	hosts, err := t.Preload(t.Metadata).Find()
 	if err != nil {
 		return resp.FailWithMsg(err.Error())
 	}

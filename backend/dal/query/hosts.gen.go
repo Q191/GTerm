@@ -37,6 +37,12 @@ func newHost(db *gorm.DB, opts ...gen.DOOption) host {
 	_host.Description = field.NewString(tableName, "description")
 	_host.CredentialID = field.NewUint(tableName, "credential_id")
 	_host.GroupID = field.NewUint(tableName, "group_id")
+	_host.Metadata = hostHasOneMetadata{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Metadata", "model.Metadata"),
+	}
+
 	_host.Credential = hostBelongsToCredential{
 		db: db.Session(&gorm.Session{}),
 
@@ -62,7 +68,9 @@ type host struct {
 	Description  field.String
 	CredentialID field.Uint
 	GroupID      field.Uint
-	Credential   hostBelongsToCredential
+	Metadata     hostHasOneMetadata
+
+	Credential hostBelongsToCredential
 
 	fieldMap map[string]field.Expr
 }
@@ -105,7 +113,7 @@ func (h *host) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (h *host) fillFieldMap() {
-	h.fieldMap = make(map[string]field.Expr, 11)
+	h.fieldMap = make(map[string]field.Expr, 12)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["created_at"] = h.CreatedAt
 	h.fieldMap["updated_at"] = h.UpdatedAt
@@ -127,6 +135,77 @@ func (h host) clone(db *gorm.DB) host {
 func (h host) replaceDB(db *gorm.DB) host {
 	h.hostDo.ReplaceDB(db)
 	return h
+}
+
+type hostHasOneMetadata struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a hostHasOneMetadata) Where(conds ...field.Expr) *hostHasOneMetadata {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a hostHasOneMetadata) WithContext(ctx context.Context) *hostHasOneMetadata {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a hostHasOneMetadata) Session(session *gorm.Session) *hostHasOneMetadata {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a hostHasOneMetadata) Model(m *model.Host) *hostHasOneMetadataTx {
+	return &hostHasOneMetadataTx{a.db.Model(m).Association(a.Name())}
+}
+
+type hostHasOneMetadataTx struct{ tx *gorm.Association }
+
+func (a hostHasOneMetadataTx) Find() (result *model.Metadata, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a hostHasOneMetadataTx) Append(values ...*model.Metadata) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a hostHasOneMetadataTx) Replace(values ...*model.Metadata) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a hostHasOneMetadataTx) Delete(values ...*model.Metadata) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a hostHasOneMetadataTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a hostHasOneMetadataTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type hostBelongsToCredential struct {

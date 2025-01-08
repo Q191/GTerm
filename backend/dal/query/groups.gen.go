@@ -42,6 +42,11 @@ func newGroup(db *gorm.DB, opts ...gen.DOOption) group {
 		}{
 			RelationField: field.NewRelation("Hosts.Credential", "model.Credential"),
 		},
+		Metadata: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("Hosts.Metadata", "model.Metadata"),
+		},
 	}
 
 	_group.fillFieldMap()
@@ -124,6 +129,9 @@ type groupHasManyHosts struct {
 	field.RelationField
 
 	Credential struct {
+		field.RelationField
+	}
+	Metadata struct {
 		field.RelationField
 	}
 }

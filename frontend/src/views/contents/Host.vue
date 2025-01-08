@@ -91,7 +91,7 @@
                   <div class="stat-label">CPU</div>
                   <div class="stat-value">
                     <icon icon="ph:cpu-duotone" class="stat-icon" />
-                    <span>4 核心</span>
+                    <span>{{ v.metadata?.processors }} 核心</span>
                   </div>
                 </div>
                 <div class="stat-divider"></div>
@@ -99,7 +99,7 @@
                   <div class="stat-label">内存</div>
                   <div class="stat-value">
                     <icon icon="ph:memory-duotone" class="stat-icon" />
-                    <span>16GB</span>
+                    <span>{{ v.metadata?.mem_total }} GB</span>
                   </div>
                 </div>
               </div>

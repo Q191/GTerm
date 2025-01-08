@@ -51,6 +51,7 @@ func (d *Database) autoMigrate() error {
 		model.Host{},
 		model.Credential{},
 		model.Group{},
+		model.Metadata{},
 	}
 	return d.db.AutoMigrate(models...)
 }

@@ -21,10 +21,15 @@ func NewApp() *App {
 		Logger: logger,
 		Query:  query,
 	}
+	metadataSrv := &services.MetadataSrv{
+		Logger: logger,
+		Query:  query,
+	}
 	terminalSrv := &services.TerminalSrv{
 		HTTPListenerPort: httpListenerPort,
 		Logger:           logger,
 		HostSrv:          hostSrv,
+		MetadataSrv:      metadataSrv,
 	}
 	preferencesSrv := &services.PreferencesSrv{
 		Logger: logger,
@@ -40,6 +45,7 @@ func NewApp() *App {
 		PreferencesSrv:   preferencesSrv,
 		GroupSrv:         groupSrv,
 		HostSrv:          hostSrv,
+		MetadataSrv:      metadataSrv,
 	}
 	return app
 }
