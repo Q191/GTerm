@@ -26,7 +26,7 @@
     </div>
 
     <!-- 分组列表 -->
-    <div class="section">
+    <div class="section" v-if="groups?.length">
       <div class="section-header">
         <n-h3 prefix="bar">
           <icon icon="ph:folders-duotone" class="section-icon" />
@@ -60,7 +60,7 @@
     </div>
 
     <!-- 主机列表 -->
-    <div class="section">
+    <div class="section" v-if="hosts?.length">
       <div class="section-header">
         <n-h3 prefix="bar">
           <icon icon="ph:computer-tower-duotone" class="section-icon" />
@@ -75,7 +75,7 @@
             <div class="card-content">
               <div class="card-left">
                 <div class="card-icon">
-                  <icon icon="ph:computer-tower-duotone" />
+                  <icon :icon="getDeviceIcon(v)" />
                 </div>
                 <div class="card-info">
                   <div class="card-header">
@@ -139,6 +139,15 @@ const connectionStore = useConnectionStore();
 const groups = ref<model.Group[]>();
 const hosts = ref<model.Host[]>();
 
+watch(
+  () => dialogStore.hostDialogVisible,
+  newVal => {
+    if (!newVal) {
+      fetchData();
+    }
+  },
+);
+
 const toTerminal = (host: model.Host) => {
   const connection = {
     id: Date.now(),
@@ -176,10 +185,40 @@ const fetchHosts = async () => {
   return resp.data;
 };
 
-onMounted(async () => {
+const fetchData = async () => {
   const [groupsData, hostsData] = await Promise.all([fetchGroups(), fetchHosts()]);
   groups.value = groupsData;
   hosts.value = hostsData;
+};
+
+const getDeviceIcon = (host: model.Host) => {
+  const os = host.metadata?.os?.toLowerCase() || '';
+
+  if (os.includes('cisco')) {
+    return 'simple-icons:cisco';
+  } else if (os.includes('huawei')) {
+    return 'simple-icons:huawei';
+  } else if (os.includes('redhat') || os.includes('rhel')) {
+    return 'simple-icons:redhat';
+  } else if (os.includes('ubuntu')) {
+    return 'simple-icons:ubuntu';
+  } else if (os.includes('centos')) {
+    return 'simple-icons:centos';
+  } else if (os.includes('debian')) {
+    return 'simple-icons:debian';
+  } else if (os.includes('suse')) {
+    return 'simple-icons:opensuse';
+  } else if (os.includes('fedora')) {
+    return 'simple-icons:fedora';
+  } else if (os.includes('linux')) {
+    return 'simple-icons:linux';
+  }
+
+  return 'ph:computer-tower-duotone';
+};
+
+onMounted(async () => {
+  await fetchData();
 });
 </script>
 
@@ -493,5 +532,60 @@ onMounted(async () => {
   line-height: 1;
   display: flex;
   align-items: center;
+}
+
+.card-icon {
+  &.is-linux {
+    background: linear-gradient(135deg, #2b5582 0%, #45a298 100%);
+  }
+
+  &.is-switch {
+    background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+  }
+
+  // 品牌特定样式
+  &.brand-redhat {
+    background: linear-gradient(135deg, #cc0000 0%, #ee0000 100%);
+  }
+
+  &.brand-ubuntu {
+    background: linear-gradient(135deg, #e95420 0%, #ff7f50 100%);
+  }
+
+  &.brand-centos {
+    background: linear-gradient(135deg, #932279 0%, #bf4c94 100%);
+  }
+
+  &.brand-debian {
+    background: linear-gradient(135deg, #d70a53 0%, #ff4081 100%);
+  }
+
+  &.brand-suse {
+    background: linear-gradient(135deg, #02d35f 0%, #73ba25 100%);
+  }
+
+  &.brand-fedora {
+    background: linear-gradient(135deg, #294172 0%, #3c6eb4 100%);
+  }
+
+  &.brand-cisco {
+    background: linear-gradient(135deg, #049fd9 0%, #00bceb 100%);
+  }
+
+  &.brand-huawei {
+    background: linear-gradient(135deg, #cf0a2c 0%, #ff0000 100%);
+  }
+
+  &.brand-h3c {
+    background: linear-gradient(135deg, #003366 0%, #0066cc 100%);
+  }
+
+  &.brand-ruijie {
+    background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+  }
+
+  &.brand-arista {
+    background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%);
+  }
 }
 </style>

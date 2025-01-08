@@ -18,7 +18,7 @@ func models() []any {
 func main() {
 	_, err := os.Stat("main.go")
 	if err != nil {
-		panic("请在项目根目录执行 go run cmd/gen/mysql/main.go")
+		panic("请在项目根目录执行 go run backend/cmd/gen/main.go")
 	}
 
 	g := gen.NewGenerator(gen.Config{

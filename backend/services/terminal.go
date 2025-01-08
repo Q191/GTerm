@@ -165,7 +165,7 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 	}
 
 	if host.Metadata == nil {
-		s.MetadataSrv.UpdateByHost(host)
+		go s.MetadataSrv.UpdateByHost(host)
 	}
 
 	sshConf := &adapter.SSHConfig{

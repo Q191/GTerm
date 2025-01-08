@@ -4,6 +4,7 @@ import (
 	"github.com/MisakaTAT/GTerm/backend/dal/model"
 	"github.com/MisakaTAT/GTerm/backend/dal/query"
 	"github.com/MisakaTAT/GTerm/backend/pkg/resp"
+	"github.com/google/uuid"
 	"github.com/google/wire"
 	"go.uber.org/zap"
 )
@@ -16,8 +17,19 @@ type HostSrv struct {
 }
 
 func (s *HostSrv) CreateHost(host *model.Host) *resp.Resp {
-	t := s.Query.Host
-	if err := t.Create(host); err != nil {
+	if err := s.Query.Transaction(func(tx *query.Query) error {
+		if host.CredentialID == 0 && host.Credential != nil {
+			host.Credential.Name = uuid.New().String()
+			if err := tx.Credential.Create(host.Credential); err != nil {
+				return err
+			}
+			host.CredentialID = host.Credential.ID
+		}
+		if err := tx.Host.Create(host); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
 	return resp.Ok()

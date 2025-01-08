@@ -6,7 +6,7 @@ import (
 
 type Credential struct {
 	Common
-	Name               string         `gorm:"uniqueIndex;not null" json:"name"`
+	Name               string         `json:"name" gorm:"uniqueIndex;not null"`
 	Username           string         `json:"username"`
 	Password           string         `json:"password"`
 	AuthType           enums.AuthType `json:"auth_type"`

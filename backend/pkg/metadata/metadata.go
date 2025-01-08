@@ -1,6 +1,7 @@
 package metadata
 
 import (
+	"fmt"
 	"github.com/MisakaTAT/GTerm/backend/pkg/exec"
 	"golang.org/x/crypto/ssh"
 	"strconv"
@@ -100,7 +101,21 @@ func (m *Metadata) GetCPUInfo() *CPUInfo {
 
 func (m *Metadata) GetOSRelease() *OSRelease {
 	var r OSRelease
-	output := m.exec.Run("cat /etc/os-release").Unwrap()
+
+	output := m.exec.Run("display version").Unwrap()
+	if output != "" && strings.Contains(strings.ToLower(output), "huawei") {
+		r.PrettyName = "Huawei"
+		return &r
+	}
+
+	output = m.exec.Run("show version").Unwrap()
+	fmt.Println(output)
+	if strings.Contains(strings.ToLower(output), "cisco") {
+		r.PrettyName = "Cisco"
+		return &r
+	}
+
+	output = m.exec.Run("cat /etc/os-release").Unwrap()
 	if output == "" {
 		output = m.exec.Run("cat /etc/issue").Unwrap()
 		if output != "" {

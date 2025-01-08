@@ -34,6 +34,7 @@ func newMetadata(db *gorm.DB, opts ...gen.DOOption) metadata {
 	_metadata.HostID = field.NewUint(tableName, "host_id")
 	_metadata.Processors = field.NewUint(tableName, "processors")
 	_metadata.MemTotal = field.NewUint(tableName, "mem_total")
+	_metadata.OS = field.NewString(tableName, "os")
 
 	_metadata.fillFieldMap()
 
@@ -51,6 +52,7 @@ type metadata struct {
 	HostID     field.Uint
 	Processors field.Uint
 	MemTotal   field.Uint
+	OS         field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -74,6 +76,7 @@ func (m *metadata) updateTableName(table string) *metadata {
 	m.HostID = field.NewUint(table, "host_id")
 	m.Processors = field.NewUint(table, "processors")
 	m.MemTotal = field.NewUint(table, "mem_total")
+	m.OS = field.NewString(table, "os")
 
 	m.fillFieldMap()
 
@@ -90,7 +93,7 @@ func (m *metadata) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (m *metadata) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 7)
+	m.fieldMap = make(map[string]field.Expr, 8)
 	m.fieldMap["id"] = m.ID
 	m.fieldMap["created_at"] = m.CreatedAt
 	m.fieldMap["updated_at"] = m.UpdatedAt
@@ -98,6 +101,7 @@ func (m *metadata) fillFieldMap() {
 	m.fieldMap["host_id"] = m.HostID
 	m.fieldMap["processors"] = m.Processors
 	m.fieldMap["mem_total"] = m.MemTotal
+	m.fieldMap["os"] = m.OS
 }
 
 func (m metadata) clone(db *gorm.DB) metadata {

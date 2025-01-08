@@ -55,6 +55,9 @@ func (s *MetadataSrv) UpdateByHost(host *model.Host) {
 	if info.Memory != nil {
 		meta.MemTotal = info.Memory.Total
 	}
+	if info.OSRelease != nil {
+		meta.OS = info.OSRelease.PrettyName
+	}
 
 	if err = t.Save(meta); err != nil {
 		s.Logger.Error("failed to update metadata", zap.Error(err))
