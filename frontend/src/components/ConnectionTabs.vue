@@ -91,7 +91,6 @@ defineExpose({
 
 <style lang="less" scoped>
 .connection-tabs {
-  border-bottom: 1px solid v-bind('gtermThemeVars.splitColor');
   background-color: v-bind('gtermThemeVars.cardColor');
   overflow-x: auto;
   overflow-y: hidden;

@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ConnectionTabs: typeof import('./components/ConnectionTabs.vue')['default']
+    NIcon: typeof import('naive-ui')['NIcon']
     NTooltip: typeof import('naive-ui')['NTooltip']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

@@ -6,11 +6,11 @@
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
-            class="w-11 h-9 mb-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
-            :class="{ 'bg-active': selectedKey === 'Host' }"
+            class="w-11 h-[38px] mb-1 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer top-menu-item"
+            :class="{ active: selectedKey === 'Host' }"
             @click="handleSelect('Host')"
           >
-            <n-icon size="large" class="icon-hover">
+            <n-icon size="x-large">
               <icon icon="ph:hard-drives-duotone" />
             </n-icon>
           </div>
@@ -18,20 +18,20 @@
         资产清单
       </n-tooltip>
 
-      <!-- 登录凭证 -->
+      <!-- 钥匙串 -->
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
-            class="w-11 h-9 mb-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
-            :class="{ 'bg-active': selectedKey === 'Credentials' }"
-            @click="handleSelect('Credentials')"
+            class="w-11 h-[38px] mb-1 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer top-menu-item"
+            :class="{ active: selectedKey === 'KeyChain' }"
+            @click="handleSelect('KeyChain')"
           >
-            <n-icon size="large" class="icon-hover">
-              <icon icon="ph:key-duotone" />
+            <n-icon size="x-large">
+              <icon icon="ph:vault-duotone" />
             </n-icon>
           </div>
         </template>
-        登录凭证
+        钥匙串
       </n-tooltip>
     </div>
 
@@ -42,7 +42,7 @@
         <n-tooltip placement="right" trigger="hover">
           <template #trigger>
             <div class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer">
-              <n-icon size="large" class="icon-hover">
+              <n-icon size="x-large">
                 <icon icon="ph:gear-six-duotone" />
               </n-icon>
             </div>
@@ -58,7 +58,7 @@
             class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
             @click="toggleTheme"
           >
-            <n-icon size="large" class="icon-hover">
+            <n-icon size="x-large">
               <icon :icon="prefStore.isDark ? 'ph:sun-duotone' : 'ph:moon-duotone'" />
             </n-icon>
           </div>
@@ -73,7 +73,7 @@
             class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
             @click="openGithub"
           >
-            <n-icon size="large" class="icon-hover">
+            <n-icon size="x-large">
               <icon icon="ph:github-logo-duotone" />
             </n-icon>
           </div>
@@ -107,7 +107,7 @@ const settingsOptions = [
   {
     label: '偏好设置',
     key: 'settings',
-    icon: renderIcon('ph:gear-six-duotone'),
+    icon: renderIcon('ph:sliders-horizontal-duotone'),
   },
   {
     label: '检查更新',
@@ -123,7 +123,7 @@ const settingsOptions = [
 
 // 渲染图标
 function renderIcon(name: string) {
-  return () => h(NIcon, null, { default: () => h(Icon, { icon: name }) });
+  return () => h(NIcon, { size: 'large' }, { default: () => h(Icon, { icon: name }) });
 }
 
 // 处理主菜单选择
@@ -168,15 +168,30 @@ const openGithub = () => {
   background-color: v-bind('gtermThemeVars.splitColor');
 }
 
-.bg-active {
-  background-color: v-bind('gtermThemeVars.splitColor');
+.top-menu-item {
+  &:hover {
+    color: v-bind('gtermThemeVars.primaryColor');
+  }
+
+  &.active {
+    color: v-bind('gtermThemeVars.primaryColor');
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      border-radius: 3px;
+      background-color: v-bind('gtermThemeVars.primaryColor');
+    }
+  }
 }
 
 .icon-hover {
   transition: transform 0.2s ease;
-
-  &:hover {
-    transform: scale(1.1);
-  }
 }
 </style>

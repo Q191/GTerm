@@ -1,13 +1,12 @@
 <template>
-  <div class="credentials-container">
+  <div class="keychain-container">
     <div class="header">
       <div class="title">
-        <icon icon="ph:key-duotone" />
-        <span>密钥管理</span>
+        <span>钥匙串</span>
       </div>
       <div class="actions">
         <n-input-group>
-          <n-input placeholder="搜索密钥...">
+          <n-input placeholder="搜索认证信息...">
             <template #prefix>
               <icon icon="ph:magnifying-glass-duotone" />
             </template>
@@ -16,7 +15,7 @@
             <template #icon>
               <icon icon="ph:plus-bold" />
             </template>
-            添加密钥
+            添加认证信息
           </n-button>
         </n-input-group>
       </div>
@@ -24,43 +23,43 @@
 
     <n-scrollbar class="content">
       <div class="content-wrapper">
-        <n-list hoverable clickable class="credential-list">
-          <n-list-item v-for="credential in mockCredentials" :key="credential.id">
-            <div class="credential-item">
+        <n-list hoverable clickable class="keychain-list">
+          <n-list-item v-for="item in mockKeychain" :key="item.id">
+            <div class="keychain-item">
               <n-thing>
                 <template #avatar>
-                  <div class="credential-type" :class="credential.authType === 'password' ? 'success' : 'warning'">
-                    <icon :icon="credential.authType === 'password' ? 'ph:password-duotone' : 'ph:key-duotone'" />
+                  <div class="keychain-type" :class="item.authType === 'password' ? 'success' : 'warning'">
+                    <icon :icon="item.authType === 'password' ? 'ph:password-duotone' : 'ph:key-duotone'" />
                   </div>
                 </template>
                 <template #header>
-                  <div class="credential-header">
-                    <span class="name">{{ credential.name }}</span>
+                  <div class="keychain-header">
+                    <span class="name">{{ item.name }}</span>
                   </div>
                 </template>
                 <template #description>
-                  <div class="credential-info">
+                  <div class="keychain-info">
                     <span class="info-item">
                       <icon icon="ph:user-duotone" />
-                      {{ credential.username }}
+                      {{ item.username }}
                     </span>
                     <span class="info-item">
                       <icon icon="ph:clock-duotone" />
-                      {{ credential.createdAt }} 创建
+                      {{ item.createdAt }} 创建
                     </span>
                   </div>
                 </template>
               </n-thing>
-              <div class="credential-actions">
+              <div class="keychain-actions">
                 <n-tooltip trigger="hover">
                   <template #trigger>
                     <n-button circle text>
                       <template #icon>
-                        <icon :icon="credential.authType === 'password' ? 'ph:copy-duotone' : 'ph:file-text-duotone'" />
+                        <icon :icon="item.authType === 'password' ? 'ph:copy-duotone' : 'ph:file-text-duotone'" />
                       </template>
                     </n-button>
                   </template>
-                  {{ credential.authType === 'password' ? '复制密码' : '查看密钥' }}
+                  {{ item.authType === 'password' ? '复制密码' : '查看密钥' }}
                 </n-tooltip>
                 <n-tooltip trigger="hover">
                   <template #trigger>
@@ -98,7 +97,7 @@ import { usePreferencesStore } from '@/stores/preferences';
 import { gtermTheme } from '@/themes/gterm-theme';
 import { computed, ref } from 'vue';
 
-interface Credential {
+interface KeychainItem {
   id: number;
   name: string;
   username: string;
@@ -106,7 +105,7 @@ interface Credential {
   createdAt: string;
 }
 
-const mockCredentials = ref<Credential[]>([
+const mockKeychain = ref<KeychainItem[]>([
   {
     id: 1,
     name: 'root@192.168.1.100',
@@ -187,7 +186,7 @@ const gtermThemeVars = computed(() => {
 </script>
 
 <style lang="less" scoped>
-.credentials-container {
+.keychain-container {
   position: absolute;
   top: 0;
   left: 0;
@@ -202,7 +201,7 @@ const gtermThemeVars = computed(() => {
   position: sticky;
   top: 0;
   padding: 16px 24px;
-  border-bottom: 1px solid v-bind('gtermThemeVars.borderColor');
+  border-bottom: 1px solid v-bind('`${gtermThemeVars.borderColor}`');
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -244,20 +243,17 @@ const gtermThemeVars = computed(() => {
 .content-wrapper {
   padding: 16px;
 
-  .credential-list {
+  .keychain-list {
     margin: 0 auto;
     width: 100%;
     max-width: 800px;
   }
 
   :deep(.n-list) {
-    --n-border-radius: 8px;
-    --n-color-modal: v-bind('gtermThemeVars.cardColor');
-    --n-border: 1px solid v-bind('gtermThemeVars.borderColor');
-
     .n-list-item {
       padding: 16px;
       transition: all 0.2s ease;
+      background-color: v-bind('gtermThemeVars.cardColor');
 
       &:hover {
         background-color: v-bind('gtermThemeVars.cardHoverColor');
@@ -266,7 +262,7 @@ const gtermThemeVars = computed(() => {
   }
 }
 
-.credential-type {
+.keychain-type {
   width: 40px;
   height: 40px;
   border-radius: 8px;
@@ -287,7 +283,7 @@ const gtermThemeVars = computed(() => {
   }
 }
 
-.credential-header {
+.keychain-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -297,7 +293,7 @@ const gtermThemeVars = computed(() => {
   }
 }
 
-.credential-info {
+.keychain-info {
   display: flex;
   gap: 16px;
   margin-top: 4px;
@@ -315,7 +311,7 @@ const gtermThemeVars = computed(() => {
   }
 }
 
-.credential-item {
+.keychain-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -328,7 +324,7 @@ const gtermThemeVars = computed(() => {
   }
 }
 
-.credential-actions {
+.keychain-actions {
   display: flex;
   gap: 4px;
   flex-shrink: 0;

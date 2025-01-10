@@ -20,7 +20,9 @@
             :class="{ active: selectedGroup?.id === group.id }"
             @click="selectGroup(group)"
           >
-            <icon icon="ph:folder-simple-duotone" />
+            <n-icon size="large">
+              <icon icon="ph:folder-simple-duotone" />
+            </n-icon>
             <span class="name">{{ group.name }}</span>
             <span class="count">{{ getHostCountInGroup(group) }}</span>
           </div>
@@ -249,7 +251,7 @@ onMounted(async () => {
 // 左侧边栏样式
 .sidebar {
   width: 260px;
-  border-right: 1px solid v-bind('`${gtermThemeVars.primaryColor}10`');
+  border-right: 1px solid v-bind('`${gtermThemeVars.borderColor}`');
   display: flex;
   flex-direction: column;
 }
@@ -264,7 +266,7 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid v-bind('`${gtermThemeVars.primaryColor}10`');
+    border-bottom: 1px solid v-bind('`${gtermThemeVars.borderColor}`');
 
     .title {
       font-size: 13px;
@@ -457,7 +459,7 @@ onMounted(async () => {
     align-items: center;
     justify-content: space-between;
     margin-top: auto;
-    background: v-bind('`${gtermThemeVars.primaryColor}05`');
+    background: v-bind('`${gtermThemeVars.primaryColor}10`');
 
     .last-connected {
       display: flex;

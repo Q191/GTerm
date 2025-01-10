@@ -5,7 +5,7 @@
     </n-layout-header>
 
     <n-layout :has-sider="!isTerminal">
-      <n-layout-sider v-if="!isTerminal" bordered :width="60">
+      <n-layout-sider v-if="!isTerminal" bordered :width="50">
         <Sider />
       </n-layout-sider>
       <n-layout-content>

@@ -12,76 +12,152 @@
     transform-origin="center"
     @positive-click="handleConfirm"
   >
-    <n-tabs animated type="line" v-model:value="activeTab">
+    <n-tabs animated type="line" placement="left" v-model:value="activeTab">
       <n-tab-pane name="basic" :tab="$t('host_dialog.basic_config')">
-        <n-form ref="formRef" :model="formValue" :rules="rules" label-placement="left" label-width="80">
-          <n-form-item :label="$t('host_dialog.name')" path="name">
-            <n-input v-model:value="formValue.name" clearable />
+        <n-form ref="formRef" :model="formValue" :rules="rules" :show-label="false">
+          <n-form-item spath="name">
+            <n-input v-model:value="formValue.name" clearable :placeholder="$t('host_dialog.placeholder.name')" />
           </n-form-item>
 
-          <n-form-item :label="$t('host_dialog.group')" path="group_id">
-            <n-select v-model:value="formValue.group_id" :options="groupOptions" clearable tag />
+          <n-form-item path="group_id">
+            <n-select
+              v-model:value="formValue.group_id"
+              :options="groupOptions"
+              clearable
+              tag
+              :placeholder="$t('host_dialog.placeholder.group')"
+            />
           </n-form-item>
 
           <div class="flex items-center w-full gap-2">
-            <n-form-item :label="$t('host_dialog.host')" path="host" class="flex-1">
-              <n-input v-model:value="formValue.host" clearable />
+            <n-form-item path="host" class="flex-1">
+              <n-input v-model:value="formValue.host" clearable :placeholder="$t('host_dialog.placeholder.host')" />
             </n-form-item>
             <n-form-item path="port" class="port-input">
-              <n-input-number v-model:value="formValue.port" :min="1" :max="65535" />
+              <n-input-number
+                v-model:value="formValue.port"
+                :min="1"
+                :max="65535"
+                :show-button="false"
+                :placeholder="$t('host_dialog.placeholder.port')"
+              />
             </n-form-item>
           </div>
 
+          <n-form-item path="description">
+            <n-input
+              v-model:value="formValue.description"
+              type="textarea"
+              :rows="3"
+              clearable
+              :placeholder="$t('host_dialog.placeholder.description')"
+            />
+          </n-form-item>
+
           <n-form-item :label="$t('host_dialog.auth_type')" path="credential.auth_type">
-            <n-radio-group v-model:value="formValue.credential!.auth_type">
-              <n-space>
-                <n-radio :value="0">{{ $t('host_dialog.password') }}</n-radio>
-                <n-radio :value="1">{{ $t('host_dialog.private_key') }}</n-radio>
-              </n-space>
-            </n-radio-group>
+            <div class="flex items-center justify-between w-full">
+              <n-button-group>
+                <n-button
+                  :type="formValue.credential!.auth_type === 0 ? 'primary' : 'default'"
+                  @click="handleAuthTypeChange(0)"
+                >
+                  <template #icon>
+                    <Icon icon="ph:password-duotone" />
+                  </template>
+                  {{ $t('host_dialog.password') }}
+                </n-button>
+                <n-button
+                  :type="formValue.credential!.auth_type === 1 ? 'primary' : 'default'"
+                  @click="handleAuthTypeChange(1)"
+                >
+                  <template #icon>
+                    <Icon icon="ph:key-duotone" />
+                  </template>
+                  {{ $t('host_dialog.private_key') }}
+                </n-button>
+                <n-button :type="isKeychainMode ? 'primary' : 'default'" @click="handleAuthTypeChange(-1)">
+                  <template #icon>
+                    <Icon icon="ph:vault-duotone" />
+                  </template>
+                  {{ $t('host_dialog.keychain') }}
+                </n-button>
+              </n-button-group>
+              <n-tooltip v-if="!isKeychainMode" trigger="hover" placement="right">
+                <template #trigger>
+                  <n-switch v-model:value="formValue.credential!.is_common_credential">
+                    <template #checked>{{ $t('host_dialog.common_credential') }}</template>
+                    <template #unchecked>{{ $t('host_dialog.private_credential') }}</template>
+                  </n-switch>
+                </template>
+                <span class="tooltip-text">{{ $t('host_dialog.credential_tooltip') }}</span>
+              </n-tooltip>
+            </div>
           </n-form-item>
 
-          <n-form-item :label="$t('host_dialog.username')" path="credential.username">
-            <n-input v-model:value="formValue.credential!.username" clearable />
-          </n-form-item>
-
-          <template v-if="formValue.credential!.auth_type === 0">
-            <n-form-item :label="$t('host_dialog.password')" path="credential.password">
-              <n-input
-                v-model:value="formValue.credential!.password"
-                type="password"
-                show-password-on="click"
+          <template v-if="isKeychainMode">
+            <n-form-item path="credential_id">
+              <n-select
+                v-model:value="formValue.credential_id"
+                :options="credentialOptions"
                 clearable
+                :placeholder="$t('host_dialog.placeholder.select_credential')"
+                @update:value="handleCredentialChange"
               />
             </n-form-item>
           </template>
 
           <template v-else>
-            <n-form-item :label="$t('host_dialog.private_key')" path="credential.private_key">
-              <n-input v-model:value="formValue.credential!.private_key" type="textarea" :rows="3" clearable />
-            </n-form-item>
-            <n-form-item :label="$t('host_dialog.passphrase')" path="credential.key_password">
+            <n-form-item path="credential.username">
               <n-input
-                v-model:value="formValue.credential!.key_password"
-                type="password"
-                show-password-on="click"
+                v-model:value="formValue.credential!.username"
                 clearable
+                :placeholder="$t('host_dialog.placeholder.username')"
               />
             </n-form-item>
-          </template>
 
-          <n-form-item :label="$t('host_dialog.description')" path="description">
-            <n-input
-              v-model:value="formValue.description"
-              type="textarea"
-              :autosize="{ minRows: 3, maxRows: 5 }"
-              clearable
-            />
-          </n-form-item>
+            <template v-if="formValue.credential!.auth_type === 0">
+              <n-form-item path="credential.password">
+                <n-input
+                  v-model:value="formValue.credential!.password"
+                  type="password"
+                  show-password-on="click"
+                  clearable
+                  :placeholder="$t('host_dialog.placeholder.password')"
+                />
+              </n-form-item>
+            </template>
+
+            <template v-if="formValue.credential!.auth_type === 1">
+              <n-form-item path="credential.private_key">
+                <n-input
+                  v-model:value="formValue.credential!.private_key"
+                  type="textarea"
+                  :rows="3"
+                  clearable
+                  :placeholder="$t('host_dialog.placeholder.private_key')"
+                />
+              </n-form-item>
+              <n-form-item path="credential.key_password">
+                <n-input
+                  v-model:value="formValue.credential!.key_password"
+                  type="password"
+                  show-password-on="click"
+                  clearable
+                  :placeholder="$t('host_dialog.placeholder.key_password')"
+                />
+              </n-form-item>
+            </template>
+          </template>
         </n-form>
       </n-tab-pane>
 
-      <n-tab-pane name="advanced" :tab="$t('host_dialog.advanced_config')"> </n-tab-pane>
+      <n-tab-pane name="advanced" :tab="$t('host_dialog.advanced_config')">
+        <n-empty size="small" :description="$t('host_dialog.developing')">
+          <template #icon>
+            <Icon icon="ph:code-duotone" />
+          </template>
+        </n-empty>
+      </n-tab-pane>
     </n-tabs>
   </n-modal>
 </template>
@@ -91,6 +167,7 @@ import { useDialogStore } from '@/stores/dialog';
 import { model } from '@wailsApp/go/models';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
 import { CreateHost } from '@wailsApp/go/services/HostSrv';
+import { Icon } from '@iconify/vue';
 
 import {
   FormInst,
@@ -100,13 +177,16 @@ import {
   NInput,
   NInputNumber,
   NModal,
-  NRadio,
-  NRadioGroup,
+  NButton,
+  NButtonGroup,
   NSelect,
   NSpace,
   NTabPane,
   NTabs,
   useMessage,
+  NSwitch,
+  NTooltip,
+  NEmpty,
 } from 'naive-ui';
 import { SelectMixedOption } from 'naive-ui/es/select/src/interface';
 import { ref, computed } from 'vue';
@@ -124,6 +204,7 @@ const formValue = ref(
     host: '',
     port: 22,
     description: '',
+    credential_id: '',
     credential: model.Credential.createFrom({
       username: '',
       password: '',
@@ -134,6 +215,36 @@ const formValue = ref(
     }),
   }),
 );
+
+const isKeychainMode = ref(false);
+const credentialOptions = ref<SelectMixedOption[]>([]);
+
+const handleAuthTypeChange = (type: number) => {
+  if (type === -1) {
+    isKeychainMode.value = true;
+    formValue.value.credential = model.Credential.createFrom({
+      username: '',
+      password: '',
+      auth_type: -1,
+      private_key: '',
+      key_password: '',
+      is_common_credential: false,
+    });
+  } else {
+    isKeychainMode.value = false;
+    formValue.value.credential!.auth_type = type;
+  }
+};
+
+const handleCredentialChange = async (id: string) => {
+  if (!id) return;
+  // const resp = await GetCredential(id);
+  // if (!resp.ok) {
+  // message.error(resp.msg);
+  // return;
+  // }
+  // formValue.value.credential = resp.data;
+};
 
 const rules = computed<FormRules>(() => ({
   name: {
@@ -158,29 +269,38 @@ const rules = computed<FormRules>(() => ({
     },
   },
   'credential.username': {
-    required: true,
+    required: !isKeychainMode.value,
     message: t('host_dialog.validation.username_required'),
     trigger: 'blur',
   },
   'credential.password': {
-    required: formValue.value.credential?.auth_type === 0,
+    required: !isKeychainMode.value && formValue.value.credential?.auth_type === 0,
     message: t('host_dialog.validation.password_required'),
     trigger: 'blur',
   },
   'credential.private_key': {
-    required: formValue.value.credential?.auth_type === 1,
+    required: !isKeychainMode.value && formValue.value.credential?.auth_type === 1,
     message: t('host_dialog.validation.private_key_required'),
     trigger: 'blur',
+  },
+  credential_id: {
+    required: isKeychainMode.value,
+    message: t('host_dialog.validation.credential_required'),
+    trigger: ['blur', 'change'],
   },
 }));
 
 const groupOptions = ref<SelectMixedOption[]>([]);
 
 onMounted(async () => {
-  const groups = await fetchGroups();
+  const [groups, credentials] = await Promise.all([fetchGroups(), fetchCredentials()]);
   groupOptions.value = groups.map((group: model.Group) => ({
     label: group.name,
     value: group.id,
+  }));
+  credentialOptions.value = credentials.map((credential: model.Credential) => ({
+    label: credential.name || credential.username,
+    value: credential.id,
   }));
 });
 
@@ -190,6 +310,15 @@ const fetchGroups = async () => {
     message.error(resp.msg);
   }
   return resp.data;
+};
+
+const fetchCredentials = async () => {
+  // const resp = await ListCredentials();
+  // if (!resp.ok) {
+  // message.error(resp.msg);
+  return [];
+  // }
+  // return resp.data || [];
 };
 
 const handleConfirm = async () => {
@@ -215,6 +344,10 @@ const handleConfirm = async () => {
 
 :deep(.n-input) {
   font-size: 13px;
+}
+
+.tooltip-text {
+  white-space: pre-line;
 }
 
 .port-input {
