@@ -86,9 +86,8 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NIcon, NDropdown, NTooltip } from 'naive-ui';
+import { NIcon, NDropdown, NTooltip, useThemeVars } from 'naive-ui';
 import { usePreferencesStore } from '@/stores/preferences';
-import { gtermTheme } from '@/themes/gterm-theme';
 import { useRouter } from 'vue-router';
 import { BrowserOpenURL } from '@wailsApp/runtime';
 import { useDialogStore } from '@/stores/dialog';
@@ -97,10 +96,7 @@ const router = useRouter();
 const prefStore = usePreferencesStore();
 const dialogStore = useDialogStore();
 const selectedKey = ref('Host');
-
-const gtermThemeVars = computed(() => {
-  return gtermTheme(prefStore.isDark);
-});
+const themeVars = useThemeVars();
 
 // 设置下拉菜单选项
 const settingsOptions = [
@@ -123,7 +119,7 @@ const settingsOptions = [
 
 // 渲染图标
 function renderIcon(name: string) {
-  return () => h(NIcon, { size: 'large' }, { default: () => h(Icon, { icon: name }) });
+  return () => h(NIcon, { size: 'x-large' }, { default: () => h(Icon, { icon: name }) });
 }
 
 // 处理主菜单选择
@@ -160,21 +156,20 @@ const openGithub = () => {
 
 <style lang="less" scoped>
 .menu-background {
-  background-color: v-bind('gtermThemeVars.sidebarColor');
   height: calc(100vh - 38px);
 }
 
 .hover\:bg-custom-hover:hover {
-  background-color: v-bind('gtermThemeVars.splitColor');
+  background-color: v-bind('themeVars.hoverColor');
 }
 
 .top-menu-item {
   &:hover {
-    color: v-bind('gtermThemeVars.primaryColor');
+    color: v-bind('themeVars.primaryColor');
   }
 
   &.active {
-    color: v-bind('gtermThemeVars.primaryColor');
+    color: v-bind('themeVars.primaryColor');
     position: relative;
 
     &::before {
@@ -186,7 +181,7 @@ const openGithub = () => {
       width: 3px;
       height: 20px;
       border-radius: 3px;
-      background-color: v-bind('gtermThemeVars.primaryColor');
+      background-color: v-bind('themeVars.primaryColor');
     }
   }
 }

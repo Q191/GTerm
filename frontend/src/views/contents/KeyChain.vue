@@ -92,9 +92,8 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NInput, NInputGroup, NList, NListItem, NTag, NThing, NScrollbar } from 'naive-ui';
+import { NButton, NInput, NInputGroup, NList, NListItem, NTag, NThing, NScrollbar, useThemeVars } from 'naive-ui';
 import { usePreferencesStore } from '@/stores/preferences';
-import { gtermTheme } from '@/themes/gterm-theme';
 import { computed, ref } from 'vue';
 
 interface KeychainItem {
@@ -178,11 +177,7 @@ const mockKeychain = ref<KeychainItem[]>([
   },
 ]);
 
-const prefStore = usePreferencesStore();
-
-const gtermThemeVars = computed(() => {
-  return gtermTheme(prefStore.isDark);
-});
+const themeVars = useThemeVars();
 </script>
 
 <style lang="less" scoped>
@@ -194,18 +189,16 @@ const gtermThemeVars = computed(() => {
   bottom: 0;
   display: flex;
   flex-direction: column;
-  background-color: v-bind('gtermThemeVars.cardColor');
 }
 
 .header {
   position: sticky;
   top: 0;
   padding: 16px 24px;
-  border-bottom: 1px solid v-bind('`${gtermThemeVars.borderColor}`');
+  border-bottom: 1px solid v-bind('themeVars.borderColor');
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: v-bind('gtermThemeVars.cardColor');
   z-index: 1;
 
   .title {
@@ -217,6 +210,7 @@ const gtermThemeVars = computed(() => {
     margin-bottom: 16px;
     font-size: 18px;
     font-weight: 500;
+    color: v-bind('themeVars.textColorBase');
   }
 
   .actions {
@@ -248,18 +242,6 @@ const gtermThemeVars = computed(() => {
     width: 100%;
     max-width: 800px;
   }
-
-  :deep(.n-list) {
-    .n-list-item {
-      padding: 16px;
-      transition: all 0.2s ease;
-      background-color: v-bind('gtermThemeVars.cardColor');
-
-      &:hover {
-        background-color: v-bind('gtermThemeVars.cardHoverColor');
-      }
-    }
-  }
 }
 
 .keychain-type {
@@ -290,6 +272,7 @@ const gtermThemeVars = computed(() => {
 
   .name {
     font-weight: 500;
+    color: v-bind('themeVars.textColorBase');
   }
 }
 
@@ -298,7 +281,7 @@ const gtermThemeVars = computed(() => {
   gap: 16px;
   margin-top: 4px;
   font-size: 13px;
-  color: v-bind('gtermThemeVars.secondaryText');
+  color: v-bind('themeVars.textColor3');
 
   .info-item {
     display: flex;
@@ -339,7 +322,7 @@ const gtermThemeVars = computed(() => {
     }
 
     &:hover {
-      background-color: v-bind('gtermThemeVars.splitColor');
+      background-color: v-bind('themeVars.hoverColor');
     }
   }
 }

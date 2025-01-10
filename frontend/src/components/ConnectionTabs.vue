@@ -28,21 +28,15 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NIcon, NButton, NTooltip } from 'naive-ui';
-import { usePreferencesStore } from '@/stores/preferences';
-import { gtermTheme } from '@/themes/gterm-theme';
+import { NIcon, NButton, NTooltip, useThemeVars } from 'naive-ui';
 import { useConnectionStore } from '@/stores/connection';
 import { useRouter } from 'vue-router';
 
-const prefStore = usePreferencesStore();
 const connectionStore = useConnectionStore();
 const activeTab = computed(() => connectionStore.activeConnectionId);
+const themeVars = useThemeVars();
 
 const tabs = computed(() => connectionStore.connections);
-
-const gtermThemeVars = computed(() => {
-  return gtermTheme(prefStore.isDark);
-});
 
 const terminalRefs = ref<Map<number, any>>(new Map());
 
@@ -91,7 +85,6 @@ defineExpose({
 
 <style lang="less" scoped>
 .connection-tabs {
-  background-color: v-bind('gtermThemeVars.cardColor');
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -103,7 +96,7 @@ defineExpose({
 
 .tab-item {
   position: relative;
-  border-right: 1px solid rgba(127, 127, 127, 0.1);
+  border-right: 1px solid v-bind('themeVars.borderColor');
   transition: background-color 0.2s ease;
   display: flex;
   align-items: center;
@@ -115,15 +108,15 @@ defineExpose({
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1;
+    color: v-bind('themeVars.textColorBase');
   }
 
   &:hover {
-    background-color: rgba(127, 127, 127, 0.08);
+    background-color: v-bind('themeVars.hoverColor');
   }
 
   &.active {
-    background-color: rgba(127, 127, 127, 0.15);
-    border-right-color: transparent;
+    background-color: v-bind('themeVars.hoverColor');
   }
 
   .close-btn {
@@ -142,18 +135,18 @@ defineExpose({
   border-radius: 50%;
 
   &.connected {
-    background-color: #18a058;
-    box-shadow: 0 0 4px rgba(24, 160, 88, 0.4);
+    background-color: v-bind('themeVars.successColor');
+    box-shadow: 0 0 4px v-bind('`${themeVars.successColor}40`');
   }
 
   &.error {
-    background-color: #d03050;
-    box-shadow: 0 0 4px rgba(208, 48, 80, 0.4);
+    background-color: v-bind('themeVars.errorColor');
+    box-shadow: 0 0 4px v-bind('`${themeVars.errorColor}40`');
   }
 
   &.connecting {
-    background-color: #2080f0;
-    box-shadow: 0 0 4px rgba(32, 128, 240, 0.4);
+    background-color: v-bind('themeVars.infoColor');
+    box-shadow: 0 0 4px v-bind('`${themeVars.infoColor}40`');
     animation: pulse 1.5s infinite;
   }
 }

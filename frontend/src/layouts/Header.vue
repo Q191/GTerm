@@ -17,16 +17,16 @@
     </div>
 
     <div v-if="!isDarwin" class="flex items-center mt-0">
-      <div class="w-12 h-12 flex items-center justify-center hover:bg-custom-hover" @click="WindowMinimise">
+      <div class="w-12 h-12 flex items-center justify-center" @click="WindowMinimise">
         <n-icon size="20"><Remove /></n-icon>
       </div>
-      <div class="w-12 h-12 flex items-center justify-center hover:bg-custom-hover" @click="reduction">
+      <div class="w-12 h-12 flex items-center justify-center" @click="reduction">
         <n-icon size="20">
           <span v-if="windowIsMaximised"><Contract /></span>
           <span v-else><Expand /></span>
         </n-icon>
       </div>
-      <div class="w-12 h-12 flex items-center justify-center hover:bg-custom-hover hover:rounded-tr-lg" @click="Quit">
+      <div class="w-12 h-12 flex items-center justify-center hover:rounded-tr-lg" @click="Quit">
         <n-icon size="20"><Close /></n-icon>
       </div>
     </div>
@@ -36,9 +36,7 @@
 <script lang="ts" setup>
 import { Close, Contract, Expand, Remove } from '@vicons/ionicons5';
 import { WindowMinimise, Quit, WindowIsMaximised, WindowMaximise, WindowUnmaximise } from '@wailsApp/runtime';
-import { NIcon } from 'naive-ui';
-import { usePreferencesStore } from '@/stores/preferences';
-import { gtermTheme } from '@/themes/gterm-theme';
+import { NIcon, useThemeVars } from 'naive-ui';
 import { IsDarwin } from '@wailsApp/go/services/PreferencesSrv';
 import ConnectionTabs from '@/components/ConnectionTabs.vue';
 import { useConnectionStore } from '@/stores/connection';
@@ -49,20 +47,16 @@ defineExpose({
   connectionTabsRef,
 });
 
-const prefStore = usePreferencesStore();
 const connectionStore = useConnectionStore();
 const hasConnections = computed(() => connectionStore.hasConnections);
 const router = useRouter();
+const themeVars = useThemeVars();
 
 const isDarwin = ref(false);
 
 const toHost = () => {
   router.push({ name: 'Host' });
 };
-
-const gtermThemeVars = computed(() => {
-  return gtermTheme(prefStore.isDark);
-});
 
 const windowIsMaximised = ref(false);
 
@@ -86,12 +80,7 @@ onMounted(async () => {
 <style lang="less" scoped>
 .header {
   --wails-draggable: drag;
-  background: v-bind('gtermThemeVars.titleColor');
   width: 100%;
   height: 38px;
-}
-
-.hover\:bg-custom-hover:hover {
-  background-color: v-bind('gtermThemeVars.splitColor');
 }
 </style>

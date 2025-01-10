@@ -106,10 +106,9 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NTag, NTooltip, useMessage } from 'naive-ui';
+import { NButton, NTag, NTooltip, useMessage, useThemeVars } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { usePreferencesStore } from '@/stores/preferences';
-import { gtermTheme } from '@/themes/gterm-theme';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
 import { ListHost } from '@wailsApp/go/services/HostSrv';
 import { model } from '@wailsApp/go/models';
@@ -159,10 +158,6 @@ const toTerminal = (host: model.Host) => {
   connectionStore.addConnection(connection);
   router.push({ name: 'Terminal' });
 };
-
-const gtermThemeVars = computed(() => {
-  return gtermTheme(prefStore.isDark);
-});
 
 const handleEditHost = (event: MouseEvent) => {
   event.preventDefault();
@@ -239,19 +234,20 @@ const getErrorConnectionCount = (host: model.Host) => {
 onMounted(async () => {
   await fetchData();
 });
+
+const themeVars = useThemeVars();
 </script>
 
 <style lang="less" scoped>
 .page-container {
   height: 100%;
   display: flex;
-  background: v-bind('gtermThemeVars.cardColor');
 }
 
 // 左侧边栏样式
 .sidebar {
   width: 260px;
-  border-right: 1px solid v-bind('`${gtermThemeVars.borderColor}`');
+  border-right: 1px solid v-bind('themeVars.borderColor');
   display: flex;
   flex-direction: column;
 }
@@ -266,15 +262,12 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid v-bind('`${gtermThemeVars.borderColor}`');
+    border-bottom: 1px solid v-bind('themeVars.borderColor');
 
     .title {
       font-size: 13px;
       font-weight: 600;
-      color: v-bind('gtermThemeVars.textColor');
-      opacity: 0.6;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: v-bind('themeVars.textColorBase');
     }
   }
 
@@ -292,16 +285,16 @@ onMounted(async () => {
     border-radius: 6px;
     cursor: pointer;
     margin: 2px 0;
-    color: v-bind('gtermThemeVars.textColor');
+    color: v-bind('themeVars.textColorBase');
     transition: all 0.2s ease;
 
     &:hover {
-      background: v-bind('`${gtermThemeVars.primaryColor}08`');
+      background: v-bind('themeVars.hoverColor');
     }
 
     &.active {
-      background: v-bind('`${gtermThemeVars.primaryColor}15`');
-      color: v-bind('gtermThemeVars.primaryColor');
+      background: v-bind('`${themeVars.primaryColor}20`');
+      color: v-bind('themeVars.primaryColor');
     }
 
     .name {
@@ -344,7 +337,7 @@ onMounted(async () => {
       h2 {
         font-size: 20px;
         font-weight: 600;
-        color: v-bind('gtermThemeVars.textColor');
+        color: v-bind('themeVars.textColorBase');
         margin: 0;
       }
     }
@@ -361,7 +354,7 @@ onMounted(async () => {
 }
 
 .host-card {
-  background: v-bind('gtermThemeVars.cardHoverColor');
+  background: v-bind('themeVars.cardColor');
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
@@ -371,7 +364,7 @@ onMounted(async () => {
   border: 1px solid transparent;
 
   &:hover {
-    border-color: v-bind('`${gtermThemeVars.primaryColor}30`');
+    border-color: v-bind('`${themeVars.primaryColor}20`');
 
     .card-header {
       .edit-btn {
@@ -397,8 +390,8 @@ onMounted(async () => {
         width: 38px;
         height: 38px;
         border-radius: 6px;
-        background: v-bind('`${gtermThemeVars.primaryColor}10`');
-        color: v-bind('gtermThemeVars.primaryColor');
+        background: v-bind('`${themeVars.primaryColor}20`');
+        color: v-bind('themeVars.primaryColor');
         display: flex;
         align-items: center;
         justify-content: center;
@@ -412,7 +405,7 @@ onMounted(async () => {
         .host-name {
           font-size: 14px;
           font-weight: 600;
-          color: v-bind('gtermThemeVars.textColor');
+          color: v-bind('themeVars.textColorBase');
           margin-bottom: 2px;
           white-space: nowrap;
           overflow: hidden;
@@ -421,7 +414,7 @@ onMounted(async () => {
 
         .host-addr {
           font-size: 12px;
-          color: v-bind('gtermThemeVars.secondaryText');
+          color: v-bind('themeVars.textColor3');
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -433,7 +426,7 @@ onMounted(async () => {
       opacity: 0;
       transition: all 0.2s ease;
       margin-left: 8px;
-      background: v-bind('`${gtermThemeVars.primaryColor}10`');
+      background: v-bind('`${themeVars.primaryColor}20`');
       width: 32px;
       height: 32px;
       border-radius: 6px !important;
@@ -443,8 +436,8 @@ onMounted(async () => {
       }
 
       &:hover {
-        color: v-bind('gtermThemeVars.primaryColor');
-        background: v-bind('`${gtermThemeVars.primaryColor}20`');
+        color: v-bind('themeVars.primaryColor');
+        background: v-bind('`${themeVars.primaryColor}30`');
       }
     }
   }
@@ -459,15 +452,14 @@ onMounted(async () => {
     align-items: center;
     justify-content: space-between;
     margin-top: auto;
-    background: v-bind('`${gtermThemeVars.primaryColor}10`');
+    background: v-bind('`${themeVars.primaryColor}20`');
 
     .last-connected {
       display: flex;
       align-items: center;
       gap: 4px;
       font-size: 12px;
-      color: v-bind('gtermThemeVars.textColor');
-      opacity: 0.5;
+      color: v-bind('themeVars.textColor3');
 
       :deep(svg) {
         font-size: 14px;
