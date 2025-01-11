@@ -16,29 +16,29 @@
       <ConnectionTabs v-if="hasConnections" ref="connectionTabsRef" class="ml-4" />
     </div>
 
-    <div v-if="!isDarwin" class="flex items-center mt-0">
-      <div class="w-12 h-12 flex items-center justify-center" @click="WindowMinimise">
-        <n-icon size="20"><Remove /></n-icon>
+    <div v-if="!isDarwin" class="flex items-center ml-auto">
+      <div class="window-control-btn" @click="WindowMinimise">
+        <n-icon size="16"><icon icon="ph:minus-bold" /></n-icon>
       </div>
-      <div class="w-12 h-12 flex items-center justify-center" @click="reduction">
-        <n-icon size="20">
-          <span v-if="windowIsMaximised"><Contract /></span>
-          <span v-else><Expand /></span>
+      <div class="window-control-btn" @click="reduction">
+        <n-icon size="16">
+          <span v-if="windowIsMaximised"><icon icon="ph:corners-in-bold" /></span>
+          <span v-else><icon icon="ph:corners-out-bold" /></span>
         </n-icon>
       </div>
-      <div class="w-12 h-12 flex items-center justify-center hover:rounded-tr-lg" @click="Quit">
-        <n-icon size="20"><Close /></n-icon>
+      <div class="window-control-btn close-btn rounded-tr-lg" @click="Quit">
+        <n-icon size="16"><icon icon="ph:x-bold" /></n-icon>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Close, Contract, Expand, Remove } from '@vicons/ionicons5';
 import { WindowMinimise, Quit, WindowIsMaximised, WindowMaximise, WindowUnmaximise } from '@wailsApp/runtime';
-import { NIcon, useThemeVars } from 'naive-ui';
+import { NIcon } from 'naive-ui';
+import { Icon } from '@iconify/vue';
 import { IsDarwin } from '@wailsApp/go/services/PreferencesSrv';
-import ConnectionTabs from '@/components/ConnectionTabs.vue';
+import ConnectionTabs from '@/layouts/ConnectionTabs.vue';
 import { useConnectionStore } from '@/stores/connection';
 
 const connectionTabsRef = ref();
@@ -50,7 +50,6 @@ defineExpose({
 const connectionStore = useConnectionStore();
 const hasConnections = computed(() => connectionStore.hasConnections);
 const router = useRouter();
-const themeVars = useThemeVars();
 
 const isDarwin = ref(false);
 
@@ -82,5 +81,26 @@ onMounted(async () => {
   --wails-draggable: drag;
   width: 100%;
   height: 38px;
+}
+
+.window-control-btn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+  }
+}
+
+.close-btn {
+  &:hover {
+    background-color: #e54d42;
+    color: #fff;
+  }
 }
 </style>

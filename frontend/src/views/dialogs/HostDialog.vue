@@ -204,7 +204,7 @@ const formValue = ref(
     host: '',
     port: 22,
     description: '',
-    credential_id: '',
+    credential_id: 0,
     credential: model.Credential.createFrom({
       username: '',
       password: '',

@@ -93,8 +93,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { NButton, NInput, NInputGroup, NList, NListItem, NTag, NThing, NScrollbar, useThemeVars } from 'naive-ui';
-import { usePreferencesStore } from '@/stores/preferences';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 interface KeychainItem {
   id: number;
