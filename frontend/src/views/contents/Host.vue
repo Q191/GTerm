@@ -71,11 +71,11 @@
           </div>
 
           <div class="card-footer">
-            <div class="last-connected">
-              <icon icon="ph:clock-counter-clockwise-duotone" />
-              <span>{{ getLastConnectedTime(host) }}</span>
+            <div class="protocol-info">
+              <icon :icon="getProtocolIcon(host)" />
+              <span>{{ getProtocolName(host) }}</span>
             </div>
-            <div class="connection-tags">
+            <div class="connection-tags" style="margin-left: auto">
               <n-tooltip trigger="hover" v-if="getConnectionCount(host) > 0">
                 <template #trigger>
                   <div>
@@ -108,14 +108,12 @@
 import { Icon } from '@iconify/vue';
 import { NButton, NTag, NTooltip, useMessage, useThemeVars } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
-import { usePreferencesStore } from '@/stores/preferences';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
 import { ListHost } from '@wailsApp/go/services/HostSrv';
 import { model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
 import { useRouter } from 'vue-router';
 
-const prefStore = usePreferencesStore();
 const dialogStore = useDialogStore();
 const router = useRouter();
 const message = useMessage();
@@ -217,18 +215,49 @@ const getDeviceIcon = (host: model.Host) => {
   return 'ph:computer-tower-duotone';
 };
 
-const getLastConnectedTime = (host: model.Host) => {
-  // 这里可以根据实际情况返回上次连接时间
-  // 暂时返回一个示例时间
-  return '10分钟前';
-};
-
 const getConnectionCount = (host: model.Host) => {
   return connectionStore.connections.filter(c => c.host === host.host && !c.connectionError).length;
 };
 
 const getErrorConnectionCount = (host: model.Host) => {
   return connectionStore.connections.filter(c => c.host === host.host && c.connectionError).length;
+};
+
+const getProtocolIcon = (host: model.Host) => {
+  const protocol = host.conn_protocol;
+
+  switch (protocol) {
+    case 0:
+      return 'ph:terminal-duotone';
+    case 1:
+      return 'ph:broadcast-duotone';
+    case 2:
+      return 'ph:desktop-duotone';
+    case 3:
+      return 'ph:monitor-duotone';
+    case 4:
+      return 'ph:plug-duotone';
+    default:
+      return 'ph:ghost-duotone';
+  }
+};
+
+const getProtocolName = (host: model.Host) => {
+  const protocol = host.conn_protocol;
+  switch (protocol) {
+    case 0:
+      return 'SSH';
+    case 1:
+      return 'Telnet';
+    case 2:
+      return 'RDP';
+    case 3:
+      return 'VNC';
+    case 4:
+      return 'Serial';
+    default:
+      return 'Unknown';
+  }
 };
 
 onMounted(async () => {
@@ -274,7 +303,7 @@ const themeVars = useThemeVars();
   .list-content {
     flex: 1;
     overflow-y: auto;
-    padding: 0 12px;
+    padding: 2px 4px 2px 4px;
   }
 
   .group-item {
@@ -361,10 +390,10 @@ const themeVars = useThemeVars();
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
-  border: 1px solid transparent;
+  border: 1px solid v-bind('themeVars.borderColor');
 
   &:hover {
-    border-color: v-bind('`${themeVars.primaryColor}20`');
+    border-color: v-bind('themeVars.primaryColor');
 
     .card-header {
       .edit-btn {
@@ -450,19 +479,21 @@ const themeVars = useThemeVars();
     padding: 8px 12px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     margin-top: auto;
-    background: v-bind('`${themeVars.primaryColor}20`');
+    border-top: 1px dashed v-bind('themeVars.borderColor');
 
-    .last-connected {
+    .protocol-info {
       display: flex;
       align-items: center;
       gap: 4px;
       font-size: 12px;
       color: v-bind('themeVars.textColor3');
+      flex-shrink: 0;
 
       :deep(svg) {
-        font-size: 14px;
+        font-size: 16px;
+        color: v-bind('themeVars.primaryColor');
       }
     }
 

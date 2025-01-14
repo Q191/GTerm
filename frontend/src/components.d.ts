@@ -7,10 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    ConnectionTabs: typeof import('./components/ConnectionTabs.vue')['default']
-    NCard: typeof import('naive-ui')['NCard']
     NIcon: typeof import('naive-ui')['NIcon']
-    NThemeEditor: typeof import('naive-ui')['NThemeEditor']
     NTooltip: typeof import('naive-ui')['NTooltip']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

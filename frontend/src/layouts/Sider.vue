@@ -18,20 +18,20 @@
         资产清单
       </n-tooltip>
 
-      <!-- 钥匙串 -->
+      <!-- 凭据 -->
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
             class="w-11 h-[38px] mb-1 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer top-menu-item"
-            :class="{ active: selectedKey === 'KeyChain' }"
-            @click="handleSelect('KeyChain')"
+            :class="{ active: selectedKey === 'Credential' }"
+            @click="handleSelect('Credential')"
           >
             <n-icon size="x-large">
               <icon icon="ph:vault-duotone" />
             </n-icon>
           </div>
         </template>
-        钥匙串
+        凭据
       </n-tooltip>
     </div>
 

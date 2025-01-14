@@ -1,12 +1,12 @@
 <template>
-  <div class="keychain-container">
+  <div class="credential-container">
     <div class="header">
       <div class="title">
-        <span>钥匙串</span>
+        <span>凭据</span>
       </div>
       <div class="actions">
         <n-input-group>
-          <n-input placeholder="搜索认证信息...">
+          <n-input placeholder="搜索凭据...">
             <template #prefix>
               <icon icon="ph:magnifying-glass-duotone" />
             </template>
@@ -15,7 +15,7 @@
             <template #icon>
               <icon icon="ph:plus-bold" />
             </template>
-            添加认证信息
+            添加凭据
           </n-button>
         </n-input-group>
       </div>
@@ -23,22 +23,22 @@
 
     <n-scrollbar class="content">
       <div class="content-wrapper">
-        <n-list hoverable clickable class="keychain-list">
-          <n-list-item v-for="item in mockKeychain" :key="item.id">
-            <div class="keychain-item">
+        <n-list hoverable clickable class="credential-list">
+          <n-list-item v-for="item in mockCredential" :key="item.id">
+            <div class="credential-item">
               <n-thing>
                 <template #avatar>
-                  <div class="keychain-type" :class="item.authType === 'password' ? 'success' : 'warning'">
+                  <div class="credential-type" :class="item.authType === 'password' ? 'success' : 'warning'">
                     <icon :icon="item.authType === 'password' ? 'ph:password-duotone' : 'ph:key-duotone'" />
                   </div>
                 </template>
                 <template #header>
-                  <div class="keychain-header">
+                  <div class="credential-header">
                     <span class="name">{{ item.name }}</span>
                   </div>
                 </template>
                 <template #description>
-                  <div class="keychain-info">
+                  <div class="credential-info">
                     <span class="info-item">
                       <icon icon="ph:user-duotone" />
                       {{ item.username }}
@@ -50,7 +50,7 @@
                   </div>
                 </template>
               </n-thing>
-              <div class="keychain-actions">
+              <div class="credential-actions">
                 <n-tooltip trigger="hover">
                   <template #trigger>
                     <n-button circle text>
@@ -95,7 +95,7 @@ import { Icon } from '@iconify/vue';
 import { NButton, NInput, NInputGroup, NList, NListItem, NTag, NThing, NScrollbar, useThemeVars } from 'naive-ui';
 import { ref } from 'vue';
 
-interface KeychainItem {
+interface CredentialItem {
   id: number;
   name: string;
   username: string;
@@ -103,7 +103,7 @@ interface KeychainItem {
   createdAt: string;
 }
 
-const mockKeychain = ref<KeychainItem[]>([
+const mockCredential = ref<CredentialItem[]>([
   {
     id: 1,
     name: 'root@192.168.1.100',
@@ -180,7 +180,7 @@ const themeVars = useThemeVars();
 </script>
 
 <style lang="less" scoped>
-.keychain-container {
+.credential-container {
   position: absolute;
   top: 0;
   left: 0;
@@ -236,14 +236,14 @@ const themeVars = useThemeVars();
 .content-wrapper {
   padding: 16px;
 
-  .keychain-list {
+  .credential-list {
     margin: 0 auto;
     width: 100%;
     max-width: 800px;
   }
 }
 
-.keychain-type {
+.credential-type {
   width: 40px;
   height: 40px;
   border-radius: 8px;
@@ -264,7 +264,7 @@ const themeVars = useThemeVars();
   }
 }
 
-.keychain-header {
+.credential-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -275,7 +275,7 @@ const themeVars = useThemeVars();
   }
 }
 
-.keychain-info {
+.credential-info {
   display: flex;
   gap: 16px;
   margin-top: 4px;
@@ -293,7 +293,7 @@ const themeVars = useThemeVars();
   }
 }
 
-.keychain-item {
+.credential-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -306,7 +306,7 @@ const themeVars = useThemeVars();
   }
 }
 
-.keychain-actions {
+.credential-actions {
   display: flex;
   gap: 4px;
   flex-shrink: 0;

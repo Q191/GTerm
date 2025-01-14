@@ -21,18 +21,18 @@ func InitDatabase() *query.Query {
 	if err := localStorage.CreateDirectory(); err != nil {
 		panic(err)
 	}
-	if !localStorage.DatabaseExist() {
-		if err := database.connect(localStorage.Path); err != nil {
-			panic(err)
-		}
-		if err := database.autoMigrate(); err != nil {
-			panic(err)
-		}
-		return database.Query
-	}
+	// if !localStorage.DatabaseExist() {
 	if err := database.connect(localStorage.Path); err != nil {
 		panic(err)
 	}
+	if err := database.autoMigrate(); err != nil {
+		panic(err)
+	}
+	return database.Query
+	// }
+	// if err := database.connect(localStorage.Path); err != nil {
+	// 	panic(err)
+	// }
 	return database.Query
 }
 

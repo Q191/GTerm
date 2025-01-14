@@ -75,14 +75,14 @@
                   </template>
                   {{ $t('host_dialog.private_key') }}
                 </n-button>
-                <n-button :type="isKeychainMode ? 'primary' : 'default'" @click="handleAuthTypeChange(-1)">
+                <n-button :type="useCommonCredential ? 'primary' : 'default'" @click="handleAuthTypeChange(-1)">
                   <template #icon>
                     <Icon icon="ph:vault-duotone" />
                   </template>
-                  {{ $t('host_dialog.keychain') }}
+                  {{ $t('host_dialog.common_credential_lib') }}
                 </n-button>
               </n-button-group>
-              <n-tooltip v-if="!isKeychainMode" trigger="hover" placement="right">
+              <n-tooltip v-if="!useCommonCredential" trigger="hover" placement="right">
                 <template #trigger>
                   <n-switch v-model:value="formValue.credential!.is_common_credential">
                     <template #checked>{{ $t('host_dialog.common_credential') }}</template>
@@ -94,7 +94,7 @@
             </div>
           </n-form-item>
 
-          <template v-if="isKeychainMode">
+          <template v-if="useCommonCredential">
             <n-form-item path="credential_id">
               <n-select
                 v-model:value="formValue.credential_id"
@@ -216,12 +216,12 @@ const formValue = ref(
   }),
 );
 
-const isKeychainMode = ref(false);
+const useCommonCredential = ref(false);
 const credentialOptions = ref<SelectMixedOption[]>([]);
 
 const handleAuthTypeChange = (type: number) => {
   if (type === -1) {
-    isKeychainMode.value = true;
+    useCommonCredential.value = true;
     formValue.value.credential = model.Credential.createFrom({
       username: '',
       password: '',
@@ -231,7 +231,7 @@ const handleAuthTypeChange = (type: number) => {
       is_common_credential: false,
     });
   } else {
-    isKeychainMode.value = false;
+    useCommonCredential.value = false;
     formValue.value.credential!.auth_type = type;
   }
 };
@@ -269,22 +269,22 @@ const rules = computed<FormRules>(() => ({
     },
   },
   'credential.username': {
-    required: !isKeychainMode.value,
+    required: !useCommonCredential.value,
     message: t('host_dialog.validation.username_required'),
     trigger: 'blur',
   },
   'credential.password': {
-    required: !isKeychainMode.value && formValue.value.credential?.auth_type === 0,
+    required: !useCommonCredential.value && formValue.value.credential?.auth_type === 0,
     message: t('host_dialog.validation.password_required'),
     trigger: 'blur',
   },
   'credential.private_key': {
-    required: !isKeychainMode.value && formValue.value.credential?.auth_type === 1,
+    required: !useCommonCredential.value && formValue.value.credential?.auth_type === 1,
     message: t('host_dialog.validation.private_key_required'),
     trigger: 'blur',
   },
   credential_id: {
-    required: isKeychainMode.value,
+    required: useCommonCredential.value,
     message: t('host_dialog.validation.credential_required'),
     trigger: ['blur', 'change'],
   },

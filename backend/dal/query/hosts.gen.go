@@ -34,6 +34,7 @@ func newHost(db *gorm.DB, opts ...gen.DOOption) host {
 	_host.Name = field.NewString(tableName, "name")
 	_host.Host = field.NewString(tableName, "host")
 	_host.Port = field.NewUint(tableName, "port")
+	_host.ConnProtocol = field.NewInt(tableName, "conn_protocol")
 	_host.Description = field.NewString(tableName, "description")
 	_host.CredentialID = field.NewUint(tableName, "credential_id")
 	_host.GroupID = field.NewUint(tableName, "group_id")
@@ -65,6 +66,7 @@ type host struct {
 	Name         field.String
 	Host         field.String
 	Port         field.Uint
+	ConnProtocol field.Int
 	Description  field.String
 	CredentialID field.Uint
 	GroupID      field.Uint
@@ -94,6 +96,7 @@ func (h *host) updateTableName(table string) *host {
 	h.Name = field.NewString(table, "name")
 	h.Host = field.NewString(table, "host")
 	h.Port = field.NewUint(table, "port")
+	h.ConnProtocol = field.NewInt(table, "conn_protocol")
 	h.Description = field.NewString(table, "description")
 	h.CredentialID = field.NewUint(table, "credential_id")
 	h.GroupID = field.NewUint(table, "group_id")
@@ -113,7 +116,7 @@ func (h *host) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (h *host) fillFieldMap() {
-	h.fieldMap = make(map[string]field.Expr, 12)
+	h.fieldMap = make(map[string]field.Expr, 13)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["created_at"] = h.CreatedAt
 	h.fieldMap["updated_at"] = h.UpdatedAt
@@ -121,6 +124,7 @@ func (h *host) fillFieldMap() {
 	h.fieldMap["name"] = h.Name
 	h.fieldMap["host"] = h.Host
 	h.fieldMap["port"] = h.Port
+	h.fieldMap["conn_protocol"] = h.ConnProtocol
 	h.fieldMap["description"] = h.Description
 	h.fieldMap["credential_id"] = h.CredentialID
 	h.fieldMap["group_id"] = h.GroupID

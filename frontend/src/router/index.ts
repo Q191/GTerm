@@ -23,9 +23,9 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('@/views/contents/Host.vue'),
           },
           {
-            path: 'keyChain',
-            name: 'KeyChain',
-            component: () => import('@/views/contents/KeyChain.vue'),
+            path: 'credential',
+            name: 'Credential',
+            component: () => import('@/views/contents/Credential.vue'),
           },
         ],
       },
