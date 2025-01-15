@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    LayoutPreview: typeof import('./components/LayoutPreview.vue')['default']
     NDivider: typeof import('naive-ui')['NDivider']
     NTooltip: typeof import('naive-ui')['NTooltip']
     RouterLink: typeof import('vue-router')['RouterLink']

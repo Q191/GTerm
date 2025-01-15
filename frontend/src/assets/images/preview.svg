@@ -1,0 +1,59 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+	<style>
+		/* 默认主题 */
+		:root {
+		--bg-color: #121212;
+		--header-color: #1a1a1a;
+		--sidebar-color: #1e1e1e;
+		--icon-color: #2a2a2a;
+		--text-color: #ffffff;
+		}
+		
+		/* 亮色主题 */
+		@media (prefers-color-scheme: light) {
+		:root {
+		--bg-color: #f9f9f9;
+		--header-color: #eaeaea;
+		--sidebar-color: #dcdcdc;
+		--icon-color: #c0c0c0;
+		--text-color: #000000;
+		}
+		}
+	</style>
+	<!-- Background -->
+	<rect x="0" y="0" width="800" height="600" fill="var(--bg-color)" />
+	<!-- Full width header -->
+	<rect x="0" y="0" width="800" height="40" fill="var(--header-color)" />
+	<!-- Left navigation sidebar -->
+	<rect x="0" y="40" width="50" height="560" fill="var(--header-color)" />
+	<!-- Group sidebar -->
+	<rect x="50" y="40" width="150" height="560" fill="var(--sidebar-color)" />
+	<!-- Main content area -->
+	<rect x="200" y="40" width="600" height="560" fill="var(--bg-color)" />
+	<!-- Navigation icons in left sidebar -->
+	<rect x="10" y="60" width="30" height="30" rx="5" fill="var(--icon-color)" />
+	<rect x="10" y="110" width="30" height="30" rx="5" fill="var(--icon-color)" />
+	<rect x="10" y="160" width="30" height="30" rx="5" fill="var(--icon-color)" />
+	<!-- Bottom utility icons -->
+	<rect x="10" y="520" width="30" height="30" rx="5" fill="var(--icon-color)" />
+	<rect x="10" y="560" width="30" height="30" rx="5" fill="var(--icon-color)" />
+	<!-- Group sidebar items -->
+	<rect x="65" y="60" width="120" height="35" rx="5" fill="var(--icon-color)" />
+	<rect x="75" y="110" width="110" height="30" rx="5" fill="var(--icon-color)" opacity="0.7" />
+	<rect x="75" y="150" width="110" height="30" rx="5" fill="var(--icon-color)" opacity="0.7" />
+	<!-- Server cards in main area -->
+	<rect x="220" y="60" width="180" height="100" rx="10" fill="var(--sidebar-color)" />
+	<rect x="410" y="60" width="180" height="100" rx="10" fill="var(--sidebar-color)" />
+	<rect x="600" y="60" width="180" height="100" rx="10" fill="var(--sidebar-color)" />
+	<!-- Logo placeholder and GTerm text -->
+	<rect x="385" y="8" width="24" height="24" rx="4" fill="var(--icon-color)" />
+	<text x="415" y="25" fill="var(--text-color)" font-family="Arial" font-size="14">
+		GTerm
+	</text>
+	<!-- Window control buttons (macOS style) -->
+	<g transform="translate(5, 5)">
+		<circle cx="12" cy="12" r="6" fill="#ff5f57" />
+		<circle cx="32" cy="12" r="6" fill="#febc2e" />
+		<circle cx="52" cy="12" r="6" fill="#28c840" />
+	</g>
+</svg>

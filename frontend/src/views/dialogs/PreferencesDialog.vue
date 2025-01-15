@@ -12,39 +12,38 @@
     transform-origin="center"
     @positive-click="handleSubmit"
   >
-    <n-tabs key="settings" animated placement="left" type="line" style="min-height: 400px">
-      <n-tab-pane name="appearance" tab="常规设置" style="padding: 0 20px">
+    <n-tabs key="settings" animated placement="left" type="line" style="min-height: 460px">
+      <n-tab-pane name="appearance" tab="常规设置" style="padding: 0 24px">
         <n-form ref="formRef" label-placement="top" size="small">
           <n-form-item label="主题">
-            <n-button-group size="medium">
-              <n-button
-                :type="prefStore.themeMode === 'auto' ? 'primary' : 'default'"
-                @click="prefStore.updateThemeMode('auto')"
-              >
-                <template #icon>
-                  <icon icon="ph:desktop" />
-                </template>
-                跟随系统
-              </n-button>
-              <n-button
-                :type="prefStore.themeMode === 'light' ? 'primary' : 'default'"
+            <div style="display: flex; gap: 12px">
+              <div
+                :class="['theme-option', prefStore.themeMode === 'light' && 'theme-option--active']"
                 @click="prefStore.updateThemeMode('light')"
               >
-                <template #icon>
-                  <icon icon="ph:sun" />
-                </template>
-                明亮模式
-              </n-button>
-              <n-button
-                :type="prefStore.themeMode === 'dark' ? 'primary' : 'default'"
+                <div class="theme-preview light" v-html="PreviewSvg" />
+                <div class="theme-label">明亮模式</div>
+              </div>
+              <div
+                :class="['theme-option', prefStore.themeMode === 'dark' && 'theme-option--active']"
                 @click="prefStore.updateThemeMode('dark')"
               >
-                <template #icon>
-                  <icon icon="ph:moon" />
-                </template>
-                暗黑模式
-              </n-button>
-            </n-button-group>
+                <div class="theme-preview dark" v-html="PreviewSvg" />
+                <div class="theme-label">暗黑模式</div>
+              </div>
+              <div
+                :class="['theme-option', prefStore.themeMode === 'auto' && 'theme-option--active']"
+                @click="prefStore.updateThemeMode('auto')"
+              >
+                <div class="theme-preview auto">
+                  <div class="split-preview">
+                    <div class="split-half light" v-html="PreviewSvg" />
+                    <div class="split-half dark" v-html="PreviewSvg" />
+                  </div>
+                </div>
+                <div class="theme-label">跟随系统</div>
+              </div>
+            </div>
           </n-form-item>
 
           <n-form-item label="语言">
@@ -82,10 +81,11 @@
 <script lang="ts" setup>
 import { useDialogStore } from '@/stores/dialog';
 import { usePreferencesStore, languageOptions } from '@/stores/preferences';
-import { NButton, NButtonGroup, NModal, NTabPane, NTabs, NInputNumber, NSelect, NForm, NFormItem } from 'naive-ui';
+import { NButton, NModal, NTabPane, NTabs, NInputNumber, NSelect, NForm, NFormItem } from 'naive-ui';
 import { onMounted, onUnmounted } from 'vue';
 import { Icon } from '@iconify/vue';
 import type { FormInst } from 'naive-ui';
+import PreviewSvg from '@/assets/images/preview.svg?raw';
 
 const dialogStore = useDialogStore();
 const prefStore = usePreferencesStore();
@@ -107,3 +107,124 @@ const handleSubmit = () => {
   dialogStore.closePreferencesDialog();
 };
 </script>
+
+<style scoped>
+.theme-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 106px;
+  position: relative;
+}
+
+.theme-preview :deep(svg) {
+  width: 120px;
+  height: 90px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.theme-option {
+  flex: 1;
+  cursor: pointer;
+}
+
+.theme-option--active .theme-preview::after {
+  content: '✓';
+  position: absolute;
+  top: 0;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  background: #18a058;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.theme-label {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--n-text-color);
+  margin-top: 4px;
+}
+
+.split-preview {
+  display: flex;
+  width: 120px;
+  height: 90px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.split-half {
+  width: 60px;
+  height: 90px;
+  position: relative;
+  overflow: hidden;
+}
+
+.split-half:first-child {
+  border-right: 1px solid var(--n-border-color);
+}
+
+.split-half.light :deep(svg) {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 120px;
+  height: 90px;
+  --bg-color: #ffffff;
+  --header-color: #f5f5f5;
+  --sidebar-color: #f0f0f0;
+  --icon-color: #d9d9d9;
+  --text-color: #000000;
+}
+
+.split-half.dark :deep(svg) {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 120px;
+  height: 90px;
+  --bg-color: #121212;
+  --header-color: #1f1f1f;
+  --sidebar-color: #262626;
+  --icon-color: #404040;
+  --text-color: #ffffff;
+}
+
+.theme-preview.light :deep(svg) {
+  --bg-color: #ffffff;
+  --header-color: #f5f5f5;
+  --sidebar-color: #f0f0f0;
+  --icon-color: #d9d9d9;
+  --text-color: #000000;
+}
+
+.theme-preview.dark :deep(svg) {
+  --bg-color: #121212;
+  --header-color: #1f1f1f;
+  --sidebar-color: #262626;
+  --icon-color: #404040;
+  --text-color: #ffffff;
+}
+
+.theme-option--active .theme-preview :deep(svg) {
+  border-color: #18a058;
+}
+
+:deep(.n-form-item) {
+  margin-bottom: 18px;
+}
+</style>
