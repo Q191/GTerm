@@ -22,7 +22,6 @@ export const themeOverrides: GlobalThemeOverrides = {
     feedbackFontSizeSmall: '11px',
     feedbackFontSizeMedium: '12px',
     feedbackFontSizeLarge: '12px',
-    labelTextColor: 'rgb(113,120,128)',
     labelFontWeight: '450',
   },
 };

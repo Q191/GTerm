@@ -12,8 +12,8 @@
     transform-origin="center"
     @positive-click="handleSubmit"
   >
-    <n-tabs key="settings" animated placement="left" type="line" style="min-height: 460px">
-      <n-tab-pane name="appearance" tab="常规设置" style="padding: 0 24px">
+    <n-tabs key="settings" animated placement="left" type="line">
+      <n-tab-pane name="appearance" tab="常规设置">
         <n-form ref="formRef" label-placement="top" size="small">
           <n-form-item label="主题">
             <div style="display: flex; gap: 12px">
