@@ -62,7 +62,7 @@
                   @click="handleAuthTypeChange(0)"
                 >
                   <template #icon>
-                    <Icon icon="ph:password-duotone" />
+                    <Icon icon="ph:password" />
                   </template>
                   {{ $t('host_dialog.password') }}
                 </n-button>
@@ -71,13 +71,13 @@
                   @click="handleAuthTypeChange(1)"
                 >
                   <template #icon>
-                    <Icon icon="ph:key-duotone" />
+                    <Icon icon="ph:key" />
                   </template>
                   {{ $t('host_dialog.private_key') }}
                 </n-button>
                 <n-button :type="useCommonCredential ? 'primary' : 'default'" @click="handleAuthTypeChange(-1)">
                   <template #icon>
-                    <Icon icon="ph:vault-duotone" />
+                    <Icon icon="ph:vault" />
                   </template>
                   {{ $t('host_dialog.common_credential_lib') }}
                 </n-button>
@@ -154,7 +154,7 @@
       <n-tab-pane name="advanced" :tab="$t('host_dialog.advanced_config')">
         <n-empty size="small" :description="$t('host_dialog.developing')">
           <template #icon>
-            <Icon icon="ph:code-duotone" />
+            <Icon icon="ph:code" />
           </template>
         </n-empty>
       </n-tab-pane>

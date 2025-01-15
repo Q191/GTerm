@@ -11,7 +11,7 @@
             @click="handleSelect('Host')"
           >
             <n-icon size="x-large">
-              <icon icon="ph:hard-drives-duotone" />
+              <icon icon="ph:hard-drives" />
             </n-icon>
           </div>
         </template>
@@ -27,7 +27,7 @@
             @click="handleSelect('Credential')"
           >
             <n-icon size="x-large">
-              <icon icon="ph:vault-duotone" />
+              <icon icon="ph:vault" />
             </n-icon>
           </div>
         </template>
@@ -43,7 +43,7 @@
           <template #trigger>
             <div class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer">
               <n-icon size="x-large">
-                <icon icon="ph:gear-six-duotone" />
+                <icon icon="ph:gear-six" />
               </n-icon>
             </div>
           </template>
@@ -59,7 +59,7 @@
             @click="toggleTheme"
           >
             <n-icon size="x-large">
-              <icon :icon="prefStore.isDark ? 'ph:sun-duotone' : 'ph:moon-duotone'" />
+              <icon :icon="prefStore.isDark ? 'ph:sun' : 'ph:moon'" />
             </n-icon>
           </div>
         </template>
@@ -74,7 +74,7 @@
             @click="openGithub"
           >
             <n-icon size="x-large">
-              <icon icon="ph:github-logo-duotone" />
+              <icon icon="ph:github-logo" />
             </n-icon>
           </div>
         </template>
@@ -103,17 +103,17 @@ const settingsOptions = [
   {
     label: '偏好设置',
     key: 'settings',
-    icon: renderIcon('ph:sliders-horizontal-duotone'),
+    icon: renderIcon('ph:sliders-horizontal'),
   },
   {
     label: '检查更新',
     key: 'check-update',
-    icon: renderIcon('ph:arrow-circle-up-duotone'),
+    icon: renderIcon('ph:arrow-circle-up'),
   },
   {
     label: '关于',
     key: 'about',
-    icon: renderIcon('ph:info-duotone'),
+    icon: renderIcon('ph:info'),
   },
 ];
 

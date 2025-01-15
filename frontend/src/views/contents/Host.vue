@@ -13,19 +13,34 @@
           </n-button>
         </div>
         <div class="list-content">
-          <div
-            v-for="group in groups"
-            :key="group.id"
-            class="group-item"
-            :class="{ active: selectedGroup?.id === group.id }"
-            @click="selectGroup(group)"
-          >
-            <n-icon size="large">
-              <icon icon="ph:folder-simple-duotone" />
-            </n-icon>
-            <span class="name">{{ group.name }}</span>
-            <span class="count">{{ getHostCountInGroup(group) }}</span>
-          </div>
+          <n-tree
+            block-line
+            :data="treeData"
+            :pattern="searchText"
+            :show-irrelevant-nodes="false"
+            :selected-keys="selectedKeys"
+            :expanded-keys="expandedKeys"
+            :node-props="nodeProps"
+            @update:selected-keys="handleSelect"
+            @update:expanded-keys="handleExpand"
+          />
+          <n-dropdown
+            trigger="manual"
+            placement="bottom-start"
+            :show="showDropdown"
+            :options="dropdownOptions"
+            :x="dropdownX"
+            :y="dropdownY"
+            @select="handleDropdownSelect"
+            @clickoutside="handleClickoutside"
+          />
+        </div>
+        <div class="list-footer">
+          <n-input v-model:value="searchText" size="small" clearable placeholder="搜索主机">
+            <template #prefix>
+              <icon icon="ph:magnifying-glass" />
+            </template>
+          </n-input>
         </div>
       </div>
     </div>
@@ -35,7 +50,7 @@
       <div class="content-header">
         <div class="header-left">
           <h2>{{ selectedGroup ? selectedGroup.name : '所有主机' }}</h2>
-          <n-tag size="small">{{ filteredHosts.length }}</n-tag>
+          <n-badge :value="filteredHosts.length" show-zero type="success" />
         </div>
         <n-button type="primary" size="small" @click="dialogStore.openAddHostDialog()">
           <template #icon>
@@ -46,7 +61,7 @@
       </div>
 
       <!-- 主机网格 -->
-      <div class="hosts-grid">
+      <div class="hosts-grid" v-if="filteredHosts.length > 0">
         <div v-for="host in filteredHosts" :key="host.id" class="host-card" @click="toTerminal(host)">
           <div class="card-header">
             <div class="card-left">
@@ -100,19 +115,24 @@
           </div>
         </div>
       </div>
+      <div class="empty-state" v-else>
+        <n-result status="404" title="空空如也" :description="`分组「${selectedGroup?.name}」中还没有添加任何主机`" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NTag, NTooltip, useMessage, useThemeVars } from 'naive-ui';
+import { NButton, NTag, NTooltip, NTree, NDropdown, NResult, NBadge, NInput, useMessage, useThemeVars } from 'naive-ui';
+import type { DropdownOption } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
 import { ListHost } from '@wailsApp/go/services/HostSrv';
 import { model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
 import { useRouter } from 'vue-router';
+import { h, ref, computed, onMounted, watch } from 'vue';
 
 const dialogStore = useDialogStore();
 const router = useRouter();
@@ -123,12 +143,211 @@ const groups = ref<model.Group[]>();
 const hosts = ref<model.Host[]>();
 const selectedGroup = ref<model.Group | null>(null);
 
-const selectGroup = (group: model.Group) => {
-  selectedGroup.value = group;
+const selectedKeys = ref<string[]>([]);
+const expandedKeys = ref<string[]>([]);
+
+const showDropdown = ref(false);
+const dropdownX = ref(0);
+const dropdownY = ref(0);
+const dropdownOptions = ref<DropdownOption[]>([]);
+
+const searchText = ref('');
+
+const updateDropdownOptions = (type: 'group' | 'host') => {
+  if (type === 'group') {
+    dropdownOptions.value = [
+      {
+        label: '编辑分组',
+        key: 'edit-group',
+        icon: () => h(Icon, { icon: 'ph:pencil-simple' }),
+      },
+      {
+        label: '删除分组',
+        key: 'delete-group',
+        icon: () => h(Icon, { icon: 'ph:trash' }),
+      },
+    ];
+  } else {
+    dropdownOptions.value = [
+      {
+        label: '编辑主机',
+        key: 'edit-host',
+        icon: () => h(Icon, { icon: 'ph:pencil-simple' }),
+      },
+      {
+        label: '删除主机',
+        key: 'delete-host',
+        icon: () => h(Icon, { icon: 'ph:trash' }),
+      },
+    ];
+  }
 };
 
-const getHostCountInGroup = (group: model.Group) => {
-  return hosts.value?.filter(host => host.group_id === group.id).length || 0;
+const currentContextNode = ref<any>(null);
+
+const nodeProps = ({ option }: { option: any }) => {
+  return {
+    onClick() {
+      if (option.key.startsWith('group-')) {
+        const groupId = parseInt(option.key.replace('group-', ''));
+        const group = groups.value?.find(g => g.id === groupId);
+        if (group) {
+          const groupHosts = hosts.value?.filter(host => host.group_id === group.id) || [];
+          if (groupHosts.length > 0) {
+            selectedGroup.value = group;
+            selectedKeys.value = [option.key];
+          }
+        }
+      }
+    },
+    onContextmenu(e: MouseEvent) {
+      currentContextNode.value = option;
+      dropdownX.value = e.clientX;
+      dropdownY.value = e.clientY;
+      showDropdown.value = true;
+
+      if (option.key.startsWith('group-')) {
+        updateDropdownOptions('group');
+      } else if (option.key.startsWith('host-')) {
+        updateDropdownOptions('host');
+      }
+
+      e.preventDefault();
+    },
+  };
+};
+
+const handleDropdownSelect = (key: string) => {
+  showDropdown.value = false;
+  if (!currentContextNode.value) return;
+
+  switch (key) {
+    case 'edit-group':
+      dialogStore.openAddGroupDialog();
+      break;
+    case 'delete-group':
+      // TODO: 实现删除分组功能
+      break;
+    case 'edit-host':
+      const hostId = parseInt(currentContextNode.value.key.replace('host-', ''));
+      const host = hosts.value?.find(h => h.id === hostId);
+      if (host) {
+        dialogStore.openAddHostDialog(true);
+      }
+      break;
+    case 'delete-host':
+      // TODO: 实现删除主机功能
+      break;
+  }
+  currentContextNode.value = null;
+};
+
+const handleClickoutside = () => {
+  showDropdown.value = false;
+};
+
+const treeData = computed(() => {
+  if (!groups.value) return [];
+
+  const treeNodes = [];
+
+  // 添加"全部主机"节点
+  treeNodes.push({
+    key: 'all',
+    label: '所有主机',
+    prefix: () =>
+      h(Icon, {
+        icon: 'ph:paw-print',
+        style: {
+          fontSize: '1.2rem',
+        },
+      }),
+  });
+
+  // 添加分组节点
+  treeNodes.push(
+    ...groups.value.map(group => {
+      const groupHosts = hosts.value?.filter(host => host.group_id === group.id) || [];
+      return {
+        key: `group-${group.id}`,
+        label: group.name,
+        children:
+          groupHosts.length > 0
+            ? groupHosts.map(host => ({
+                key: `host-${host.id}`,
+                label: host.name,
+                isLeaf: true,
+                prefix: () =>
+                  h(Icon, {
+                    icon: getDeviceIcon(host),
+                    style: {
+                      fontSize: '1.2rem',
+                    },
+                  }),
+              }))
+            : undefined,
+        isLeaf: groupHosts.length === 0,
+        prefix: () => {
+          const expanded = expandedKeys.value.includes(`group-${group.id}`);
+          return h(Icon, {
+            icon: expanded
+              ? 'ph:folder-open-duotone'
+              : groupHosts.length === 0
+                ? 'ph:folder-dashed-duotone'
+                : 'ph:folders-duotone',
+            style: { fontSize: '1.2rem' },
+          });
+        },
+      };
+    }),
+  );
+
+  // 添加未分组的主机节点
+  const ungroupedHosts = hosts.value?.filter(host => !host.group_id) || [];
+  if (ungroupedHosts.length > 0) {
+    treeNodes.push(
+      ...ungroupedHosts.map(host => ({
+        key: `host-${host.id}`,
+        label: host.name,
+        isLeaf: true,
+        prefix: () =>
+          h(Icon, {
+            icon: getDeviceIcon(host),
+            style: {
+              fontSize: '1rem',
+            },
+          }),
+      })),
+    );
+  }
+
+  return treeNodes;
+});
+
+const handleSelect = (keys: string[]) => {
+  if (keys.length > 0) {
+    const key = keys[0];
+    if (key === 'all') {
+      selectedGroup.value = null;
+      selectedKeys.value = keys;
+    } else if (key.startsWith('host-')) {
+      const hostId = parseInt(key.replace('host-', ''));
+      const host = hosts.value?.find(h => h.id === hostId);
+      if (host) {
+        toTerminal(host);
+      }
+    } else if (key.startsWith('group-')) {
+      const groupId = parseInt(key.replace('group-', ''));
+      const group = groups.value?.find(g => g.id === groupId);
+      if (group) {
+        selectedGroup.value = group;
+        selectedKeys.value = keys;
+      }
+    }
+  } else {
+    selectedGroup.value = null;
+    selectedKeys.value = [];
+  }
 };
 
 const filteredHosts = computed(() => {
@@ -189,30 +408,43 @@ const fetchData = async () => {
   hosts.value = hostsData;
 };
 
+const osIconMap = new Map([
+  [['cisco ios', 'cisco ios-xe', 'cisco ios-xr', 'cisco nx-os', 'cisco asa', 'cisco'], 'simple-icons:cisco'],
+  [['huawei vrp', 'huawei', 'huawei ce', 'huawei ne', 'huawei s', 'huawei ar', 'huawei usg'], 'simple-icons:huawei'],
+  [['fortinet', 'fortigate', 'fortios', 'fortimanager', 'fortianalyzer'], 'simple-icons:fortinet'],
+  [['mikrotik', 'routeros'], 'simple-icons:mikrotik'],
+  [['pfsense', 'opnsense'], 'simple-icons:pfsense'],
+  [['juniper', 'junos', 'juniper ex', 'juniper mx', 'juniper srx'], 'simple-icons:juniper'],
+  [['hp', 'hpe', 'hp procurve', 'hp comware', 'hpe aruba'], 'simple-icons:hp'],
+  [['dell', 'dell emc', 'dell networking'], 'simple-icons:dell'],
+  [['red hat enterprise', 'red hat', 'rhel', 'redhat'], 'simple-icons:redhat'],
+  [['ubuntu', 'ubuntu server', 'xubuntu', 'kubuntu'], 'simple-icons:ubuntu'],
+  [['centos stream', 'centos'], 'simple-icons:centos'],
+  [['debian gnu', 'debian'], 'simple-icons:debian'],
+  [['opensuse leap', 'opensuse tumbleweed', 'opensuse', 'suse'], 'simple-icons:opensuse'],
+  [['fedora server', 'fedora workstation', 'fedora'], 'simple-icons:fedora'],
+  [['alma linux', 'almalinux'], 'simple-icons:almalinux'],
+  [['kali linux', 'kalilinux', 'kali'], 'simple-icons:kalilinux'],
+  [['arch linux', 'archlinux', 'arch', 'manjaro'], 'simple-icons:archlinux'],
+  [['rocky linux', 'rockylinux', 'rocky'], 'simple-icons:rockylinux'],
+  [['alpine linux', 'alpinelinux', 'alpine'], 'simple-icons:alpinelinux'],
+  [['gentoo linux', 'gentoo'], 'simple-icons:gentoo'],
+  [['raspberry pi os', 'raspbian'], 'simple-icons:raspberrypi'],
+  [['mint', 'linux mint'], 'simple-icons:linuxmint'],
+  [['elementary os', 'elementary'], 'simple-icons:elementary'],
+  [['zorin os', 'zorin'], 'simple-icons:zorinos'],
+  [['pop!_os', 'pop os', 'popos'], 'simple-icons:popos'],
+  [['linux'], 'simple-icons:linux'],
+]);
+
 const getDeviceIcon = (host: model.Host) => {
   const os = host.metadata?.os?.toLowerCase() || '';
-
-  if (os.includes('cisco')) {
-    return 'simple-icons:cisco';
-  } else if (os.includes('huawei')) {
-    return 'simple-icons:huawei';
-  } else if (os.includes('redhat') || os.includes('rhel')) {
-    return 'simple-icons:redhat';
-  } else if (os.includes('ubuntu')) {
-    return 'simple-icons:ubuntu';
-  } else if (os.includes('centos')) {
-    return 'simple-icons:centos';
-  } else if (os.includes('debian')) {
-    return 'simple-icons:debian';
-  } else if (os.includes('suse')) {
-    return 'simple-icons:opensuse';
-  } else if (os.includes('fedora')) {
-    return 'simple-icons:fedora';
-  } else if (os.includes('linux')) {
-    return 'simple-icons:linux';
+  for (const [keys, icon] of osIconMap) {
+    if (keys.some(key => os.includes(key))) {
+      return icon;
+    }
   }
-
-  return 'ph:computer-tower-duotone';
+  return 'ph:computer-tower';
 };
 
 const getConnectionCount = (host: model.Host) => {
@@ -260,8 +492,13 @@ const getProtocolName = (host: model.Host) => {
   }
 };
 
+const handleExpand = (keys: string[]) => {
+  expandedKeys.value = keys;
+};
+
 onMounted(async () => {
   await fetchData();
+  selectedKeys.value = ['all'];
 });
 
 const themeVars = useThemeVars();
@@ -273,7 +510,6 @@ const themeVars = useThemeVars();
   display: flex;
 }
 
-// 左侧边栏样式
 .sidebar {
   width: 260px;
   border-right: 1px solid v-bind('themeVars.borderColor');
@@ -301,50 +537,55 @@ const themeVars = useThemeVars();
   }
 
   .list-content {
-    flex: 1;
-    overflow-y: auto;
     padding: 2px 4px 2px 4px;
+    height: calc(100vh - 131px);
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    position: relative;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    :deep(.n-tree) {
+      .n-tree-node {
+        &:hover {
+          background: v-bind('`${themeVars.primaryColor}10`');
+        }
+
+        &.n-tree-node--selected {
+          background: v-bind('`${themeVars.primaryColor}20`');
+
+          .n-tree-node-content {
+            color: v-bind('themeVars.primaryColor');
+          }
+        }
+
+        .n-tree-node-content {
+          .n-tree-node-content__text {
+            border-bottom: none !important;
+            text-decoration: none !important;
+          }
+        }
+      }
+
+      .n-tree__empty {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
   }
 
-  .group-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin: 2px 0;
-    color: v-bind('themeVars.textColorBase');
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: v-bind('themeVars.hoverColor');
-    }
-
-    &.active {
-      background: v-bind('`${themeVars.primaryColor}20`');
-      color: v-bind('themeVars.primaryColor');
-    }
-
-    .name {
-      flex: 1;
-      font-size: 14px;
-    }
-
-    .count {
-      font-size: 12px;
-      opacity: 0.5;
-      min-width: 20px;
-      height: 20px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  .list-footer {
+    padding: 6px;
+    border-top: 1px solid v-bind('themeVars.borderColor');
   }
 }
 
-// 主内容区样式
 .main-content {
   flex: 1;
   display: flex;
@@ -373,7 +614,6 @@ const themeVars = useThemeVars();
   }
 }
 
-// 主机网格样式
 .hosts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -515,5 +755,13 @@ const themeVars = useThemeVars();
       justify-content: center;
     }
   }
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100% - 72px);
+  width: 100%;
 }
 </style>

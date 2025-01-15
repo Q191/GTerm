@@ -33,21 +33,6 @@ func newGroup(db *gorm.DB, opts ...gen.DOOption) group {
 	_group.DeletedAt = field.NewField(tableName, "deleted_at")
 	_group.Name = field.NewString(tableName, "name")
 	_group.Description = field.NewString(tableName, "description")
-	_group.Hosts = groupHasManyHosts{
-		db: db.Session(&gorm.Session{}),
-
-		RelationField: field.NewRelation("Hosts", "model.Host"),
-		Credential: struct {
-			field.RelationField
-		}{
-			RelationField: field.NewRelation("Hosts.Credential", "model.Credential"),
-		},
-		Metadata: struct {
-			field.RelationField
-		}{
-			RelationField: field.NewRelation("Hosts.Metadata", "model.Metadata"),
-		},
-	}
 
 	_group.fillFieldMap()
 
@@ -64,7 +49,6 @@ type group struct {
 	DeletedAt   field.Field
 	Name        field.String
 	Description field.String
-	Hosts       groupHasManyHosts
 
 	fieldMap map[string]field.Expr
 }
@@ -103,14 +87,13 @@ func (g *group) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *group) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 7)
+	g.fieldMap = make(map[string]field.Expr, 6)
 	g.fieldMap["id"] = g.ID
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["deleted_at"] = g.DeletedAt
 	g.fieldMap["name"] = g.Name
 	g.fieldMap["description"] = g.Description
-
 }
 
 func (g group) clone(db *gorm.DB) group {
@@ -121,84 +104,6 @@ func (g group) clone(db *gorm.DB) group {
 func (g group) replaceDB(db *gorm.DB) group {
 	g.groupDo.ReplaceDB(db)
 	return g
-}
-
-type groupHasManyHosts struct {
-	db *gorm.DB
-
-	field.RelationField
-
-	Credential struct {
-		field.RelationField
-	}
-	Metadata struct {
-		field.RelationField
-	}
-}
-
-func (a groupHasManyHosts) Where(conds ...field.Expr) *groupHasManyHosts {
-	if len(conds) == 0 {
-		return &a
-	}
-
-	exprs := make([]clause.Expression, 0, len(conds))
-	for _, cond := range conds {
-		exprs = append(exprs, cond.BeCond().(clause.Expression))
-	}
-	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
-	return &a
-}
-
-func (a groupHasManyHosts) WithContext(ctx context.Context) *groupHasManyHosts {
-	a.db = a.db.WithContext(ctx)
-	return &a
-}
-
-func (a groupHasManyHosts) Session(session *gorm.Session) *groupHasManyHosts {
-	a.db = a.db.Session(session)
-	return &a
-}
-
-func (a groupHasManyHosts) Model(m *model.Group) *groupHasManyHostsTx {
-	return &groupHasManyHostsTx{a.db.Model(m).Association(a.Name())}
-}
-
-type groupHasManyHostsTx struct{ tx *gorm.Association }
-
-func (a groupHasManyHostsTx) Find() (result []*model.Host, err error) {
-	return result, a.tx.Find(&result)
-}
-
-func (a groupHasManyHostsTx) Append(values ...*model.Host) (err error) {
-	targetValues := make([]interface{}, len(values))
-	for i, v := range values {
-		targetValues[i] = v
-	}
-	return a.tx.Append(targetValues...)
-}
-
-func (a groupHasManyHostsTx) Replace(values ...*model.Host) (err error) {
-	targetValues := make([]interface{}, len(values))
-	for i, v := range values {
-		targetValues[i] = v
-	}
-	return a.tx.Replace(targetValues...)
-}
-
-func (a groupHasManyHostsTx) Delete(values ...*model.Host) (err error) {
-	targetValues := make([]interface{}, len(values))
-	for i, v := range values {
-		targetValues[i] = v
-	}
-	return a.tx.Delete(targetValues...)
-}
-
-func (a groupHasManyHostsTx) Clear() error {
-	return a.tx.Clear()
-}
-
-func (a groupHasManyHostsTx) Count() int64 {
-	return a.tx.Count()
 }
 
 type groupDo struct{ gen.DO }

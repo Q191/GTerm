@@ -8,7 +8,7 @@
         <n-input-group>
           <n-input placeholder="搜索凭据...">
             <template #prefix>
-              <icon icon="ph:magnifying-glass-duotone" />
+              <icon icon="ph:magnifying-glass" />
             </template>
           </n-input>
           <n-button type="primary" ghost>
@@ -29,7 +29,7 @@
               <n-thing>
                 <template #avatar>
                   <div class="credential-type" :class="item.authType === 'password' ? 'success' : 'warning'">
-                    <icon :icon="item.authType === 'password' ? 'ph:password-duotone' : 'ph:key-duotone'" />
+                    <icon :icon="item.authType === 'password' ? 'ph:password' : 'ph:key'" />
                   </div>
                 </template>
                 <template #header>
@@ -40,11 +40,11 @@
                 <template #description>
                   <div class="credential-info">
                     <span class="info-item">
-                      <icon icon="ph:user-duotone" />
+                      <icon icon="ph:user" />
                       {{ item.username }}
                     </span>
                     <span class="info-item">
-                      <icon icon="ph:clock-duotone" />
+                      <icon icon="ph:clock" />
                       {{ item.createdAt }} 创建
                     </span>
                   </div>
@@ -55,7 +55,7 @@
                   <template #trigger>
                     <n-button circle text>
                       <template #icon>
-                        <icon :icon="item.authType === 'password' ? 'ph:copy-duotone' : 'ph:file-text-duotone'" />
+                        <icon :icon="item.authType === 'password' ? 'ph:copy' : 'ph:file-text'" />
                       </template>
                     </n-button>
                   </template>
@@ -65,7 +65,7 @@
                   <template #trigger>
                     <n-button circle text>
                       <template #icon>
-                        <icon icon="ph:pencil-simple-duotone" />
+                        <icon icon="ph:pencil-simple" />
                       </template>
                     </n-button>
                   </template>
@@ -75,7 +75,7 @@
                   <template #trigger>
                     <n-button circle text type="error">
                       <template #icon>
-                        <icon icon="ph:trash-duotone" />
+                        <icon icon="ph:trash" />
                       </template>
                     </n-button>
                   </template>
