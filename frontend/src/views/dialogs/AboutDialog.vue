@@ -20,7 +20,7 @@
         <n-text class="about-link" @click="onOpenWebsite">{{ $t('about.website') }}</n-text>
       </n-space>
       <div :style="{ color: themeVars.textColor3 }" class="about-copyright">
-        Copyright © 2024 - {{ currentYear }} MisakaTAT All rights reserved
+        <span>Copyright © 2024-{{ currentYear }} MisakaTAT.<br />All rights reserved.</span>
       </div>
     </n-space>
   </n-modal>
@@ -55,8 +55,6 @@ const onOpenWebsite = () => {
 .about-app-title {
   font-weight: bold;
   font-size: 18px;
-  margin: 5px;
-  padding-top: 20px;
 }
 
 .about-link {
@@ -69,5 +67,6 @@ const onOpenWebsite = () => {
 
 .about-copyright {
   font-size: 12px;
+  text-align: center;
 }
 </style>

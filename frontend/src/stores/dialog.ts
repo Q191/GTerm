@@ -25,7 +25,7 @@ export const useDialogStore = defineStore('dialog', () => {
     aboutDialogVisible.value = false;
   };
 
-  const openPreferencesDialog= () => {
+  const openPreferencesDialog = () => {
     preferencesDialogVisible.value = true;
   };
 
