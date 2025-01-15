@@ -20,7 +20,7 @@
         <n-text class="about-link" @click="onOpenWebsite">{{ $t('about.website') }}</n-text>
       </n-space>
       <div :style="{ color: themeVars.textColor3 }" class="about-copyright">
-        Copyright © 2024 MisakaTAT All rights reserved
+        Copyright © 2024 - {{ currentYear }} MisakaTAT All rights reserved
       </div>
     </n-space>
   </n-modal>
@@ -34,6 +34,7 @@ import { GTermVer } from '@wailsApp/go/services/PreferencesSrv';
 import { NAvatar, NDivider, NModal, NSpace, NText, useThemeVars } from 'naive-ui';
 
 const gTermVer = ref('Unknown');
+const currentYear = computed(() => new Date().getFullYear());
 
 onMounted(async () => {
   gTermVer.value = await GTermVer();

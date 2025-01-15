@@ -5,7 +5,7 @@
       <AboutDialog />
       <HostDialog />
       <GroupDialog />
-      <SettingDialog />
+      <PreferencesDialog />
     </NConfigProvider>
   </NMessageProvider>
 </template>
@@ -15,7 +15,7 @@ import { usePreferencesStore } from '@/stores/preferences';
 import { darkThemeOverrides, themeOverrides } from '@/themes/naive-theme';
 import AboutDialog from '@/views/dialogs/AboutDialog.vue';
 import HostDialog from '@/views/dialogs/HostDialog.vue';
-import SettingDialog from '@/views/dialogs/SettingDialog.vue';
+import PreferencesDialog from '@/views/dialogs/PreferencesDialog.vue';
 import { darkTheme, NConfigProvider, NMessageProvider } from 'naive-ui';
 import GroupDialog from '@/views/dialogs/GroupDialog.vue';
 import hljs from 'highlight.js/lib/core';

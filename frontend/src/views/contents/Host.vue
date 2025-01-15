@@ -1,16 +1,38 @@
 <template>
   <div class="page-container">
     <!-- 左侧边栏 -->
-    <div class="sidebar">
+    <div class="sidebar" ref="sidebarRef" :style="{ width: sidebarWidth + 'px' }">
       <!-- 分组列表 -->
       <div class="groups-list">
         <div class="list-header">
-          <span class="title">分组</span>
-          <n-button text size="tiny" @click="dialogStore.openAddGroupDialog">
-            <template #icon>
-              <icon icon="ph:plus-bold" />
+          <n-input v-model:value="searchText" size="small" clearable placeholder="搜索主机">
+            <template #prefix>
+              <icon icon="ph:magnifying-glass" />
             </template>
-          </n-button>
+          </n-input>
+          <n-divider vertical />
+          <div class="header-right">
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <n-button text size="large" @click="dialogStore.openAddGroupDialog">
+                  <template #icon>
+                    <icon icon="ph:folder-plus" />
+                  </template>
+                </n-button>
+              </template>
+              添加分组
+            </n-tooltip>
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <n-button text size="large" @click="dialogStore.openAddHostDialog()">
+                  <template #icon>
+                    <icon icon="ph:plus" />
+                  </template>
+                </n-button>
+              </template>
+              添加主机
+            </n-tooltip>
+          </div>
         </div>
         <div class="list-content">
           <n-tree
@@ -35,15 +57,11 @@
             @clickoutside="handleClickoutside"
           />
         </div>
-        <div class="list-footer">
-          <n-input v-model:value="searchText" size="small" clearable placeholder="搜索主机">
-            <template #prefix>
-              <icon icon="ph:magnifying-glass" />
-            </template>
-          </n-input>
-        </div>
       </div>
     </div>
+
+    <!-- 拖动分隔线 -->
+    <div class="resize-handle" :style="{ left: sidebarWidth + 'px' }" @mousedown="startResize"></div>
 
     <!-- 主内容区 -->
     <div class="main-content">
@@ -52,12 +70,6 @@
           <h2>{{ selectedGroup ? selectedGroup.name : '所有主机' }}</h2>
           <n-badge :value="filteredHosts.length" show-zero type="success" />
         </div>
-        <n-button type="primary" size="small" @click="dialogStore.openAddHostDialog()">
-          <template #icon>
-            <icon icon="ph:plus-bold" />
-          </template>
-          添加主机
-        </n-button>
       </div>
 
       <!-- 主机网格 -->
@@ -132,7 +144,7 @@ import { ListHost } from '@wailsApp/go/services/HostSrv';
 import { model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
 import { useRouter } from 'vue-router';
-import { h, ref, computed, onMounted, watch } from 'vue';
+import { h, ref, computed, onMounted, watch, onUnmounted } from 'vue';
 
 const dialogStore = useDialogStore();
 const router = useRouter();
@@ -502,19 +514,68 @@ onMounted(async () => {
 });
 
 const themeVars = useThemeVars();
+
+const sidebarRef = ref<HTMLElement | null>(null);
+const sidebarWidth = ref(Number(localStorage.getItem('sidebarWidth')) || 260);
+const minWidth = 260;
+const maxWidth = 380;
+const isResizing = ref(false);
+
+const startResize = (e: MouseEvent) => {
+  e.preventDefault();
+  isResizing.value = true;
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+
+  const startX = e.clientX;
+  const startWidth = sidebarWidth.value;
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isResizing.value) return;
+
+    const delta = e.clientX - startX;
+    const newWidth = Math.min(Math.max(startWidth + delta, minWidth), maxWidth);
+    sidebarWidth.value = newWidth;
+    localStorage.setItem('sidebarWidth', newWidth.toString());
+  };
+
+  const handleMouseUp = () => {
+    isResizing.value = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
+};
+
+onMounted(() => {
+  window.addEventListener('sidebar-width-change', ((e: CustomEvent) => {
+    sidebarWidth.value = e.detail;
+  }) as EventListener);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('sidebar-width-change', ((e: CustomEvent) => {
+    sidebarWidth.value = e.detail;
+  }) as EventListener);
+});
 </script>
 
 <style lang="less" scoped>
 .page-container {
   height: 100%;
   display: flex;
+  position: relative;
 }
 
 .sidebar {
-  width: 260px;
-  border-right: 1px solid v-bind('themeVars.borderColor');
+  border-right: none;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 }
 
 .groups-list {
@@ -523,10 +584,9 @@ const themeVars = useThemeVars();
   flex-direction: column;
 
   .list-header {
-    padding: 16px 20px;
+    padding: 6px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     border-bottom: 1px solid v-bind('themeVars.borderColor');
 
     .title {
@@ -534,11 +594,17 @@ const themeVars = useThemeVars();
       font-weight: 600;
       color: v-bind('themeVars.textColorBase');
     }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
   }
 
   .list-content {
     padding: 2px 4px 2px 4px;
-    height: calc(100vh - 131px);
+    height: calc(100vh - 80px);
     overflow-y: auto;
     scroll-behavior: smooth;
     position: relative;
@@ -592,6 +658,7 @@ const themeVars = useThemeVars();
   flex-direction: column;
   min-width: 0;
   padding: 24px;
+  position: relative;
 
   .content-header {
     display: flex;
@@ -763,5 +830,18 @@ const themeVars = useThemeVars();
   align-items: center;
   height: calc(100% - 72px);
   width: 100%;
+}
+
+.resize-handle {
+  width: 4px;
+  cursor: col-resize;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  margin-left: -2px;
+  border-right: 1px solid v-bind('themeVars.borderColor');
+  background: transparent;
 }
 </style>

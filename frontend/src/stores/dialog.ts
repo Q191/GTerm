@@ -4,7 +4,7 @@ import { ref } from 'vue';
 export const useDialogStore = defineStore('dialog', () => {
   const hostDialogVisible = ref(false);
   const aboutDialogVisible = ref(false);
-  const settingsDialogVisible = ref(false);
+  const preferencesDialogVisible = ref(false);
   const groupDialogVisible = ref(false);
   const isEditMode = ref(false);
 
@@ -25,12 +25,12 @@ export const useDialogStore = defineStore('dialog', () => {
     aboutDialogVisible.value = false;
   };
 
-  const openSettingsDialog = () => {
-    settingsDialogVisible.value = true;
+  const openPreferencesDialog= () => {
+    preferencesDialogVisible.value = true;
   };
 
-  const closeSettingsDialog = () => {
-    settingsDialogVisible.value = false;
+  const closePreferencesDialog = () => {
+    preferencesDialogVisible.value = false;
   };
 
   const openAddGroupDialog = () => {
@@ -44,14 +44,14 @@ export const useDialogStore = defineStore('dialog', () => {
   return {
     hostDialogVisible,
     aboutDialogVisible,
-    settingsDialogVisible,
+    preferencesDialogVisible,
     groupDialogVisible,
     openAddHostDialog,
     closeAddHostDialog,
     openAboutDialog,
     closeAboutDialog,
-    openSettingsDialog,
-    closeSettingsDialog,
+    openPreferencesDialog,
+    closePreferencesDialog,
     openAddGroupDialog,
     closeAddGroupDialog,
     isEditMode,

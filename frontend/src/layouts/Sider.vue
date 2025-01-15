@@ -41,7 +41,9 @@
       <n-dropdown :options="settingsOptions" trigger="click" :width="150" @select="handleSettingsSelect">
         <n-tooltip placement="right" trigger="hover">
           <template #trigger>
-            <div class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer">
+            <div
+              class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer bottom-menu-item"
+            >
               <n-icon size="x-large">
                 <icon icon="ph:gear-six" />
               </n-icon>
@@ -55,7 +57,7 @@
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
-            class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
+            class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer bottom-menu-item"
             @click="toggleTheme"
           >
             <n-icon size="x-large">
@@ -70,7 +72,7 @@
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
-            class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer"
+            class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer bottom-menu-item"
             @click="openGithub"
           >
             <n-icon size="x-large">
@@ -102,7 +104,7 @@ const themeVars = useThemeVars();
 const settingsOptions = [
   {
     label: '偏好设置',
-    key: 'settings',
+    key: 'preferences',
     icon: renderIcon('ph:sliders-horizontal'),
   },
   {
@@ -119,7 +121,7 @@ const settingsOptions = [
 
 // 渲染图标
 function renderIcon(name: string) {
-  return () => h(NIcon, { size: 'x-large' }, { default: () => h(Icon, { icon: name }) });
+  return () => h(NIcon, { size: 'large' }, { default: () => h(Icon, { icon: name }) });
 }
 
 // 处理主菜单选择
@@ -131,8 +133,8 @@ const handleSelect = (key: string) => {
 // 处理设置菜单选择
 const handleSettingsSelect = (key: string) => {
   switch (key) {
-    case 'settings':
-      dialogStore.openSettingsDialog();
+    case 'preferences':
+      dialogStore.openPreferencesDialog();
       break;
     case 'about':
       dialogStore.openAboutDialog();
@@ -186,7 +188,9 @@ const openGithub = () => {
   }
 }
 
-.icon-hover {
-  transition: transform 0.2s ease;
+.bottom-menu-item {
+  &:hover {
+    color: v-bind('themeVars.primaryColor');
+  }
 }
 </style>
