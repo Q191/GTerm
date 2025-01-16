@@ -176,9 +176,9 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 	}
 
 	switch host.Credential.AuthType {
-	case enums.Password:
+	case enums.CredentialAuthTypePassword:
 		sshConf.Password = host.Credential.Password
-	case enums.PrivateKey:
+	case enums.CredentialAuthTypePrivateKey:
 		sshConf.PrivateKey = host.Credential.PrivateKey
 		sshConf.KeyPassword = host.Credential.KeyPassword
 	}

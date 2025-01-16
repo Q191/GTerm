@@ -44,22 +44,12 @@
             </n-form-item>
           </div>
 
-          <n-form-item path="description">
-            <n-input
-              v-model:value="formValue.description"
-              type="textarea"
-              :rows="3"
-              clearable
-              :placeholder="$t('host_dialog.placeholder.description')"
-            />
-          </n-form-item>
-
           <n-form-item :label="$t('host_dialog.auth_type')" path="credential.auth_type">
             <div class="flex items-center justify-between w-full">
               <n-button-group>
                 <n-button
-                  :type="formValue.credential!.auth_type === 0 ? 'primary' : 'default'"
-                  @click="handleAuthTypeChange(0)"
+                  :type="formValue.credential!.auth_type === CredentialType.Password ? 'primary' : 'default'"
+                  @click="handleAuthTypeChange(CredentialType.Password)"
                 >
                   <template #icon>
                     <Icon icon="ph:password" />
@@ -67,15 +57,18 @@
                   {{ $t('host_dialog.password') }}
                 </n-button>
                 <n-button
-                  :type="formValue.credential!.auth_type === 1 ? 'primary' : 'default'"
-                  @click="handleAuthTypeChange(1)"
+                  :type="formValue.credential!.auth_type === CredentialType.PrivateKey ? 'primary' : 'default'"
+                  @click="handleAuthTypeChange(CredentialType.PrivateKey)"
                 >
                   <template #icon>
                     <Icon icon="ph:key" />
                   </template>
                   {{ $t('host_dialog.private_key') }}
                 </n-button>
-                <n-button :type="useCommonCredential ? 'primary' : 'default'" @click="handleAuthTypeChange(-1)">
+                <n-button
+                  :type="useCommonCredential ? 'primary' : 'default'"
+                  @click="handleAuthTypeChange(CredentialType.Common)"
+                >
                   <template #icon>
                     <Icon icon="ph:vault" />
                   </template>
@@ -115,7 +108,7 @@
               />
             </n-form-item>
 
-            <template v-if="formValue.credential!.auth_type === 0">
+            <template v-if="formValue.credential!.auth_type === CredentialType.Password">
               <n-form-item path="credential.password">
                 <n-input
                   v-model:value="formValue.credential!.password"
@@ -127,7 +120,7 @@
               </n-form-item>
             </template>
 
-            <template v-if="formValue.credential!.auth_type === 1">
+            <template v-if="formValue.credential!.auth_type === CredentialType.PrivateKey">
               <n-form-item path="credential.private_key">
                 <n-input
                   v-model:value="formValue.credential!.private_key"
@@ -166,7 +159,7 @@
 import { useDialogStore } from '@/stores/dialog';
 import { model } from '@wailsApp/go/models';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
-import { CreateHost } from '@wailsApp/go/services/HostSrv';
+import { CreateHost, UpdateHost } from '@wailsApp/go/services/HostSrv';
 import { Icon } from '@iconify/vue';
 
 import {
@@ -180,7 +173,6 @@ import {
   NButton,
   NButtonGroup,
   NSelect,
-  NSpace,
   NTabPane,
   NTabs,
   useMessage,
@@ -189,7 +181,7 @@ import {
   NEmpty,
 } from 'naive-ui';
 import { SelectMixedOption } from 'naive-ui/es/select/src/interface';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -198,46 +190,112 @@ const formRef = ref<FormInst | null>(null);
 const activeTab = ref('basic');
 const message = useMessage();
 
-const formValue = ref(
+// 认证类型常量
+const CredentialType = {
+  Password: 0,
+  PrivateKey: 1,
+  Common: 2,
+} as const;
+
+// 默认凭据信息
+const defaultCredential = {
+  username: '',
+  password: '',
+  private_key: '',
+  key_password: '',
+  is_common_credential: false,
+};
+
+// 默认主机信息
+const defaultHost = {
+  name: '',
+  host: '',
+  port: 22,
+  description: '',
+  credential_id: 0,
+  credential_type: 0,
+  conn_protocol: 0,
+};
+
+// 创建新的凭据对象
+const createCredential = (type: number) =>
+  model.Credential.createFrom({
+    ...defaultCredential,
+    auth_type: type,
+  });
+
+// 创建新的主机对象
+const createHost = (credentialType = 0) =>
   model.Host.createFrom({
-    name: '',
-    host: '',
-    port: 22,
-    description: '',
-    credential_id: 0,
-    credential: model.Credential.createFrom({
-      username: '',
-      password: '',
-      auth_type: 0,
-      private_key: '',
-      key_password: '',
-      is_common_credential: false,
-    }),
-  }),
-);
+    ...defaultHost,
+    credential_type: credentialType,
+    credential: createCredential(credentialType),
+  });
+
+const formValue = ref(createHost());
+
+// 保存不同认证类型的凭据信息
+const savedCredentials = ref({
+  password: createCredential(0),
+  privateKey: createCredential(1),
+});
 
 const useCommonCredential = ref(false);
 const credentialOptions = ref<SelectMixedOption[]>([]);
 
+watch(
+  () => dialogStore.editHost,
+  newHost => {
+    if (newHost) {
+      formValue.value = model.Host.createFrom(newHost);
+      // 保存认证信息到对应类型
+      if (newHost.credential) {
+        if (newHost.credential_type === CredentialType.Password) {
+          savedCredentials.value.password = model.Credential.createFrom(newHost.credential);
+        } else if (newHost.credential_type === CredentialType.PrivateKey) {
+          savedCredentials.value.privateKey = model.Credential.createFrom(newHost.credential);
+        }
+      }
+      useCommonCredential.value = newHost.credential_type === 2;
+    } else {
+      formValue.value = createHost();
+      savedCredentials.value = {
+        password: createCredential(0),
+        privateKey: createCredential(1),
+      };
+    }
+  },
+  { immediate: true },
+);
+
 const handleAuthTypeChange = (type: number) => {
-  if (type === -1) {
+  if (type === CredentialType.Common) {
+    // 切换到凭据库之前，保存当前认证信息
+    const currentType = formValue.value.credential_type;
+    if (currentType === CredentialType.Password || currentType === CredentialType.PrivateKey) {
+      const key = currentType === CredentialType.Password ? 'password' : 'privateKey';
+      savedCredentials.value[key] = model.Credential.createFrom(formValue.value.credential!);
+    }
+
     useCommonCredential.value = true;
-    formValue.value.credential = model.Credential.createFrom({
-      username: '',
-      password: '',
-      auth_type: -1,
-      private_key: '',
-      key_password: '',
-      is_common_credential: false,
-    });
+    formValue.value.credential_type = CredentialType.Common; // 凭据库
+    formValue.value.credential_id = undefined as any; // 清空凭据选择
+    formValue.value.credential = createCredential(CredentialType.Common);
   } else {
     useCommonCredential.value = false;
-    formValue.value.credential!.auth_type = type;
+    formValue.value.credential_type = type; // 密码或私钥
+    formValue.value.credential_id = 0; // 清空凭据ID
+    // 恢复之前保存的认证信息
+    formValue.value.credential = model.Credential.createFrom(
+      type === CredentialType.Password ? savedCredentials.value.password : savedCredentials.value.privateKey,
+    );
   }
 };
 
 const handleCredentialChange = async (id: string) => {
   if (!id) return;
+  formValue.value.credential_id = parseInt(id);
+  formValue.value.credential_type = 2; // 设置为凭据库类型
   // const resp = await GetCredential(id);
   // if (!resp.ok) {
   // message.error(resp.msg);
@@ -292,22 +350,11 @@ const rules = computed<FormRules>(() => ({
 
 const groupOptions = ref<SelectMixedOption[]>([]);
 
-onMounted(async () => {
-  const [groups, credentials] = await Promise.all([fetchGroups(), fetchCredentials()]);
-  groupOptions.value = groups.map((group: model.Group) => ({
-    label: group.name,
-    value: group.id,
-  }));
-  credentialOptions.value = credentials.map((credential: model.Credential) => ({
-    label: credential.name || credential.username,
-    value: credential.id,
-  }));
-});
-
 const fetchGroups = async () => {
   const resp = await ListGroup();
   if (!resp.ok) {
     message.error(resp.msg);
+    return [];
   }
   return resp.data;
 };
@@ -321,15 +368,31 @@ const fetchCredentials = async () => {
   // return resp.data || [];
 };
 
+const initOptions = async () => {
+  const [groups, credentials] = await Promise.all([fetchGroups(), fetchCredentials()]);
+  groupOptions.value = groups.map((group: model.Group) => ({
+    label: group.name,
+    value: group.id,
+  }));
+  credentialOptions.value = credentials.map((credential: model.Credential) => ({
+    label: credential.name || credential.username,
+    value: credential.id,
+  }));
+};
+
+onMounted(initOptions);
+
 const handleConfirm = async () => {
   try {
     await formRef.value?.validate();
-    const resp = await CreateHost(formValue.value);
+    const resp = dialogStore.isEditMode ? await UpdateHost(formValue.value) : await CreateHost(formValue.value);
+
     if (!resp.ok) {
       message.error(resp.msg);
-    } else {
-      message.success('创建成功');
+      return false;
     }
+
+    message.success(dialogStore.isEditMode ? '更新成功' : '创建成功');
     dialogStore.closeAddHostDialog();
   } catch (errors) {
     return false;

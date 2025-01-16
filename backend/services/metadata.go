@@ -27,9 +27,9 @@ func (s *MetadataSrv) UpdateByHost(host *model.Host) {
 		AuthType: host.Credential.AuthType,
 	}
 	switch host.Credential.AuthType {
-	case enums.Password:
+	case enums.CredentialAuthTypePassword:
 		config.Password = host.Credential.Password
-	case enums.PrivateKey:
+	case enums.CredentialAuthTypePrivateKey:
 		config.PrivateKey = host.Credential.PrivateKey
 		config.KeyPassword = host.Credential.KeyPassword
 	}

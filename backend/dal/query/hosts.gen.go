@@ -35,7 +35,7 @@ func newHost(db *gorm.DB, opts ...gen.DOOption) host {
 	_host.Host = field.NewString(tableName, "host")
 	_host.Port = field.NewUint(tableName, "port")
 	_host.ConnProtocol = field.NewInt(tableName, "conn_protocol")
-	_host.Description = field.NewString(tableName, "description")
+	_host.CredentialType = field.NewInt(tableName, "credential_type")
 	_host.CredentialID = field.NewUint(tableName, "credential_id")
 	_host.GroupID = field.NewUint(tableName, "group_id")
 	_host.Metadata = hostHasOneMetadata{
@@ -58,19 +58,19 @@ func newHost(db *gorm.DB, opts ...gen.DOOption) host {
 type host struct {
 	hostDo
 
-	ALL          field.Asterisk
-	ID           field.Uint
-	CreatedAt    field.Time
-	UpdatedAt    field.Time
-	DeletedAt    field.Field
-	Name         field.String
-	Host         field.String
-	Port         field.Uint
-	ConnProtocol field.Int
-	Description  field.String
-	CredentialID field.Uint
-	GroupID      field.Uint
-	Metadata     hostHasOneMetadata
+	ALL            field.Asterisk
+	ID             field.Uint
+	CreatedAt      field.Time
+	UpdatedAt      field.Time
+	DeletedAt      field.Field
+	Name           field.String
+	Host           field.String
+	Port           field.Uint
+	ConnProtocol   field.Int
+	CredentialType field.Int
+	CredentialID   field.Uint
+	GroupID        field.Uint
+	Metadata       hostHasOneMetadata
 
 	Credential hostBelongsToCredential
 
@@ -97,7 +97,7 @@ func (h *host) updateTableName(table string) *host {
 	h.Host = field.NewString(table, "host")
 	h.Port = field.NewUint(table, "port")
 	h.ConnProtocol = field.NewInt(table, "conn_protocol")
-	h.Description = field.NewString(table, "description")
+	h.CredentialType = field.NewInt(table, "credential_type")
 	h.CredentialID = field.NewUint(table, "credential_id")
 	h.GroupID = field.NewUint(table, "group_id")
 
@@ -125,7 +125,7 @@ func (h *host) fillFieldMap() {
 	h.fieldMap["host"] = h.Host
 	h.fieldMap["port"] = h.Port
 	h.fieldMap["conn_protocol"] = h.ConnProtocol
-	h.fieldMap["description"] = h.Description
+	h.fieldMap["credential_type"] = h.CredentialType
 	h.fieldMap["credential_id"] = h.CredentialID
 	h.fieldMap["group_id"] = h.GroupID
 

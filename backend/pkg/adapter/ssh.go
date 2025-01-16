@@ -18,7 +18,7 @@ import (
 )
 
 type SSHConfig struct {
-	AuthType    enums.AuthType
+	AuthType    enums.CredentialAuthType
 	Port        uint
 	Host        string
 	User        string
@@ -78,7 +78,7 @@ func (s *SSH) Connect() (*SSH, error) {
 	var auth []ssh.AuthMethod
 
 	switch s.conf.AuthType {
-	case enums.Password:
+	case enums.CredentialAuthTypePassword:
 		auth = append(auth, ssh.Password(s.conf.Password))
 		auth = append(auth, ssh.KeyboardInteractive(func(user, instruction string, questions []string, echos []bool) ([]string, error) {
 			answers := make([]string, len(questions))
@@ -87,7 +87,7 @@ func (s *SSH) Connect() (*SSH, error) {
 			}
 			return answers, nil
 		}))
-	case enums.PrivateKey:
+	case enums.CredentialAuthTypePrivateKey:
 		signer, err := s.signer()
 		if err != nil {
 			return s, err

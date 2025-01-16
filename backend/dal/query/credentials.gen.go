@@ -37,7 +37,6 @@ func newCredential(db *gorm.DB, opts ...gen.DOOption) credential {
 	_credential.AuthType = field.NewInt(tableName, "auth_type")
 	_credential.PrivateKey = field.NewString(tableName, "private_key")
 	_credential.KeyPassword = field.NewString(tableName, "key_password")
-	_credential.Description = field.NewString(tableName, "description")
 	_credential.IsCommonCredential = field.NewBool(tableName, "is_common_credential")
 
 	_credential.fillFieldMap()
@@ -59,7 +58,6 @@ type credential struct {
 	AuthType           field.Int
 	PrivateKey         field.String
 	KeyPassword        field.String
-	Description        field.String
 	IsCommonCredential field.Bool
 
 	fieldMap map[string]field.Expr
@@ -87,7 +85,6 @@ func (c *credential) updateTableName(table string) *credential {
 	c.AuthType = field.NewInt(table, "auth_type")
 	c.PrivateKey = field.NewString(table, "private_key")
 	c.KeyPassword = field.NewString(table, "key_password")
-	c.Description = field.NewString(table, "description")
 	c.IsCommonCredential = field.NewBool(table, "is_common_credential")
 
 	c.fillFieldMap()
@@ -105,7 +102,7 @@ func (c *credential) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *credential) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 12)
+	c.fieldMap = make(map[string]field.Expr, 11)
 	c.fieldMap["id"] = c.ID
 	c.fieldMap["created_at"] = c.CreatedAt
 	c.fieldMap["updated_at"] = c.UpdatedAt
@@ -116,7 +113,6 @@ func (c *credential) fillFieldMap() {
 	c.fieldMap["auth_type"] = c.AuthType
 	c.fieldMap["private_key"] = c.PrivateKey
 	c.fieldMap["key_password"] = c.KeyPassword
-	c.fieldMap["description"] = c.Description
 	c.fieldMap["is_common_credential"] = c.IsCommonCredential
 }
 

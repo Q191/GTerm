@@ -16,15 +16,6 @@
       <n-form-item :label="$t('group_dialog.name')" path="name">
         <n-input v-model:value="formValue.name" clearable />
       </n-form-item>
-
-      <n-form-item :label="$t('group_dialog.description')" path="description">
-        <n-input
-          v-model:value="formValue.description"
-          type="textarea"
-          :autosize="{ minRows: 3, maxRows: 5 }"
-          clearable
-        />
-      </n-form-item>
     </n-form>
   </n-modal>
 </template>

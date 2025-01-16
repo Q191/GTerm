@@ -1,8 +1,16 @@
 package enums
 
-type AuthType = int
+type CredentialAuthType = int
 
 const (
-	Password AuthType = iota
-	PrivateKey
+	CredentialAuthTypePassword CredentialAuthType = iota
+	CredentialAuthTypePrivateKey
+)
+
+type CredentialType = int
+
+const (
+	CredentialTypePassword CredentialAuthType = iota
+	CredentialTypePrivateKey
+	CredentialTypeCommon
 )

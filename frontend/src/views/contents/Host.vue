@@ -85,7 +85,7 @@
                 <div class="host-addr">{{ host.credential?.username }}@{{ host.host }}</div>
               </div>
             </div>
-            <n-button circle text size="small" class="edit-btn" @click.stop="handleEditHost">
+            <n-button circle text size="small" class="edit-btn" @click.stop="handleEditHost($event, host)">
               <template #icon>
                 <icon icon="ph:pencil-simple" class="edit-icon" />
               </template>
@@ -244,7 +244,7 @@ const handleDropdownSelect = (key: string) => {
       const hostId = parseInt(currentContextNode.value.key.replace('host-', ''));
       const host = hosts.value?.find(h => h.id === hostId);
       if (host) {
-        dialogStore.openAddHostDialog(true);
+        dialogStore.openAddHostDialog(true, host);
       }
       break;
     case 'delete-host':
@@ -388,9 +388,9 @@ const toTerminal = (host: model.Host) => {
   router.push({ name: 'Terminal' });
 };
 
-const handleEditHost = (event: MouseEvent) => {
+const handleEditHost = (event: MouseEvent, host: model.Host) => {
   event.preventDefault();
-  dialogStore.openAddHostDialog(true);
+  dialogStore.openAddHostDialog(true, host);
 };
 
 const handleEditGroup = (event: MouseEvent) => {
@@ -411,6 +411,7 @@ const fetchHosts = async () => {
   if (!resp.ok) {
     message.error(resp.msg);
   }
+  console.log(resp.data);
   return resp.data;
 };
 

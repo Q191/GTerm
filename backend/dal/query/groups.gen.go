@@ -32,7 +32,6 @@ func newGroup(db *gorm.DB, opts ...gen.DOOption) group {
 	_group.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_group.DeletedAt = field.NewField(tableName, "deleted_at")
 	_group.Name = field.NewString(tableName, "name")
-	_group.Description = field.NewString(tableName, "description")
 
 	_group.fillFieldMap()
 
@@ -42,13 +41,12 @@ func newGroup(db *gorm.DB, opts ...gen.DOOption) group {
 type group struct {
 	groupDo
 
-	ALL         field.Asterisk
-	ID          field.Uint
-	CreatedAt   field.Time
-	UpdatedAt   field.Time
-	DeletedAt   field.Field
-	Name        field.String
-	Description field.String
+	ALL       field.Asterisk
+	ID        field.Uint
+	CreatedAt field.Time
+	UpdatedAt field.Time
+	DeletedAt field.Field
+	Name      field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -70,7 +68,6 @@ func (g *group) updateTableName(table string) *group {
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.DeletedAt = field.NewField(table, "deleted_at")
 	g.Name = field.NewString(table, "name")
-	g.Description = field.NewString(table, "description")
 
 	g.fillFieldMap()
 
@@ -87,13 +84,12 @@ func (g *group) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *group) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 6)
+	g.fieldMap = make(map[string]field.Expr, 5)
 	g.fieldMap["id"] = g.ID
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["deleted_at"] = g.DeletedAt
 	g.fieldMap["name"] = g.Name
-	g.fieldMap["description"] = g.Description
 }
 
 func (g group) clone(db *gorm.DB) group {
