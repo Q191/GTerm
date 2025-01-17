@@ -4,30 +4,27 @@
     "github": "GitHub",
     "website": "官网"
   },
-  "host_dialog": {
+  "hostDialog": {
     "title": "添加主机",
-    "edit_title": "编辑主机",
+    "editTitle": "编辑主机",
     "cancel": "取消",
     "confirm": "确定",
-    "basic_config": "基础配置",
-    "advanced_config": "高级配置",
+    "basicConfig": "基础配置",
+    "advancedConfig": "高级配置",
     "developing": "功能开发中...",
     "name": "名称",
-    "description": "描述",
     "group": "分组",
     "host": "主机",
     "port": "端口",
-    "auth_type": "认证方式",
+    "authType": "认证方式",
     "username": "用户名",
     "password": "密码",
-    "private_key": "私钥",
-    "common_credential_lib": "凭据",
-    "common_credential": "公共",
-    "private_credential": "私有",
-    "credential_tooltip": "公共：该认证信息将被添加至凭据库\n私有：仅当前主机可使用",
+    "privateKey": "私钥",
+    "commonCredentialLib": "凭据",
+    "commonCredential": "公共",
+    "privateCredential": "私有",
+    "credentialTooltip": "公共：该认证信息将被添加至凭据库\n私有：仅当前主机可使用",
     "passphrase": "密钥口令",
-    "charset": "字符编码",
-    "term_type": "终端类型",
     "placeholder": {
       "name": "请输入主机名称",
       "group": "请选择分组",
@@ -35,31 +32,28 @@
       "port": "请输入端口号",
       "username": "请输入用户名",
       "password": "请输入密码",
-      "private_key": "请输入私钥内容",
-      "key_password": "请输入私钥密码",
-      "select_credential": "选择认证信息",
-      "description": "请输入主机描述信息"
+      "privateKey": "请输入私钥内容",
+      "passphrase": "请输入密钥口令",
+      "selectCredential": "选择凭据信息"
     },
     "validation": {
-      "label_required": "请输入标签名称",
-      "host_required": "请输入主机地址",
-      "port_required": "请输入端口号",
-      "username_required": "请输入用户名",
-      "name_required": "请输入名称",
-      "password_required": "请输入密码",
-      "private_key_required": "请输入私钥",
-      "credential_required": "请选择认证信息",
-      "port_invalid": "端口号必须在 1-65535 之间"
+      "nameRequired": "请输入名称",
+      "hostRequired": "请输入主机地址",
+      "portRequired": "请输入端口号",
+      "usernameRequired": "请输入用户名",
+      "passwordRequired": "请输入密码",
+      "privateKeyRequired": "请输入私钥",
+      "credentialRequired": "请选择认证信息",
+      "portInvalid": "端口号必须在 1-65535 之间"
     }
   },
-  "group_dialog": {
+  "groupDialog": {
     "title": "新建分组",
     "name": "名称",
-    "description": "描述",
     "cancel": "取消",
     "confirm": "确定",
     "validation": {
-      "name_required": "请输入分组名称"
+      "nameRequired": "请输入分组名称"
     }
   }
 }

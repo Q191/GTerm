@@ -18,7 +18,7 @@ import (
 )
 
 type SSHConfig struct {
-	AuthType    enums.CredentialAuthType
+	AuthMethod  enums.AuthMethod
 	Port        uint
 	Host        string
 	User        string
@@ -77,8 +77,8 @@ func NewSSH(conf *SSHConfig, ws *websocket.Conn, logger *zap.Logger) *SSH {
 func (s *SSH) Connect() (*SSH, error) {
 	var auth []ssh.AuthMethod
 
-	switch s.conf.AuthType {
-	case enums.CredentialAuthTypePassword:
+	switch s.conf.AuthMethod {
+	case enums.Password:
 		auth = append(auth, ssh.Password(s.conf.Password))
 		auth = append(auth, ssh.KeyboardInteractive(func(user, instruction string, questions []string, echos []bool) ([]string, error) {
 			answers := make([]string, len(questions))
@@ -87,7 +87,7 @@ func (s *SSH) Connect() (*SSH, error) {
 			}
 			return answers, nil
 		}))
-	case enums.CredentialAuthTypePrivateKey:
+	case enums.PrivateKey:
 		signer, err := s.signer()
 		if err != nil {
 			return s, err

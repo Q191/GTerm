@@ -6,13 +6,13 @@ import (
 
 type Credential struct {
 	Common
-	Name               string                   `json:"name" gorm:"uniqueIndex;not null"`
-	Username           string                   `json:"username"`
-	Password           string                   `json:"password"`
-	AuthType           enums.CredentialAuthType `json:"auth_type"`
-	PrivateKey         string                   `json:"private_key"`
-	KeyPassword        string                   `json:"key_password"`
-	IsCommonCredential bool                     `json:"is_common_credential"`
+	Name               string           `json:"name" gorm:"uniqueIndex;not null"`
+	Username           string           `json:"username"`
+	Password           string           `json:"password"`
+	AuthMethod         enums.AuthMethod `json:"authMethod"`
+	PrivateKey         string           `json:"privateKey"`
+	Passphrase         string           `json:"passphrase"`
+	IsCommonCredential bool             `json:"isCommonCredential"`
 }
 
 func (c *Credential) TableName() string {

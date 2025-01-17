@@ -2,18 +2,18 @@
   <n-modal
     v-model:show="dialogStore.groupDialogVisible"
     :close-on-esc="true"
-    :negative-text="$t('group_dialog.cancel')"
-    :on-close="dialogStore.closeAddGroupDialog"
-    :positive-text="$t('group_dialog.confirm')"
+    :negative-text="$t('groupDialog.cancel')"
+    :on-close="resetForm"
+    :positive-text="$t('groupDialog.confirm')"
     :show-icon="false"
-    :title="$t('group_dialog.title')"
+    :title="$t('groupDialog.title')"
     preset="dialog"
     style="width: 500px"
     transform-origin="center"
     @positive-click="handleConfirm"
   >
     <n-form ref="formRef" :model="formValue" :rules="rules" label-placement="left" label-width="80">
-      <n-form-item :label="$t('group_dialog.name')" path="name">
+      <n-form-item :label="$t('groupDialog.name')" path="name">
         <n-input v-model:value="formValue.name" clearable />
       </n-form-item>
     </n-form>
@@ -36,14 +36,20 @@ const message = useMessage();
 const formValue = ref(
   model.Group.createFrom({
     name: '',
-    description: '',
   }),
 );
+
+const resetForm = () => {
+  formValue.value = model.Group.createFrom({
+    name: '',
+  });
+  dialogStore.closeAddGroupDialog();
+};
 
 const rules: FormRules = {
   name: {
     required: true,
-    message: t('group_dialog.validation.name_required'),
+    message: t('groupDialog.validation.nameRequired'),
     trigger: 'blur',
   },
 };
@@ -54,10 +60,10 @@ const handleConfirm = async () => {
     const resp = await CreateGroup(formValue.value);
     if (!resp.ok) {
       message.error(resp.msg);
-    } else {
-      message.success('创建成功');
+      return false;
     }
-    dialogStore.closeAddHostDialog();
+    message.success('创建成功');
+    dialogStore.closeAddGroupDialog();
   } catch (errors) {
     return false;
   }

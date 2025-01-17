@@ -18,12 +18,12 @@ type HostSrv struct {
 
 func (s *HostSrv) CreateHost(host *model.Host) *resp.Resp {
 	if err := s.Query.Transaction(func(tx *query.Query) error {
-		if host.CredentialID == 0 && host.Credential != nil {
+		if host.CredentialID == nil && host.Credential != nil {
 			host.Credential.Name = uuid.New().String()
 			if err := tx.Credential.Create(host.Credential); err != nil {
 				return err
 			}
-			host.CredentialID = host.Credential.ID
+			host.CredentialID = &host.Credential.ID
 		}
 		if err := tx.Host.Create(host); err != nil {
 			return err

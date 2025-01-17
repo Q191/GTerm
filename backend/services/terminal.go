@@ -169,18 +169,18 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 	}
 
 	sshConf := &adapter.SSHConfig{
-		Host:     host.Host,
-		Port:     host.Port,
-		User:     host.Credential.Username,
-		AuthType: host.Credential.AuthType,
+		Host:       host.Host,
+		Port:       host.Port,
+		User:       host.Credential.Username,
+		AuthMethod: host.Credential.AuthMethod,
 	}
 
-	switch host.Credential.AuthType {
-	case enums.CredentialAuthTypePassword:
+	switch host.Credential.AuthMethod {
+	case enums.Password:
 		sshConf.Password = host.Credential.Password
-	case enums.CredentialAuthTypePrivateKey:
+	case enums.PrivateKey:
 		sshConf.PrivateKey = host.Credential.PrivateKey
-		sshConf.KeyPassword = host.Credential.KeyPassword
+		sshConf.KeyPassword = host.Credential.Passphrase
 	}
 
 	ssh, err := adapter.NewSSH(sshConf, ws, s.Logger).Connect()

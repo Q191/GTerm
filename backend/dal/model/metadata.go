@@ -2,7 +2,7 @@ package model
 
 type Metadata struct {
 	Common
-	HostID uint   `json:"host_id" gorm:"not null"`
+	HostID uint   `json:"hostID" gorm:"not null"`
 	OS     string `json:"os" gorm:"not null"`
 }
 

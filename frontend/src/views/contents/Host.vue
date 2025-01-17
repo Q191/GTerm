@@ -67,8 +67,16 @@
     <div class="main-content">
       <div class="content-header">
         <div class="header-left">
-          <h2>{{ selectedGroup ? selectedGroup.name : '所有主机' }}</h2>
+          <h2>{{ selectedGroup ? selectedGroup.name : '资产清单' }}</h2>
           <n-badge :value="filteredHosts.length" show-zero type="success" />
+        </div>
+        <div class="header-right">
+          <n-button v-if="selectedGroup" text @click="handleSelect([])">
+            <template #icon>
+              <icon icon="ph:arrow-left" />
+            </template>
+            返回
+          </n-button>
         </div>
       </div>
 
@@ -128,7 +136,11 @@
         </div>
       </div>
       <div class="empty-state" v-else>
-        <n-result status="404" title="空空如也" :description="`分组「${selectedGroup?.name}」中还没有添加任何主机`" />
+        <n-result
+          status="404"
+          title="空空如也"
+          :description="`${selectedGroup ? `分组「${selectedGroup.name}」中还没有添加任何主机` : '您还没有任何可用连接，点击创建即刻开始！'}`"
+        />
       </div>
     </div>
   </div>
@@ -136,7 +148,20 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NTag, NTooltip, NTree, NDropdown, NResult, NBadge, NInput, useMessage, useThemeVars } from 'naive-ui';
+import {
+  NButton,
+  NTag,
+  NTooltip,
+  NTree,
+  NDropdown,
+  NResult,
+  NBadge,
+  NInput,
+  NBreadcrumb,
+  NBreadcrumbItem,
+  useMessage,
+  useThemeVars,
+} from 'naive-ui';
 import type { DropdownOption } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
@@ -204,7 +229,7 @@ const nodeProps = ({ option }: { option: any }) => {
         const groupId = parseInt(option.key.replace('group-', ''));
         const group = groups.value?.find(g => g.id === groupId);
         if (group) {
-          const groupHosts = hosts.value?.filter(host => host.group_id === group.id) || [];
+          const groupHosts = hosts.value?.filter(host => host.groupID === group.id) || [];
           if (groupHosts.length > 0) {
             selectedGroup.value = group;
             selectedKeys.value = [option.key];
@@ -263,23 +288,10 @@ const treeData = computed(() => {
 
   const treeNodes = [];
 
-  // 添加"全部主机"节点
-  treeNodes.push({
-    key: 'all',
-    label: '所有主机',
-    prefix: () =>
-      h(Icon, {
-        icon: 'ph:paw-print',
-        style: {
-          fontSize: '1.2rem',
-        },
-      }),
-  });
-
   // 添加分组节点
   treeNodes.push(
     ...groups.value.map(group => {
-      const groupHosts = hosts.value?.filter(host => host.group_id === group.id) || [];
+      const groupHosts = hosts.value?.filter(host => host.groupID === group.id) || [];
       return {
         key: `group-${group.id}`,
         label: group.name,
@@ -315,7 +327,7 @@ const treeData = computed(() => {
   );
 
   // 添加未分组的主机节点
-  const ungroupedHosts = hosts.value?.filter(host => !host.group_id) || [];
+  const ungroupedHosts = hosts.value?.filter(host => !host.groupID) || [];
   if (ungroupedHosts.length > 0) {
     treeNodes.push(
       ...ungroupedHosts.map(host => ({
@@ -326,7 +338,7 @@ const treeData = computed(() => {
           h(Icon, {
             icon: getDeviceIcon(host),
             style: {
-              fontSize: '1rem',
+              fontSize: '1.2rem',
             },
           }),
       })),
@@ -339,10 +351,7 @@ const treeData = computed(() => {
 const handleSelect = (keys: string[]) => {
   if (keys.length > 0) {
     const key = keys[0];
-    if (key === 'all') {
-      selectedGroup.value = null;
-      selectedKeys.value = keys;
-    } else if (key.startsWith('host-')) {
+    if (key.startsWith('host-')) {
       const hostId = parseInt(key.replace('host-', ''));
       const host = hosts.value?.find(h => h.id === hostId);
       if (host) {
@@ -364,17 +373,14 @@ const handleSelect = (keys: string[]) => {
 
 const filteredHosts = computed(() => {
   if (!selectedGroup.value) return hosts.value || [];
-  return hosts.value?.filter(host => host.group_id === selectedGroup.value?.id) || [];
+  return hosts.value?.filter(host => host.groupID === selectedGroup.value?.id) || [];
 });
 
-watch(
-  () => dialogStore.hostDialogVisible,
-  newVal => {
-    if (!newVal) {
-      fetchData();
-    }
-  },
-);
+watch([() => dialogStore.hostDialogVisible, () => dialogStore.groupDialogVisible], ([hostVisible, groupVisible]) => {
+  if (!hostVisible || !groupVisible) {
+    fetchData();
+  }
+});
 
 const toTerminal = (host: model.Host) => {
   const connection = {
@@ -469,7 +475,7 @@ const getErrorConnectionCount = (host: model.Host) => {
 };
 
 const getProtocolIcon = (host: model.Host) => {
-  const protocol = host.conn_protocol;
+  const protocol = host.connProtocol;
 
   switch (protocol) {
     case 0:
@@ -488,7 +494,7 @@ const getProtocolIcon = (host: model.Host) => {
 };
 
 const getProtocolName = (host: model.Host) => {
-  const protocol = host.conn_protocol;
+  const protocol = host.connProtocol;
   switch (protocol) {
     case 0:
       return 'SSH';
@@ -511,7 +517,6 @@ const handleExpand = (keys: string[]) => {
 
 onMounted(async () => {
   await fetchData();
-  selectedKeys.value = ['all'];
 });
 
 const themeVars = useThemeVars();
@@ -677,6 +682,18 @@ onUnmounted(() => {
         font-weight: 600;
         color: v-bind('themeVars.textColorBase');
         margin: 0;
+      }
+    }
+
+    .header-right {
+      :deep(.n-button) {
+        font-size: 13px;
+        color: v-bind('themeVars.textColor3');
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: v-bind('themeVars.primaryColor');
+        }
       }
     }
   }

@@ -21,17 +21,17 @@ func (s *MetadataSrv) UpdateByHost(host *model.Host) {
 	t := s.Query.Metadata
 
 	config := &exec.Config{
-		Host:     host.Host,
-		Port:     host.Port,
-		User:     host.Credential.Username,
-		AuthType: host.Credential.AuthType,
+		Host:       host.Host,
+		Port:       host.Port,
+		User:       host.Credential.Username,
+		AuthMethod: host.Credential.AuthMethod,
 	}
-	switch host.Credential.AuthType {
-	case enums.CredentialAuthTypePassword:
+	switch host.Credential.AuthMethod {
+	case enums.Password:
 		config.Password = host.Credential.Password
-	case enums.CredentialAuthTypePrivateKey:
+	case enums.PrivateKey:
 		config.PrivateKey = host.Credential.PrivateKey
-		config.KeyPassword = host.Credential.KeyPassword
+		config.KeyPassword = host.Credential.Passphrase
 	}
 	client, err := exec.NewExec(config)
 	if err != nil {

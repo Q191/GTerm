@@ -34,9 +34,9 @@ func newCredential(db *gorm.DB, opts ...gen.DOOption) credential {
 	_credential.Name = field.NewString(tableName, "name")
 	_credential.Username = field.NewString(tableName, "username")
 	_credential.Password = field.NewString(tableName, "password")
-	_credential.AuthType = field.NewInt(tableName, "auth_type")
+	_credential.AuthMethod = field.NewInt(tableName, "auth_method")
 	_credential.PrivateKey = field.NewString(tableName, "private_key")
-	_credential.KeyPassword = field.NewString(tableName, "key_password")
+	_credential.Passphrase = field.NewString(tableName, "passphrase")
 	_credential.IsCommonCredential = field.NewBool(tableName, "is_common_credential")
 
 	_credential.fillFieldMap()
@@ -55,9 +55,9 @@ type credential struct {
 	Name               field.String
 	Username           field.String
 	Password           field.String
-	AuthType           field.Int
+	AuthMethod         field.Int
 	PrivateKey         field.String
-	KeyPassword        field.String
+	Passphrase         field.String
 	IsCommonCredential field.Bool
 
 	fieldMap map[string]field.Expr
@@ -82,9 +82,9 @@ func (c *credential) updateTableName(table string) *credential {
 	c.Name = field.NewString(table, "name")
 	c.Username = field.NewString(table, "username")
 	c.Password = field.NewString(table, "password")
-	c.AuthType = field.NewInt(table, "auth_type")
+	c.AuthMethod = field.NewInt(table, "auth_method")
 	c.PrivateKey = field.NewString(table, "private_key")
-	c.KeyPassword = field.NewString(table, "key_password")
+	c.Passphrase = field.NewString(table, "passphrase")
 	c.IsCommonCredential = field.NewBool(table, "is_common_credential")
 
 	c.fillFieldMap()
@@ -110,9 +110,9 @@ func (c *credential) fillFieldMap() {
 	c.fieldMap["name"] = c.Name
 	c.fieldMap["username"] = c.Username
 	c.fieldMap["password"] = c.Password
-	c.fieldMap["auth_type"] = c.AuthType
+	c.fieldMap["auth_method"] = c.AuthMethod
 	c.fieldMap["private_key"] = c.PrivateKey
-	c.fieldMap["key_password"] = c.KeyPassword
+	c.fieldMap["passphrase"] = c.Passphrase
 	c.fieldMap["is_common_credential"] = c.IsCommonCredential
 }
 

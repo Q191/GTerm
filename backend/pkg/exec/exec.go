@@ -13,7 +13,7 @@ import (
 )
 
 type Config struct {
-	AuthType    enums.CredentialAuthType
+	AuthMethod  enums.AuthMethod
 	Port        uint
 	Host        string
 	User        string
@@ -154,8 +154,8 @@ func (r *Result) String() string {
 func NewExec(conf *Config) (*ssh.Client, error) {
 	var auth []ssh.AuthMethod
 
-	switch conf.AuthType {
-	case enums.CredentialAuthTypePassword:
+	switch conf.AuthMethod {
+	case enums.Password:
 		auth = append(auth, ssh.Password(conf.Password))
 		auth = append(auth, ssh.KeyboardInteractive(func(user, instruction string, questions []string, echos []bool) ([]string, error) {
 			answers := make([]string, len(questions))
@@ -164,7 +164,7 @@ func NewExec(conf *Config) (*ssh.Client, error) {
 			}
 			return answers, nil
 		}))
-	case enums.CredentialAuthTypePrivateKey:
+	case enums.PrivateKey:
 		var signer ssh.Signer
 		var err error
 		if conf.KeyPassword == "" {
