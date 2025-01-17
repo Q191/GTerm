@@ -49,9 +49,21 @@ func (s *HostSrv) FindByID(id uint) (*model.Host, error) {
 }
 
 func (s *HostSrv) DeleteHost(id uint) *resp.Resp {
-	t := s.Query.Host
-	_, err := t.Where(t.ID.Eq(id)).Delete()
-	if err != nil {
+	if err := s.Query.Transaction(func(tx *query.Query) error {
+		host, err := tx.Host.Where(tx.Host.ID.Eq(id)).First()
+		if err != nil {
+			return err
+		}
+		if !host.IsCommonCredential && host.CredentialID != nil {
+			if _, err = tx.Credential.Where(tx.Credential.ID.Eq(*host.CredentialID)).Unscoped().Delete(); err != nil {
+				return err
+			}
+		}
+		if _, err = tx.Host.Select(tx.Host.Metadata.Field()).Unscoped().Delete(host); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
 	return resp.Ok()

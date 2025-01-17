@@ -165,7 +165,7 @@ import {
 import type { DropdownOption } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
-import { ListHost } from '@wailsApp/go/services/HostSrv';
+import { ListHost, DeleteHost } from '@wailsApp/go/services/HostSrv';
 import { model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
 import { useRouter } from 'vue-router';
@@ -254,9 +254,11 @@ const nodeProps = ({ option }: { option: any }) => {
   };
 };
 
-const handleDropdownSelect = (key: string) => {
+const handleDropdownSelect = async (key: string) => {
   showDropdown.value = false;
   if (!currentContextNode.value) return;
+
+  const hostId = parseInt(currentContextNode.value.key.replace('host-', ''));
 
   switch (key) {
     case 'edit-group':
@@ -266,14 +268,17 @@ const handleDropdownSelect = (key: string) => {
       // TODO: 实现删除分组功能
       break;
     case 'edit-host':
-      const hostId = parseInt(currentContextNode.value.key.replace('host-', ''));
       const host = hosts.value?.find(h => h.id === hostId);
-      if (host) {
-        dialogStore.openAddHostDialog(true, host);
-      }
+      if (host) dialogStore.openAddHostDialog(true, host);
       break;
     case 'delete-host':
-      // TODO: 实现删除主机功能
+      const resp = await DeleteHost(hostId);
+      if (!resp.ok) {
+        message.error(resp.msg);
+        return;
+      }
+      message.success('删除成功');
+      await fetchData();
       break;
   }
   currentContextNode.value = null;
@@ -288,37 +293,32 @@ const treeData = computed(() => {
 
   const treeNodes = [];
 
-  // 添加分组节点
   treeNodes.push(
     ...groups.value.map(group => {
       const groupHosts = hosts.value?.filter(host => host.groupID === group.id) || [];
+      const isEmpty = groupHosts.length === 0;
       return {
         key: `group-${group.id}`,
         label: group.name,
-        children:
-          groupHosts.length > 0
-            ? groupHosts.map(host => ({
-                key: `host-${host.id}`,
-                label: host.name,
-                isLeaf: true,
-                prefix: () =>
-                  h(Icon, {
-                    icon: getDeviceIcon(host),
-                    style: {
-                      fontSize: '1.2rem',
-                    },
-                  }),
-              }))
-            : undefined,
-        isLeaf: groupHosts.length === 0,
+        children: isEmpty
+          ? undefined
+          : groupHosts.map(host => ({
+              key: `host-${host.id}`,
+              label: host.name,
+              isLeaf: true,
+              prefix: () =>
+                h(Icon, {
+                  icon: getDeviceIcon(host),
+                  style: {
+                    fontSize: '1.2rem',
+                  },
+                }),
+            })),
+        isLeaf: isEmpty,
         prefix: () => {
           const expanded = expandedKeys.value.includes(`group-${group.id}`);
           return h(Icon, {
-            icon: expanded
-              ? 'ph:folder-open-duotone'
-              : groupHosts.length === 0
-                ? 'ph:folder-dashed-duotone'
-                : 'ph:folders-duotone',
+            icon: isEmpty ? 'ph:folder-dashed-duotone' : expanded ? 'ph:folder-open-duotone' : 'ph:folders-duotone',
             style: { fontSize: '1.2rem' },
           });
         },
