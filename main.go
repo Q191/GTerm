@@ -51,7 +51,7 @@ func main() {
 			TitleBar: mac.TitleBarHiddenInset(),
 			About: &mac.AboutInfo{
 				Title:   fmt.Sprintf("%s %s", consts.ApplicationName, base.Version),
-				Message: "Copyright © 2025 MisakaTAT All rights reserved",
+				Message: app.PreferencesSrv.Copyright(),
 				Icon:    icon,
 			},
 			WebviewIsTransparent: false,
