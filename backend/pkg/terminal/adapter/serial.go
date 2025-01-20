@@ -22,14 +22,6 @@ func NewSerial(ws *websocket.Conn, logger *zap.Logger) *Serial {
 	}
 }
 
-func (s *Serial) SerialPorts() []string {
-	ports, err := serial.GetPortsList()
-	if err != nil {
-		panic(err)
-	}
-	return ports
-}
-
 func (s *Serial) Open(portName string) error {
 	mode := &serial.Mode{
 		BaudRate: 9600,

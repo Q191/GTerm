@@ -23,7 +23,7 @@ func (s *GroupSrv) CreateGroup(group *model.Group) *resp.Resp {
 	return resp.Ok()
 }
 
-func (s *GroupSrv) UpdateGroup(group *model.Host) *resp.Resp {
+func (s *GroupSrv) UpdateGroup(group *model.Group) *resp.Resp {
 	t := s.Query.Group
 	if _, err := t.Where(t.ID.Eq(group.ID)).Updates(group); err != nil {
 		return resp.FailWithMsg(err.Error())

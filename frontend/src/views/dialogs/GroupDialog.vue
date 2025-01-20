@@ -43,7 +43,7 @@ const resetForm = () => {
   formValue.value = model.Group.createFrom({
     name: '',
   });
-  dialogStore.closeAddGroupDialog();
+  dialogStore.closeGroupDialog();
 };
 
 const rules: FormRules = {
@@ -62,8 +62,8 @@ const handleConfirm = async () => {
       message.error(resp.msg);
       return false;
     }
-    message.success('创建成功');
-    dialogStore.closeAddGroupDialog();
+    message.success(t('message.createSuccess'));
+    dialogStore.closeGroupDialog();
   } catch (errors) {
     return false;
   }

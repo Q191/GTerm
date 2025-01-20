@@ -1,11 +1,9 @@
 <template>
   <div class="page-container">
-    <!-- 左侧边栏 -->
     <div class="sidebar" ref="sidebarRef" :style="{ width: sidebarWidth + 'px' }">
-      <!-- 分组列表 -->
       <div class="groups-list">
         <div class="list-header">
-          <n-input v-model:value="searchText" size="small" clearable placeholder="搜索主机">
+          <n-input v-model:value="searchText" size="small" clearable :placeholder="$t('connection.search')">
             <template #prefix>
               <icon icon="ph:magnifying-glass" />
             </template>
@@ -14,23 +12,23 @@
           <div class="header-right">
             <n-tooltip trigger="hover">
               <template #trigger>
-                <n-button text size="large" @click="dialogStore.openAddGroupDialog">
+                <n-button text size="large" @click="dialogStore.openGroupDialog">
                   <template #icon>
                     <icon icon="ph:folder-plus" />
                   </template>
                 </n-button>
               </template>
-              添加分组
+              {{ $t('connection.add.group') }}
             </n-tooltip>
             <n-tooltip trigger="hover">
               <template #trigger>
-                <n-button text size="large" @click="dialogStore.openAddHostDialog()">
+                <n-button text size="large" @click="dialogStore.openConnDialog()">
                   <template #icon>
                     <icon icon="ph:plus" />
                   </template>
                 </n-button>
               </template>
-              添加主机
+              {{ $t('connection.add.conn') }}
             </n-tooltip>
           </div>
         </div>
@@ -60,40 +58,37 @@
       </div>
     </div>
 
-    <!-- 拖动分隔线 -->
     <div class="resize-handle" :style="{ left: sidebarWidth + 'px' }" @mousedown="startResize"></div>
 
-    <!-- 主内容区 -->
     <div class="main-content">
       <div class="content-header">
         <div class="header-left">
-          <h2>{{ selectedGroup ? selectedGroup.name : '资产清单' }}</h2>
-          <n-badge :value="filteredHosts.length" show-zero type="success" />
+          <h2>{{ selectedGroup ? selectedGroup.name : $t('sider.assets') }}</h2>
+          <n-badge :value="filteredConns.length" show-zero type="success" />
         </div>
         <div class="header-right">
           <n-button v-if="selectedGroup" text @click="handleSelect([])">
             <template #icon>
               <icon icon="ph:arrow-left" />
             </template>
-            返回
+            {{ $t('connection.back') }}
           </n-button>
         </div>
       </div>
 
-      <!-- 主机网格 -->
-      <div class="hosts-grid" v-if="filteredHosts.length > 0">
-        <div v-for="host in filteredHosts" :key="host.id" class="host-card" @click="toTerminal(host)">
+      <div class="conns-grid" v-if="filteredConns.length > 0">
+        <div v-for="conn in filteredConns" :key="conn.id" class="conn-card" @click="toTerminal(conn)">
           <div class="card-header">
             <div class="card-left">
               <div class="os-icon">
-                <icon :icon="getDeviceIcon(host)" />
+                <icon :icon="getDeviceIcon(conn)" />
               </div>
               <div class="card-info">
-                <div class="host-name">{{ host.name }}</div>
-                <div class="host-addr">{{ host.credential?.username }}@{{ host.host }}</div>
+                <div class="conn-name">{{ conn.label }}</div>
+                <div class="conn-addr">{{ conn.credential?.username }}@{{ conn.host }}</div>
               </div>
             </div>
-            <n-button circle text size="small" class="edit-btn" @click.stop="handleEditHost($event, host)">
+            <n-button circle text size="small" class="edit-btn" @click.stop="handleEditConn($event, conn)">
               <template #icon>
                 <icon icon="ph:pencil-simple" class="edit-icon" />
               </template>
@@ -101,35 +96,35 @@
           </div>
 
           <div class="card-body">
-            <div class="host-name">{{ host.name }}</div>
-            <div class="host-addr">{{ host.credential?.username }}@{{ host.host }}</div>
+            <div class="conn-name">{{ conn.label }}</div>
+            <div class="conn-addr">{{ conn.credential?.username }}@{{ conn.host }}</div>
           </div>
 
           <div class="card-footer">
             <div class="protocol-info">
-              <icon :icon="getProtocolIcon(host)" />
-              <span>{{ getProtocolName(host) }}</span>
+              <icon :icon="getProtocolIcon(conn)" />
+              <span>{{ getProtocolName(conn) }}</span>
             </div>
             <div class="connection-tags" style="margin-left: auto">
-              <n-tooltip trigger="hover" v-if="getConnectionCount(host) > 0">
+              <n-tooltip trigger="hover" v-if="getConnCount(conn) > 0">
                 <template #trigger>
                   <div>
                     <n-tag size="tiny" type="success">
-                      {{ getConnectionCount(host) }}
+                      {{ getConnCount(conn) }}
                     </n-tag>
                   </div>
                 </template>
-                活跃连接
+                {{ $t('connection.connection.active') }}
               </n-tooltip>
-              <n-tooltip trigger="hover" v-if="getErrorConnectionCount(host) > 0">
+              <n-tooltip trigger="hover" v-if="getErrorConnCount(conn) > 0">
                 <template #trigger>
                   <div>
                     <n-tag size="tiny" type="error">
-                      {{ getErrorConnectionCount(host) }}
+                      {{ getErrorConnCount(conn) }}
                     </n-tag>
                   </div>
                 </template>
-                断开连接
+                {{ $t('connection.connection.disconnected') }}
               </n-tooltip>
             </div>
           </div>
@@ -138,8 +133,12 @@
       <div class="empty-state" v-else>
         <n-result
           status="404"
-          title="空空如也"
-          :description="`${selectedGroup ? `分组「${selectedGroup.name}」中还没有添加任何主机` : '您还没有任何可用连接，点击创建即刻开始！'}`"
+          :title="$t('connection.empty.title')"
+          :description="
+            selectedGroup
+              ? $t('connection.empty.group_desc', { name: selectedGroup.name })
+              : $t('connection.empty.all_desc')
+          "
         />
       </div>
     </div>
@@ -148,36 +147,25 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import {
-  NButton,
-  NTag,
-  NTooltip,
-  NTree,
-  NDropdown,
-  NResult,
-  NBadge,
-  NInput,
-  NBreadcrumb,
-  NBreadcrumbItem,
-  useMessage,
-  useThemeVars,
-} from 'naive-ui';
+import { NButton, NTag, NTooltip, NTree, NDropdown, NResult, NBadge, NInput, useMessage, useThemeVars } from 'naive-ui';
 import type { DropdownOption } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
-import { ListHost, DeleteHost } from '@wailsApp/go/services/HostSrv';
+import { ListConnection, DeleteConnection } from '@wailsApp/go/services/ConnectionSrv';
 import { model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
 import { useRouter } from 'vue-router';
 import { h, ref, computed, onMounted, watch, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const dialogStore = useDialogStore();
 const router = useRouter();
 const message = useMessage();
-const connectionStore = useConnectionStore();
+const connStore = useConnectionStore();
+const { t } = useI18n();
 
 const groups = ref<model.Group[]>();
-const hosts = ref<model.Host[]>();
+const conns = ref<model.Connection[]>();
 const selectedGroup = ref<model.Group | null>(null);
 
 const selectedKeys = ref<string[]>([]);
@@ -190,16 +178,16 @@ const dropdownOptions = ref<DropdownOption[]>([]);
 
 const searchText = ref('');
 
-const updateDropdownOptions = (type: 'group' | 'host') => {
+const updateDropdownOptions = (type: 'group' | 'conn') => {
   if (type === 'group') {
     dropdownOptions.value = [
       {
-        label: '编辑分组',
+        label: t('connection.menu.edit_group'),
         key: 'edit-group',
         icon: () => h(Icon, { icon: 'ph:pencil-simple' }),
       },
       {
-        label: '删除分组',
+        label: t('connection.menu.delete_group'),
         key: 'delete-group',
         icon: () => h(Icon, { icon: 'ph:trash' }),
       },
@@ -207,13 +195,13 @@ const updateDropdownOptions = (type: 'group' | 'host') => {
   } else {
     dropdownOptions.value = [
       {
-        label: '编辑主机',
-        key: 'edit-host',
+        label: t('connection.menu.edit_conn'),
+        key: 'edit-conn',
         icon: () => h(Icon, { icon: 'ph:pencil-simple' }),
       },
       {
-        label: '删除主机',
-        key: 'delete-host',
+        label: t('connection.menu.delete_conn'),
+        key: 'delete-conn',
         icon: () => h(Icon, { icon: 'ph:trash' }),
       },
     ];
@@ -229,8 +217,8 @@ const nodeProps = ({ option }: { option: any }) => {
         const groupId = parseInt(option.key.replace('group-', ''));
         const group = groups.value?.find(g => g.id === groupId);
         if (group) {
-          const groupHosts = hosts.value?.filter(host => host.groupID === group.id) || [];
-          if (groupHosts.length > 0) {
+          const groupConns = conns.value?.filter(conn => conn.groupID === group.id) || [];
+          if (groupConns.length > 0) {
             selectedGroup.value = group;
             selectedKeys.value = [option.key];
           }
@@ -245,8 +233,8 @@ const nodeProps = ({ option }: { option: any }) => {
 
       if (option.key.startsWith('group-')) {
         updateDropdownOptions('group');
-      } else if (option.key.startsWith('host-')) {
-        updateDropdownOptions('host');
+      } else if (option.key.startsWith('conn-')) {
+        updateDropdownOptions('conn');
       }
 
       e.preventDefault();
@@ -258,21 +246,21 @@ const handleDropdownSelect = async (key: string) => {
   showDropdown.value = false;
   if (!currentContextNode.value) return;
 
-  const hostId = parseInt(currentContextNode.value.key.replace('host-', ''));
+  const connId = parseInt(currentContextNode.value.key.replace('conn-', ''));
 
   switch (key) {
     case 'edit-group':
-      dialogStore.openAddGroupDialog();
+      dialogStore.openGroupDialog();
       break;
     case 'delete-group':
       // TODO: 实现删除分组功能
       break;
-    case 'edit-host':
-      const host = hosts.value?.find(h => h.id === hostId);
-      if (host) dialogStore.openAddHostDialog(true, host);
+    case 'edit-conn':
+      const conn = conns.value?.find(h => h.id === connId);
+      if (conn) dialogStore.openConnDialog(true, conn);
       break;
-    case 'delete-host':
-      const resp = await DeleteHost(hostId);
+    case 'delete-conn':
+      const resp = await DeleteConnection(connId);
       if (!resp.ok) {
         message.error(resp.msg);
         return;
@@ -295,20 +283,20 @@ const treeData = computed(() => {
 
   treeNodes.push(
     ...groups.value.map(group => {
-      const groupHosts = hosts.value?.filter(host => host.groupID === group.id) || [];
-      const isEmpty = groupHosts.length === 0;
+      const groupConns = conns.value?.filter(conn => conn.groupID === group.id) || [];
+      const isEmpty = groupConns.length === 0;
       return {
         key: `group-${group.id}`,
         label: group.name,
         children: isEmpty
           ? undefined
-          : groupHosts.map(host => ({
-              key: `host-${host.id}`,
-              label: host.name,
+          : groupConns.map(conn => ({
+              key: `conn-${conn.id}`,
+              label: conn.label,
               isLeaf: true,
               prefix: () =>
                 h(Icon, {
-                  icon: getDeviceIcon(host),
+                  icon: getDeviceIcon(conn),
                   style: {
                     fontSize: '1.2rem',
                   },
@@ -326,17 +314,16 @@ const treeData = computed(() => {
     }),
   );
 
-  // 添加未分组的主机节点
-  const ungroupedHosts = hosts.value?.filter(host => !host.groupID) || [];
-  if (ungroupedHosts.length > 0) {
+  const ungroupedConns = conns.value?.filter(conn => !conn.groupID) || [];
+  if (ungroupedConns.length > 0) {
     treeNodes.push(
-      ...ungroupedHosts.map(host => ({
-        key: `host-${host.id}`,
-        label: host.name,
+      ...ungroupedConns.map(conn => ({
+        key: `conn-${conn.id}`,
+        label: conn.label,
         isLeaf: true,
         prefix: () =>
           h(Icon, {
-            icon: getDeviceIcon(host),
+            icon: getDeviceIcon(conn),
             style: {
               fontSize: '1.2rem',
             },
@@ -351,11 +338,11 @@ const treeData = computed(() => {
 const handleSelect = (keys: string[]) => {
   if (keys.length > 0) {
     const key = keys[0];
-    if (key.startsWith('host-')) {
-      const hostId = parseInt(key.replace('host-', ''));
-      const host = hosts.value?.find(h => h.id === hostId);
-      if (host) {
-        toTerminal(host);
+    if (key.startsWith('conn-')) {
+      const connId = parseInt(key.replace('conn-', ''));
+      const conn = conns.value?.find(h => h.id === connId);
+      if (conn) {
+        toTerminal(conn);
       }
     } else if (key.startsWith('group-')) {
       const groupId = parseInt(key.replace('group-', ''));
@@ -371,37 +358,37 @@ const handleSelect = (keys: string[]) => {
   }
 };
 
-const filteredHosts = computed(() => {
-  if (!selectedGroup.value) return hosts.value || [];
-  return hosts.value?.filter(host => host.groupID === selectedGroup.value?.id) || [];
+const filteredConns = computed(() => {
+  if (!selectedGroup.value) return conns.value || [];
+  return conns.value?.filter(conn => conn.groupID === selectedGroup.value?.id) || [];
 });
 
-watch([() => dialogStore.hostDialogVisible, () => dialogStore.groupDialogVisible], ([hostVisible, groupVisible]) => {
-  if (!hostVisible || !groupVisible) {
+watch([() => dialogStore.connDialogVisible, () => dialogStore.groupDialogVisible], ([connVisible, groupVisible]) => {
+  if (!connVisible || !groupVisible) {
     fetchData();
   }
 });
 
-const toTerminal = (host: model.Host) => {
+const toTerminal = (conn: model.Connection) => {
   const connection = {
     id: Date.now(),
-    hostId: host.id,
-    name: `${host.name} (${connectionStore.connections.filter(c => c.host === host.host).length + 1})`,
-    host: host.host,
-    username: host.credential?.username || '',
+    connId: conn.id,
+    label: `${conn.label} (${connStore.connections.filter(c => c.host === conn.host).length + 1})`,
+    host: conn.host,
+    username: conn.credential?.username || '',
   };
-  connectionStore.addConnection(connection);
+  connStore.addConnection(connection);
   router.push({ name: 'Terminal' });
 };
 
-const handleEditHost = (event: MouseEvent, host: model.Host) => {
+const handleEditConn = (event: MouseEvent, conn: model.Connection) => {
   event.preventDefault();
-  dialogStore.openAddHostDialog(true, host);
+  dialogStore.openConnDialog(true, conn);
 };
 
 const handleEditGroup = (event: MouseEvent) => {
   event.preventDefault();
-  dialogStore.openAddGroupDialog();
+  dialogStore.openGroupDialog();
 };
 
 const fetchGroups = async () => {
@@ -412,19 +399,18 @@ const fetchGroups = async () => {
   return resp.data;
 };
 
-const fetchHosts = async () => {
-  const resp = await ListHost();
+const fetchConns = async () => {
+  const resp = await ListConnection();
   if (!resp.ok) {
     message.error(resp.msg);
   }
-  console.log(resp.data);
   return resp.data;
 };
 
 const fetchData = async () => {
-  const [groupsData, hostsData] = await Promise.all([fetchGroups(), fetchHosts()]);
+  const [groupsData, connsData] = await Promise.all([fetchGroups(), fetchConns()]);
   groups.value = groupsData;
-  hosts.value = hostsData;
+  conns.value = connsData;
 };
 
 const osIconMap = new Map([
@@ -456,8 +442,8 @@ const osIconMap = new Map([
   [['linux'], 'simple-icons:linux'],
 ]);
 
-const getDeviceIcon = (host: model.Host) => {
-  const os = host.metadata?.os?.toLowerCase() || '';
+const getDeviceIcon = (conn: model.Connection) => {
+  const os = conn.metadata?.os?.toLowerCase() || '';
   for (const [keys, icon] of osIconMap) {
     if (keys.some(key => os.includes(key))) {
       return icon;
@@ -466,16 +452,16 @@ const getDeviceIcon = (host: model.Host) => {
   return 'ph:computer-tower';
 };
 
-const getConnectionCount = (host: model.Host) => {
-  return connectionStore.connections.filter(c => c.host === host.host && !c.connectionError).length;
+const getConnCount = (conn: model.Connection) => {
+  return connStore.connections.filter(c => c.host === conn.host && !c.connectionError).length;
 };
 
-const getErrorConnectionCount = (host: model.Host) => {
-  return connectionStore.connections.filter(c => c.host === host.host && c.connectionError).length;
+const getErrorConnCount = (conn: model.Connection) => {
+  return connStore.connections.filter(c => c.host === conn.host && c.connectionError).length;
 };
 
-const getProtocolIcon = (host: model.Host) => {
-  const protocol = host.connProtocol;
+const getProtocolIcon = (conn: model.Connection) => {
+  const protocol = conn.connProtocol;
 
   switch (protocol) {
     case 0:
@@ -489,12 +475,12 @@ const getProtocolIcon = (host: model.Host) => {
     case 4:
       return 'ph:plug-duotone';
     default:
-      return 'ph:ghost-duotone';
+      return 'ph:gconn-duotone';
   }
 };
 
-const getProtocolName = (host: model.Host) => {
-  const protocol = host.connProtocol;
+const getProtocolName = (conn: model.Connection) => {
+  const protocol = conn.connProtocol;
   switch (protocol) {
     case 0:
       return 'SSH';
@@ -699,7 +685,7 @@ onUnmounted(() => {
   }
 }
 
-.hosts-grid {
+.conns-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
@@ -707,7 +693,7 @@ onUnmounted(() => {
   padding-right: 4px;
 }
 
-.host-card {
+.conn-card {
   background: v-bind('themeVars.cardColor');
   border-radius: 8px;
   overflow: hidden;
@@ -756,7 +742,7 @@ onUnmounted(() => {
       .card-info {
         min-width: 0;
 
-        .host-name {
+        .conn-name {
           font-size: 14px;
           font-weight: 600;
           color: v-bind('themeVars.textColorBase');
@@ -766,7 +752,7 @@ onUnmounted(() => {
           text-overflow: ellipsis;
         }
 
-        .host-addr {
+        .conn-addr {
           font-size: 12px;
           color: v-bind('themeVars.textColor3');
           white-space: nowrap;

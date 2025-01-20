@@ -1,22 +1,22 @@
 <template>
   <n-modal
-    v-model:show="dialogStore.hostDialogVisible"
+    v-model:show="dialogStore.connDialogVisible"
     :close-on-esc="true"
-    :negative-text="$t('hostDialog.cancel')"
+    :negative-text="$t('connDialog.cancel')"
     :on-close="resetForm"
-    :positive-text="$t('hostDialog.confirm')"
+    :positive-text="$t('connDialog.confirm')"
     :show-icon="false"
-    :title="dialogStore.isEditMode ? $t('hostDialog.editTitle') : $t('hostDialog.title')"
+    :title="dialogStore.isEditMode ? $t('connDialog.editTitle') : $t('connDialog.title')"
     preset="dialog"
     style="width: 600px"
     transform-origin="center"
     @positive-click="handleConfirm"
   >
     <n-tabs animated type="line" placement="left" v-model:value="activeTab">
-      <n-tab-pane name="basic" :tab="$t('hostDialog.basicConfig')">
+      <n-tab-pane name="basic" :tab="$t('connDialog.basicConfig')">
         <n-form ref="formRef" :model="formValue" :rules="rules" :show-label="false">
-          <n-form-item path="name">
-            <n-input v-model:value="formValue.name" clearable :placeholder="$t('hostDialog.placeholder.name')" />
+          <n-form-item path="label">
+            <n-input v-model:value="formValue.label" clearable :placeholder="$t('connDialog.placeholder.label')" />
           </n-form-item>
 
           <n-form-item path="groupID">
@@ -25,13 +25,23 @@
               :options="groupOptions"
               clearable
               tag
-              :placeholder="$t('hostDialog.placeholder.group')"
+              :placeholder="$t('connDialog.placeholder.group')"
+            />
+          </n-form-item>
+
+          <n-form-item path="serialPort">
+            <n-select
+              v-model:value="formValue.serialPort"
+              :options="serialPortsOptions"
+              clearable
+              tag
+              :placeholder="$t('connDialog.placeholder.serialPort')"
             />
           </n-form-item>
 
           <div class="flex items-center w-full gap-2">
             <n-form-item path="host" class="flex-1">
-              <n-input v-model:value="formValue.host" clearable :placeholder="$t('hostDialog.placeholder.host')" />
+              <n-input v-model:value="formValue.host" clearable :placeholder="$t('connDialog.placeholder.host')" />
             </n-form-item>
             <n-form-item path="port" class="port-input">
               <n-input-number
@@ -39,12 +49,12 @@
                 :min="1"
                 :max="65535"
                 :show-button="false"
-                :placeholder="$t('hostDialog.placeholder.port')"
+                :placeholder="$t('connDialog.placeholder.port')"
               />
             </n-form-item>
           </div>
 
-          <n-form-item :label="$t('hostDialog.authType')" path="credential.authMethod">
+          <n-form-item :label="$t('connDialog.authType')" path="credential.authMethod">
             <div class="flex items-center justify-between w-full">
               <n-button-group>
                 <n-button
@@ -58,7 +68,7 @@
                   <template #icon>
                     <Icon icon="ph:password" />
                   </template>
-                  {{ $t('hostDialog.password') }}
+                  {{ $t('connDialog.password') }}
                 </n-button>
                 <n-button
                   :type="
@@ -71,7 +81,7 @@
                   <template #icon>
                     <Icon icon="ph:key" />
                   </template>
-                  {{ $t('hostDialog.privateKey') }}
+                  {{ $t('connDialog.privateKey') }}
                 </n-button>
                 <n-button
                   :type="formValue.isCommonCredential ? 'primary' : 'default'"
@@ -80,17 +90,17 @@
                   <template #icon>
                     <Icon icon="ph:vault" />
                   </template>
-                  {{ $t('hostDialog.commonCredentialLib') }}
+                  {{ $t('connDialog.commonCredentialLib') }}
                 </n-button>
               </n-button-group>
               <n-tooltip v-if="!formValue.isCommonCredential && formValue.credential" trigger="hover" placement="right">
                 <template #trigger>
                   <n-switch v-model:value="formValue.credential.isCommonCredential">
-                    <template #checked>{{ $t('hostDialog.commonCredential') }}</template>
-                    <template #unchecked>{{ $t('hostDialog.privateCredential') }}</template>
+                    <template #checked>{{ $t('connDialog.commonCredential') }}</template>
+                    <template #unchecked>{{ $t('connDialog.privateCredential') }}</template>
                   </n-switch>
                 </template>
-                <span class="tooltip-text">{{ $t('hostDialog.credentialTooltip') }}</span>
+                <span class="tooltip-text">{{ $t('connDialog.credentialTooltip') }}</span>
               </n-tooltip>
             </div>
           </n-form-item>
@@ -101,7 +111,7 @@
                 v-model:value="formValue.credentialID"
                 :options="credentialOptions"
                 clearable
-                :placeholder="$t('hostDialog.placeholder.selectCredential')"
+                :placeholder="$t('connDialog.placeholder.selectCredential')"
                 @update:value="handleSelectCredential"
               />
             </n-form-item>
@@ -112,7 +122,7 @@
               <n-input
                 v-model:value="formValue.credential!.username"
                 clearable
-                :placeholder="$t('hostDialog.placeholder.username')"
+                :placeholder="$t('connDialog.placeholder.username')"
               />
             </n-form-item>
 
@@ -123,7 +133,7 @@
                   type="password"
                   show-password-on="click"
                   clearable
-                  :placeholder="$t('hostDialog.placeholder.password')"
+                  :placeholder="$t('connDialog.placeholder.password')"
                 />
               </n-form-item>
             </template>
@@ -133,9 +143,9 @@
                 <n-input
                   v-model:value="formValue.credential!.privateKey"
                   type="textarea"
-                  :rows="3"
+                  :row="3"
                   clearable
-                  :placeholder="$t('hostDialog.placeholder.privateKey')"
+                  :placeholder="$t('connDialog.placeholder.privateKey')"
                 />
               </n-form-item>
               <n-form-item path="credential.passphrase">
@@ -144,7 +154,7 @@
                   type="password"
                   show-password-on="click"
                   clearable
-                  :placeholder="$t('hostDialog.placeholder.passphrase')"
+                  :placeholder="$t('connDialog.placeholder.passphrase')"
                 />
               </n-form-item>
             </template>
@@ -152,8 +162,8 @@
         </n-form>
       </n-tab-pane>
 
-      <n-tab-pane name="advanced" :tab="$t('hostDialog.advancedConfig')">
-        <n-empty size="small" :description="$t('hostDialog.developing')">
+      <n-tab-pane name="advanced" :tab="$t('connDialog.advancedConfig')">
+        <n-empty size="small" :description="$t('connDialog.developing')">
           <template #icon>
             <Icon icon="ph:code" />
           </template>
@@ -167,7 +177,7 @@
 import { useDialogStore } from '@/stores/dialog';
 import { model } from '@wailsApp/go/models';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
-import { CreateHost, UpdateHost } from '@wailsApp/go/services/HostSrv';
+import { CreateConnection, UpdateConnection } from '@wailsApp/go/services/ConnectionSrv';
 import { Icon } from '@iconify/vue';
 
 import {
@@ -189,8 +199,9 @@ import {
   NEmpty,
 } from 'naive-ui';
 import { SelectMixedOption } from 'naive-ui/es/select/src/interface';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { SerialPorts } from '@wailsApp/go/services/TerminalSrv';
 
 const { t } = useI18n();
 const dialogStore = useDialogStore();
@@ -218,10 +229,11 @@ const defaultCredential = {
   authMethod: AuthMethod.Password,
 };
 
-const defaultHost = {
-  name: '',
+const defaultConnection = {
+  label: '',
   host: '',
   port: 22,
+  serialPort: null,
   connProtocol: 0,
   credentialID: null,
   isCommonCredential: false,
@@ -234,18 +246,18 @@ const createCredential = (authMethod: number) =>
     authMethod,
   });
 
-const createHost = (isCommon = false) => {
-  const host = model.Host.createFrom({
-    ...defaultHost,
+const createConnection = (isCommon = false) => {
+  const conn = model.Connection.createFrom({
+    ...defaultConnection,
     isCommonCredential: isCommon,
   });
   if (!isCommon) {
-    host.credential = createCredential(AuthMethod.Password);
+    conn.credential = createCredential(AuthMethod.Password);
   }
-  return host;
+  return conn;
 };
 
-const formValue = ref(createHost());
+const formValue = ref(createConnection());
 
 const tempCachedCredentials = ref({
   password: createCredential(AuthMethod.Password),
@@ -256,21 +268,21 @@ const useCommonCredential = ref(false);
 const credentialOptions = ref<SelectMixedOption[]>([]);
 
 watch(
-  () => dialogStore.editHost,
-  newHost => {
-    if (newHost) {
-      formValue.value = model.Host.createFrom(newHost);
-      if (newHost.credential && !newHost.isCommonCredential) {
-        if (newHost.credential.authMethod === AuthMethod.Password) {
-          tempCachedCredentials.value.password = model.Credential.createFrom(newHost.credential);
-        } else if (newHost.credential.authMethod === AuthMethod.PrivateKey) {
-          tempCachedCredentials.value.privateKey = model.Credential.createFrom(newHost.credential);
+  () => dialogStore.editConnection,
+  newConnection => {
+    if (newConnection) {
+      formValue.value = model.Connection.createFrom(newConnection);
+      if (newConnection.credential && !newConnection.isCommonCredential) {
+        if (newConnection.credential.authMethod === AuthMethod.Password) {
+          tempCachedCredentials.value.password = model.Credential.createFrom(newConnection.credential);
+        } else if (newConnection.credential.authMethod === AuthMethod.PrivateKey) {
+          tempCachedCredentials.value.privateKey = model.Credential.createFrom(newConnection.credential);
         }
       }
-      useCommonCredential.value = newHost.isCommonCredential;
+      useCommonCredential.value = newConnection.isCommonCredential;
       return;
     }
-    formValue.value = createHost();
+    formValue.value = createConnection();
     tempCachedCredentials.value = {
       password: createCredential(AuthMethod.Password),
       privateKey: createCredential(AuthMethod.PrivateKey),
@@ -307,45 +319,45 @@ const handleSelectCredential = async (id: number) => {
 };
 
 const rules = computed<FormRules>(() => ({
-  name: {
+  label: {
     required: true,
-    message: t('hostDialog.validation.nameRequired'),
+    message: t('connDialog.validation.labelRequired'),
     trigger: 'blur',
   },
   host: {
     required: true,
-    message: t('hostDialog.validation.hostRequired'),
+    message: t('connDialog.validation.hostRequired'),
     trigger: 'blur',
   },
   port: {
     required: true,
     type: 'number',
-    message: t('hostDialog.validation.portRequired'),
+    message: t('connDialog.validation.portRequired'),
     trigger: ['blur', 'change'],
     validator: (rule, value) => {
       if (typeof value !== 'number' || value < 1 || value > 65535) {
-        return new Error(t('hostDialog.validation.portInvalid'));
+        return new Error(t('connDialog.validation.portInvalid'));
       }
     },
   },
   'credential.username': {
     required: !formValue.value.isCommonCredential,
-    message: t('hostDialog.validation.usernameRequired'),
+    message: t('connDialog.validation.usernameRequired'),
     trigger: 'blur',
   },
   'credential.password': {
     required: !formValue.value.isCommonCredential && formValue.value.credential?.authMethod === AuthMethod.Password,
-    message: t('hostDialog.validation.passwordRequired'),
+    message: t('connDialog.validation.passwordRequired'),
     trigger: 'blur',
   },
   'credential.privateKey': {
     required: !formValue.value.isCommonCredential && formValue.value.credential?.authMethod === AuthMethod.PrivateKey,
-    message: t('hostDialog.validation.privateKeyRequired'),
+    message: t('connDialog.validation.privateKeyRequired'),
     trigger: 'blur',
   },
   credentialID: {
     required: formValue.value.isCommonCredential,
-    message: t('hostDialog.validation.credentialRequired'),
+    message: t('connDialog.validation.credentialRequired'),
     trigger: ['blur', 'change'],
   },
 }));
@@ -354,6 +366,17 @@ const groupOptions = ref<SelectMixedOption[]>([]);
 
 const fetchGroups = async () => {
   const resp = await ListGroup();
+  if (!resp.ok) {
+    message.error(resp.msg);
+    return [];
+  }
+  return resp.data;
+};
+
+const serialPortsOptions = ref<SelectMixedOption[]>([]);
+
+const fetchSerialPorts = async () => {
+  const resp = await SerialPorts();
   if (!resp.ok) {
     message.error(resp.msg);
     return [];
@@ -371,14 +394,18 @@ const fetchCredentials = async () => {
 };
 
 const initOptions = async () => {
-  const [groups, credentials] = await Promise.all([fetchGroups(), fetchCredentials()]);
+  const [groups, credentials, serialPorts] = await Promise.all([fetchGroups(), fetchCredentials(), fetchSerialPorts()]);
   groupOptions.value = groups.map((group: model.Group) => ({
     label: group.name,
     value: group.id,
   }));
   credentialOptions.value = credentials.map((credential: model.Credential) => ({
-    label: credential.name || credential.username,
+    label: credential.name,
     value: credential.id,
+  }));
+  serialPortsOptions.value = serialPorts.map((serialPort: string[]) => ({
+    label: serialPort,
+    value: serialPort,
   }));
 };
 
@@ -387,28 +414,30 @@ onMounted(initOptions);
 const handleConfirm = async () => {
   try {
     await formRef.value?.validate();
-    const resp = dialogStore.isEditMode ? await UpdateHost(formValue.value) : await CreateHost(formValue.value);
+    const resp = dialogStore.isEditMode
+      ? await UpdateConnection(formValue.value)
+      : await CreateConnection(formValue.value);
 
     if (!resp.ok) {
       message.error(resp.msg);
       return false;
     }
 
-    message.success(dialogStore.isEditMode ? '更新成功' : '创建成功');
-    dialogStore.closeAddHostDialog();
+    message.success(dialogStore.isEditMode ? t('message.updateSuccess') : t('message.createSuccess'));
+    dialogStore.closeConnDialog();
   } catch (errors) {
     return false;
   }
 };
 
 const resetForm = () => {
-  formValue.value = createHost();
+  formValue.value = createConnection();
   tempCachedCredentials.value = {
     password: createCredential(AuthMethod.Password),
     privateKey: createCredential(AuthMethod.PrivateKey),
   };
   activeTab.value = 'basic';
-  dialogStore.closeAddHostDialog();
+  dialogStore.closeConnDialog();
 };
 </script>
 

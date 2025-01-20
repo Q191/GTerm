@@ -5,7 +5,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    redirect: 'content/host',
+    redirect: 'content/connection',
     component: () => import('@/layouts/Layout.vue'),
     children: [
       {
@@ -18,9 +18,9 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Content',
         children: [
           {
-            path: 'host',
-            name: 'Host',
-            component: () => import('@/views/contents/Host.vue'),
+            path: 'connection',
+            name: 'Connection',
+            component: () => import('@/views/contents/Connection.vue'),
           },
           {
             path: 'credential',

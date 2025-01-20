@@ -4,32 +4,32 @@
     :close-on-esc="true"
     :on-close="dialogStore.closePreferencesDialog"
     :show-icon="false"
-    negative-text="取消"
-    positive-text="确定"
+    :negative-text="$t('preferencesDialog.cancel')"
+    :positive-text="$t('preferencesDialog.confirm')"
     preset="dialog"
     style="width: 650px"
-    title="偏好设置"
+    :title="$t('preferencesDialog.title')"
     transform-origin="center"
     @positive-click="handleSubmit"
   >
     <n-tabs key="settings" animated placement="left" type="line">
-      <n-tab-pane name="appearance" tab="常规设置">
+      <n-tab-pane name="appearance" :tab="$t('preferencesDialog.tabs.general')">
         <n-form ref="formRef" label-placement="top" size="small">
-          <n-form-item label="主题">
+          <n-form-item :label="$t('preferencesDialog.theme.title')">
             <div style="display: flex; gap: 12px">
               <div
                 :class="['theme-option', prefStore.themeMode === 'light' && 'theme-option--active']"
                 @click="prefStore.updateThemeMode('light')"
               >
                 <div class="theme-preview light" v-html="PreviewSvg" />
-                <div class="theme-label">明亮模式</div>
+                <div class="theme-label">{{ $t('preferencesDialog.theme.light') }}</div>
               </div>
               <div
                 :class="['theme-option', prefStore.themeMode === 'dark' && 'theme-option--active']"
                 @click="prefStore.updateThemeMode('dark')"
               >
                 <div class="theme-preview dark" v-html="PreviewSvg" />
-                <div class="theme-label">暗黑模式</div>
+                <div class="theme-label">{{ $t('preferencesDialog.theme.dark') }}</div>
               </div>
               <div
                 :class="['theme-option', prefStore.themeMode === 'auto' && 'theme-option--active']"
@@ -41,12 +41,12 @@
                     <div class="split-half dark" v-html="PreviewSvg" />
                   </div>
                 </div>
-                <div class="theme-label">跟随系统</div>
+                <div class="theme-label">{{ $t('preferencesDialog.theme.auto') }}</div>
               </div>
             </div>
           </n-form-item>
 
-          <n-form-item label="语言">
+          <n-form-item :label="$t('preferencesDialog.language.title')">
             <n-select
               v-model:value="prefStore.language"
               :options="languageOptions"
@@ -56,7 +56,7 @@
             />
           </n-form-item>
 
-          <n-form-item label="分组栏宽度">
+          <n-form-item :label="$t('preferencesDialog.sidebar.title')">
             <div style="display: flex; gap: 12px; width: 100%">
               <n-input-number
                 v-model:value="prefStore.sidebarWidth"
@@ -67,9 +67,11 @@
                 style="flex: 1; width: 0"
                 @update:value="value => value && prefStore.updateSidebarWidth(value)"
               >
-                <template #suffix>px</template>
+                <template #suffix>{{ $t('preferencesDialog.sidebar.width') }}</template>
               </n-input-number>
-              <n-button size="medium" @click="prefStore.resetSidebarWidth">重置</n-button>
+              <n-button size="medium" @click="prefStore.resetSidebarWidth">{{
+                $t('preferencesDialog.sidebar.reset')
+              }}</n-button>
             </div>
           </n-form-item>
         </n-form>
@@ -83,7 +85,6 @@ import { useDialogStore } from '@/stores/dialog';
 import { usePreferencesStore, languageOptions } from '@/stores/preferences';
 import { NButton, NModal, NTabPane, NTabs, NInputNumber, NSelect, NForm, NFormItem } from 'naive-ui';
 import { onMounted, onUnmounted } from 'vue';
-import { Icon } from '@iconify/vue';
 import type { FormInst } from 'naive-ui';
 import PreviewSvg from '@/assets/images/preview.svg?raw';
 

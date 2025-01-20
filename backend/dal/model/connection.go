@@ -2,11 +2,12 @@ package model
 
 import "github.com/MisakaTAT/GTerm/backend/enums"
 
-type Host struct {
+type Connection struct {
 	Common
-	Name               string             `gorm:"uniqueIndex;not null" json:"name"`
-	Host               string             `gorm:"not null" json:"host"`
-	Port               uint               `gorm:"not null;default:22" json:"port"`
+	Label              string             `gorm:"uniqueIndex;not null" json:"label"`
+	Host               string             `json:"host"`
+	Port               uint               `json:"port"`
+	SerialPort         string             `json:"serialPort"`
 	ConnProtocol       enums.ConnProtocol `gorm:"not null" json:"connProtocol"`
 	CredentialID       *uint              `gorm:"not null" json:"credentialID"`
 	Credential         *Credential        `json:"credential"`
@@ -15,6 +16,6 @@ type Host struct {
 	GroupID            *uint              `json:"groupID"`
 }
 
-func (h *Host) TableName() string {
-	return "hosts"
+func (c *Connection) TableName() string {
+	return "connections"
 }

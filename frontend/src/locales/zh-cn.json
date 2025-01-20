@@ -4,56 +4,135 @@
     "github": "源码",
     "website": "官网"
   },
-  "hostDialog": {
-    "title": "添加主机",
-    "editTitle": "编辑主机",
+  "connDialog": {
+    "title": "新建连接",
+    "editTitle": "编辑连接",
     "cancel": "取消",
     "confirm": "确定",
     "basicConfig": "基础配置",
     "advancedConfig": "高级配置",
     "developing": "功能开发中...",
-    "name": "名称",
-    "group": "分组",
-    "host": "主机",
-    "port": "端口",
+    "label": "连接名称",
+    "group": "所属分组",
+    "host": "主机地址",
+    "port": "端口号",
     "authType": "认证方式",
     "username": "用户名",
     "password": "密码",
     "privateKey": "私钥",
     "commonCredentialLib": "凭据",
-    "commonCredential": "公共",
+    "commonCredential": "共享",
     "privateCredential": "私有",
-    "credentialTooltip": "公共：该认证信息将被添加至凭据库\n私有：仅当前主机可使用",
+    "credentialTooltip": "共享凭据：该认证信息将被添加至凭据库，可被其他连接复用\n私有凭据：仅当前连接可使用",
     "passphrase": "密钥口令",
     "placeholder": {
-      "name": "请输入主机名称",
-      "group": "请选择分组",
+      "label": "请输入连接名称",
+      "group": "请选择所属分组",
       "host": "请输入主机地址",
       "port": "请输入端口号",
       "username": "请输入用户名",
       "password": "请输入密码",
       "privateKey": "请输入私钥内容",
       "passphrase": "请输入密钥口令",
-      "selectCredential": "选择凭据信息"
+      "selectCredential": "请选择凭据信息",
+      "serialPort": "请选择串口设备"
     },
     "validation": {
-      "nameRequired": "请输入名称",
+      "labelRequired": "请输入连接名称",
       "hostRequired": "请输入主机地址",
       "portRequired": "请输入端口号",
       "usernameRequired": "请输入用户名",
       "passwordRequired": "请输入密码",
-      "privateKeyRequired": "请输入私钥",
-      "credentialRequired": "请选择认证信息",
+      "privateKeyRequired": "请输入私钥内容",
+      "credentialRequired": "请选择凭据信息",
       "portInvalid": "端口号必须在 1-65535 之间"
     }
   },
   "groupDialog": {
     "title": "新建分组",
-    "name": "名称",
+    "name": "分组名称",
     "cancel": "取消",
     "confirm": "确定",
     "validation": {
       "nameRequired": "请输入分组名称"
+    }
+  },
+  "message": {
+    "createSuccess": "创建成功",
+    "updateSuccess": "更新成功",
+    "deleteSuccess": "删除成功",
+    "operationSuccess": "操作成功",
+    "operationFailed": "操作失败"
+  },
+  "preferencesDialog": {
+    "title": "偏好设置",
+    "cancel": "取消",
+    "confirm": "确定",
+    "tabs": {
+      "general": "通用设置"
+    },
+    "theme": {
+      "title": "主题外观",
+      "light": "浅色模式",
+      "dark": "深色模式",
+      "auto": "跟随系统"
+    },
+    "language": {
+      "title": "显示语言"
+    },
+    "sidebar": {
+      "title": "侧边栏宽度",
+      "reset": "重置",
+      "width": "px"
+    }
+  },
+  "terminal": {
+    "connecting": "正在连接",
+    "connecting_desc": "正在建立连接...",
+    "reconnect": "重新连接",
+    "error": {
+      "details": "错误详情",
+      "connection": "连接失败，请检查应用是否正常运行",
+      "disconnected": "连接已断开",
+      "failed": "无法建立连接"
+    }
+  },
+  "sider": {
+    "assets": "资产管理",
+    "credentials": "凭据管理",
+    "settings": "系统设置",
+    "theme": {
+      "toggle_light": "切换到浅色模式",
+      "toggle_dark": "切换到深色模式"
+    },
+    "github": "访问项目仓库",
+    "menu": {
+      "preferences": "偏好设置",
+      "check_update": "检查更新",
+      "about": "关于"
+    }
+  },
+  "connection": {
+    "search": "搜索资产",
+    "add": {
+      "group": "新建分组",
+      "conn": "新建连接"
+    },
+    "empty": {
+      "title": "空空如也",
+      "group_desc": "分组「{name}」中还没有添加任何连接",
+      "all_desc": "您还没有任何可用连接，点击创建即刻开始！"
+    },
+    "menu": {
+      "edit_group": "编辑分组",
+      "delete_group": "删除分组",
+      "edit_conn": "编辑连接",
+      "delete_conn": "删除连接"
+    },
+    "back": "返回列表",
+    "connection": {
+      "active": "活跃会话",
+      "disconnected": "已断开"
     }
   }
 }

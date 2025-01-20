@@ -33,12 +33,14 @@ func newCredential(db *gorm.DB, opts ...gen.DOOption) credential {
 	_credential.DeletedAt = field.NewField(tableName, "deleted_at")
 	_credential.Name = field.NewString(tableName, "name")
 	_credential.Username = field.NewString(tableName, "username")
-	_credential.EncryptedPass = field.NewString(tableName, "encrypted_pass")
-	_credential.Salt = field.NewString(tableName, "salt")
-	_credential.AuthMethod = field.NewInt(tableName, "auth_method")
-	_credential.PrivateKey = field.NewString(tableName, "private_key")
-	_credential.Passphrase = field.NewString(tableName, "passphrase")
 	_credential.IsCommonCredential = field.NewBool(tableName, "is_common_credential")
+	_credential.AuthMethod = field.NewInt(tableName, "auth_method")
+	_credential.PasswordCiphertext = field.NewString(tableName, "password_ciphertext")
+	_credential.PasswordSalt = field.NewString(tableName, "password_salt")
+	_credential.PrivateKeyCiphertext = field.NewString(tableName, "private_key_ciphertext")
+	_credential.PrivateKeySalt = field.NewString(tableName, "private_key_salt")
+	_credential.PassphraseCiphertext = field.NewString(tableName, "passphrase_ciphertext")
+	_credential.PassphraseSalt = field.NewString(tableName, "passphrase_salt")
 
 	_credential.fillFieldMap()
 
@@ -48,19 +50,21 @@ func newCredential(db *gorm.DB, opts ...gen.DOOption) credential {
 type credential struct {
 	credentialDo
 
-	ALL                field.Asterisk
-	ID                 field.Uint
-	CreatedAt          field.Time
-	UpdatedAt          field.Time
-	DeletedAt          field.Field
-	Name               field.String
-	Username           field.String
-	EncryptedPass      field.String
-	Salt               field.String
-	AuthMethod         field.Int
-	PrivateKey         field.String
-	Passphrase         field.String
-	IsCommonCredential field.Bool
+	ALL                  field.Asterisk
+	ID                   field.Uint
+	CreatedAt            field.Time
+	UpdatedAt            field.Time
+	DeletedAt            field.Field
+	Name                 field.String
+	Username             field.String
+	IsCommonCredential   field.Bool
+	AuthMethod           field.Int
+	PasswordCiphertext   field.String
+	PasswordSalt         field.String
+	PrivateKeyCiphertext field.String
+	PrivateKeySalt       field.String
+	PassphraseCiphertext field.String
+	PassphraseSalt       field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -83,12 +87,14 @@ func (c *credential) updateTableName(table string) *credential {
 	c.DeletedAt = field.NewField(table, "deleted_at")
 	c.Name = field.NewString(table, "name")
 	c.Username = field.NewString(table, "username")
-	c.EncryptedPass = field.NewString(table, "encrypted_pass")
-	c.Salt = field.NewString(table, "salt")
-	c.AuthMethod = field.NewInt(table, "auth_method")
-	c.PrivateKey = field.NewString(table, "private_key")
-	c.Passphrase = field.NewString(table, "passphrase")
 	c.IsCommonCredential = field.NewBool(table, "is_common_credential")
+	c.AuthMethod = field.NewInt(table, "auth_method")
+	c.PasswordCiphertext = field.NewString(table, "password_ciphertext")
+	c.PasswordSalt = field.NewString(table, "password_salt")
+	c.PrivateKeyCiphertext = field.NewString(table, "private_key_ciphertext")
+	c.PrivateKeySalt = field.NewString(table, "private_key_salt")
+	c.PassphraseCiphertext = field.NewString(table, "passphrase_ciphertext")
+	c.PassphraseSalt = field.NewString(table, "passphrase_salt")
 
 	c.fillFieldMap()
 
@@ -105,19 +111,21 @@ func (c *credential) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *credential) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 12)
+	c.fieldMap = make(map[string]field.Expr, 14)
 	c.fieldMap["id"] = c.ID
 	c.fieldMap["created_at"] = c.CreatedAt
 	c.fieldMap["updated_at"] = c.UpdatedAt
 	c.fieldMap["deleted_at"] = c.DeletedAt
 	c.fieldMap["name"] = c.Name
 	c.fieldMap["username"] = c.Username
-	c.fieldMap["encrypted_pass"] = c.EncryptedPass
-	c.fieldMap["salt"] = c.Salt
-	c.fieldMap["auth_method"] = c.AuthMethod
-	c.fieldMap["private_key"] = c.PrivateKey
-	c.fieldMap["passphrase"] = c.Passphrase
 	c.fieldMap["is_common_credential"] = c.IsCommonCredential
+	c.fieldMap["auth_method"] = c.AuthMethod
+	c.fieldMap["password_ciphertext"] = c.PasswordCiphertext
+	c.fieldMap["password_salt"] = c.PasswordSalt
+	c.fieldMap["private_key_ciphertext"] = c.PrivateKeyCiphertext
+	c.fieldMap["private_key_salt"] = c.PrivateKeySalt
+	c.fieldMap["passphrase_ciphertext"] = c.PassphraseCiphertext
+	c.fieldMap["passphrase_salt"] = c.PassphraseSalt
 }
 
 func (c credential) clone(db *gorm.DB) credential {

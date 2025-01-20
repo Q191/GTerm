@@ -6,6 +6,6 @@ var SetProvider = wire.NewSet(
 	TerminalSrvSet,
 	PreferencesSrvSet,
 	GroupSrvSet,
-	HostSrvSet,
+	ConnectionSrvSet,
 	MetadataSrvSet,
 )

@@ -17,7 +17,7 @@ func NewApp() *App {
 	httpListenerPort := initialize.InitHTTPServer()
 	logger := initialize.InitZap()
 	query := initialize.InitDatabase()
-	hostSrv := &services.HostSrv{
+	connectionSrv := &services.ConnectionSrv{
 		Logger: logger,
 		Query:  query,
 	}
@@ -28,7 +28,7 @@ func NewApp() *App {
 	terminalSrv := &services.TerminalSrv{
 		HTTPListenerPort: httpListenerPort,
 		Logger:           logger,
-		HostSrv:          hostSrv,
+		ConnectionSrv:    connectionSrv,
 		MetadataSrv:      metadataSrv,
 	}
 	preferencesSrv := &services.PreferencesSrv{
@@ -44,7 +44,7 @@ func NewApp() *App {
 		TerminalSrv:      terminalSrv,
 		PreferencesSrv:   preferencesSrv,
 		GroupSrv:         groupSrv,
-		HostSrv:          hostSrv,
+		ConnectionSrv:    connectionSrv,
 		MetadataSrv:      metadataSrv,
 	}
 	return app

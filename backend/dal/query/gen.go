@@ -17,26 +17,26 @@ import (
 
 var (
 	Q          = new(Query)
+	Connection *connection
 	Credential *credential
 	Group      *group
-	Host       *host
 	Metadata   *metadata
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
+	Connection = &Q.Connection
 	Credential = &Q.Credential
 	Group = &Q.Group
-	Host = &Q.Host
 	Metadata = &Q.Metadata
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:         db,
+		Connection: newConnection(db, opts...),
 		Credential: newCredential(db, opts...),
 		Group:      newGroup(db, opts...),
-		Host:       newHost(db, opts...),
 		Metadata:   newMetadata(db, opts...),
 	}
 }
@@ -44,9 +44,9 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 type Query struct {
 	db *gorm.DB
 
+	Connection connection
 	Credential credential
 	Group      group
-	Host       host
 	Metadata   metadata
 }
 
@@ -55,9 +55,9 @@ func (q *Query) Available() bool { return q.db != nil }
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:         db,
+		Connection: q.Connection.clone(db),
 		Credential: q.Credential.clone(db),
 		Group:      q.Group.clone(db),
-		Host:       q.Host.clone(db),
 		Metadata:   q.Metadata.clone(db),
 	}
 }
@@ -73,25 +73,25 @@ func (q *Query) WriteDB() *Query {
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:         db,
+		Connection: q.Connection.replaceDB(db),
 		Credential: q.Credential.replaceDB(db),
 		Group:      q.Group.replaceDB(db),
-		Host:       q.Host.replaceDB(db),
 		Metadata:   q.Metadata.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
+	Connection IConnectionDo
 	Credential ICredentialDo
 	Group      IGroupDo
-	Host       IHostDo
 	Metadata   IMetadataDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
+		Connection: q.Connection.WithContext(ctx),
 		Credential: q.Credential.WithContext(ctx),
 		Group:      q.Group.WithContext(ctx),
-		Host:       q.Host.WithContext(ctx),
 		Metadata:   q.Metadata.WithContext(ctx),
 	}
 }

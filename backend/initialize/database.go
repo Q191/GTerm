@@ -48,7 +48,7 @@ func (d *Database) connect(dsn string) error {
 
 func (d *Database) autoMigrate() error {
 	models := []any{
-		model.Host{},
+		model.Connection{},
 		model.Credential{},
 		model.Group{},
 		model.Metadata{},

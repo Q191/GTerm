@@ -8,7 +8,7 @@ import (
 
 func models() []any {
 	return []any{
-		model.Host{},
+		model.Connection{},
 		model.Credential{},
 		model.Group{},
 		model.Metadata{},

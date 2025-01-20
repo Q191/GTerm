@@ -2,8 +2,8 @@ import { defineStore } from 'pinia';
 
 interface Connection {
   id: number;
-  hostId: number;
-  name: string;
+  connId: number;
+  label: string;
   host: string;
   username: string;
   isConnecting?: boolean;
@@ -18,9 +18,9 @@ export const useConnectionStore = defineStore('connection', () => {
 
   const getNextNumberForName = (baseName: string) => {
     const existingNumbers = connections.value
-      .filter(conn => conn.name.startsWith(baseName))
+      .filter(conn => conn.label.startsWith(baseName))
       .map(conn => {
-        const match = conn.name.match(new RegExp(`^${baseName}\\s*\\((\\d+)\\)$`));
+        const match = conn.label.match(new RegExp(`^${baseName}\\s*\\((\\d+)\\)$`));
         return match ? parseInt(match[1]) : 0;
       })
       .filter(num => !isNaN(num));
@@ -30,13 +30,12 @@ export const useConnectionStore = defineStore('connection', () => {
   };
 
   const addConnection = (connection: Connection) => {
-    // 检查是否已经存在相同的基础名称
-    const baseName = connection.name;
-    const existingSameName = connections.value.some(conn => conn.name === baseName);
+    const baseName = connection.label;
+    const existingSameName = connections.value.some(conn => conn.label === baseName);
 
     if (existingSameName) {
       const nextNumber = getNextNumberForName(baseName);
-      connection.name = `${baseName} (${nextNumber})`;
+      connection.label = `${baseName} (${nextNumber})`;
     }
 
     connections.value.push({

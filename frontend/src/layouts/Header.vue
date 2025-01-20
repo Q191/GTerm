@@ -9,7 +9,7 @@
         'left-0 translate-x-0': hasConnections,
       }"
     >
-      <div class="flex items-center" @click="toHost">
+      <div class="flex items-center" @click="toConnection">
         <img src="@/assets/images/icon.png" alt="Logo" class="w-6 h-6" />
         <span class="pl-2 text-base font-semibold" :class="{ hidden: hasConnections }">GTerm</span>
       </div>
@@ -53,8 +53,8 @@ const router = useRouter();
 
 const isDarwin = ref(false);
 
-const toHost = () => {
-  router.push({ name: 'Host' });
+const toConnection = () => {
+  router.push({ name: 'Connection' });
 };
 
 const windowIsMaximised = ref(false);

@@ -3,22 +3,22 @@ import { ref } from 'vue';
 import { model } from '@wailsApp/go/models';
 
 export const useDialogStore = defineStore('dialog', () => {
-  const hostDialogVisible = ref(false);
+  const connDialogVisible = ref(false);
   const aboutDialogVisible = ref(false);
   const preferencesDialogVisible = ref(false);
   const groupDialogVisible = ref(false);
   const isEditMode = ref(false);
-  const editHost = ref<model.Host | null>(null);
+  const editConnection = ref<model.Connection | null>(null);
 
-  const openAddHostDialog = (edit = false, host?: model.Host) => {
+  const openConnDialog = (edit = false, connection?: model.Connection) => {
     isEditMode.value = edit;
-    editHost.value = host || null;
-    hostDialogVisible.value = true;
+    editConnection.value = connection || null;
+    connDialogVisible.value = true;
   };
 
-  const closeAddHostDialog = () => {
-    hostDialogVisible.value = false;
-    editHost.value = null;
+  const closeConnDialog = () => {
+    connDialogVisible.value = false;
+    editConnection.value = null;
   };
 
   const openAboutDialog = () => {
@@ -37,28 +37,28 @@ export const useDialogStore = defineStore('dialog', () => {
     preferencesDialogVisible.value = false;
   };
 
-  const openAddGroupDialog = () => {
+  const openGroupDialog = () => {
     groupDialogVisible.value = true;
   };
 
-  const closeAddGroupDialog = () => {
+  const closeGroupDialog = () => {
     groupDialogVisible.value = false;
   };
 
   return {
-    hostDialogVisible,
+    connDialogVisible,
     aboutDialogVisible,
     preferencesDialogVisible,
     groupDialogVisible,
-    openAddHostDialog,
-    closeAddHostDialog,
+    openConnDialog,
+    closeConnDialog,
     openAboutDialog,
     closeAboutDialog,
     openPreferencesDialog,
     closePreferencesDialog,
-    openAddGroupDialog,
-    closeAddGroupDialog,
+    openGroupDialog,
+    closeGroupDialog,
     isEditMode,
-    editHost,
+    editConnection,
   };
 });

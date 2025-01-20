@@ -3,5 +3,9 @@
     "source.fixAll": "explicit"
   },
   "editor.formatOnSave": true,
-  "npm.packageManager": "pnpm"
+  "npm.packageManager": "pnpm",
+  "i18n-ally.localesPaths": ["src/locales"],
+  "i18n-ally.sourceLanguage": "zh-cn",
+  "i18n-ally.enabledFrameworks": ["vue"],
+  "i18n-ally.displayLanguage": "zh-cn"
 }

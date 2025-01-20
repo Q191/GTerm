@@ -8,12 +8,12 @@
         v-show="conn.id === activeConn?.id"
       >
         <template #footer>
-          <n-button @click="() => reconnect(conn.id)" type="primary">重新连接</n-button>
+          <n-button @click="() => reconnect(conn.id)" type="primary">{{ $t('terminal.reconnect') }}</n-button>
         </template>
         <template #default>
           <div class="error-details" v-if="conn.errorDetails">
             <n-collapse class="error-collapse">
-              <n-collapse-item title="详细信息" name="details">
+              <n-collapse-item :title="$t('terminal.error.details')" name="details">
                 <n-code :code="conn.errorDetails" language="bash" :word-wrap="true" />
               </n-collapse-item>
             </n-collapse>
@@ -23,8 +23,8 @@
       <n-result
         v-else-if="conn.isConnecting || !connectedTerminals[conn.id]"
         status="info"
-        title="正在连接"
-        description="少女祈祷中..."
+        :title="$t('terminal.connecting')"
+        :description="$t('terminal.connecting_desc')"
         v-show="conn.id === activeConn?.id"
       >
         <template #icon>
@@ -55,6 +55,9 @@ import '@xterm/xterm/css/xterm.css';
 import { useConnectionStore } from '@/stores/connection';
 import { NCode, NCollapse, NCollapseItem, NResult, NSpin, NButton } from 'naive-ui';
 import { onActivated } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const connectionStore = useConnectionStore();
 const connectionTabs = inject<any>('connectionTabs');
@@ -219,7 +222,7 @@ const initializeWebsocket = async (id: number, hostId: number) => {
       updateStatus(id, {
         isConnecting: false,
         connectionError: true,
-        errorMessage: '连接发生错误，请检查应用是否正常运行',
+        errorMessage: t('terminal.error.connection'),
       });
       connectedTerminals.value[id] = false;
       socket?.close();
@@ -230,14 +233,14 @@ const initializeWebsocket = async (id: number, hostId: number) => {
         updateStatus(id, {
           isConnecting: false,
           connectionError: true,
-          errorMessage: event.reason || '连接已断开',
+          errorMessage: event.reason || t('terminal.error.disconnected'),
         });
       }
       connectedTerminals.value[id] = false;
       sockets.value[id] = undefined;
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : '无法建立连接';
+    const errorMessage = error instanceof Error ? error.message : t('terminal.error.failed');
     updateStatus(id, {
       isConnecting: false,
       connectionError: true,
@@ -257,7 +260,7 @@ const reconnect = async (id: number) => {
     isConnecting: true,
     errorMessage: '',
   });
-  await initializeWebsocket(id, conn.hostId);
+  await initializeWebsocket(id, conn.connId);
 };
 
 const closeTerminal = (id: number) => {
@@ -316,7 +319,7 @@ watchEffect(async () => {
       await nextTick();
       await initializeXterm(conn.id);
       if (!sockets.value[conn.id]) {
-        await initializeWebsocket(conn.id, conn.hostId);
+        await initializeWebsocket(conn.id, conn.connId);
       }
     }
   }

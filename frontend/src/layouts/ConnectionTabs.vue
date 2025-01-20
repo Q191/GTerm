@@ -13,9 +13,9 @@
       </n-icon>
       <n-tooltip trigger="hover">
         <template #trigger>
-          <span class="text-sm tab-name">{{ tab.name }}</span>
+          <span class="text-sm tab-label">{{ tab.label }}</span>
         </template>
-        {{ tab.name }}
+        {{ tab.label }}
       </n-tooltip>
       <n-button circle text size="tiny" class="ml-1 close-btn flex-shrink-0" @click.stop="closeTab(tab.id)">
         <template #icon>
@@ -55,7 +55,6 @@ const registerTerminal = (id: number, terminal: any) => {
 
 const switchTab = (id: number) => {
   connectionStore.setActiveConnection(id);
-  // 确保切换到终端页面
   if (router.currentRoute.value.name !== 'Terminal') {
     router.push({ name: 'Terminal' });
   }
@@ -71,9 +70,8 @@ const closeTab = (id: number) => {
   terminalRefs.value.delete(id);
   connectionStore.removeConnection(id);
 
-  // 如果关闭后没有剩余标签，导航回Host页面
   if (connectionStore.connections.length === 0) {
-    router.push({ name: 'Host' });
+    router.push({ name: 'Connection' });
   }
 };
 
@@ -103,7 +101,7 @@ defineExpose({
   width: 160px;
   min-width: 160px;
 
-  .tab-name {
+  .tab-label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

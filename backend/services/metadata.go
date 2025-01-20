@@ -17,21 +17,21 @@ type MetadataSrv struct {
 	Query  *query.Query
 }
 
-func (s *MetadataSrv) UpdateByHost(host *model.Host) {
+func (s *MetadataSrv) UpdateByConnection(conn *model.Connection) {
 	t := s.Query.Metadata
 
 	config := &exec.Config{
-		Host:       host.Host,
-		Port:       host.Port,
-		User:       host.Credential.Username,
-		AuthMethod: host.Credential.AuthMethod,
+		Host:       conn.Host,
+		Port:       conn.Port,
+		User:       conn.Credential.Username,
+		AuthMethod: conn.Credential.AuthMethod,
 	}
-	switch host.Credential.AuthMethod {
+	switch conn.Credential.AuthMethod {
 	case enums.Password:
-		config.Password = host.Credential.Password
+		config.Password = conn.Credential.Password
 	case enums.PrivateKey:
-		config.PrivateKey = host.Credential.PrivateKey
-		config.KeyPassword = host.Credential.Passphrase
+		config.PrivateKey = conn.Credential.PrivateKey
+		config.KeyPassword = conn.Credential.Passphrase
 	}
 	client, err := exec.NewExec(config)
 	if err != nil {
@@ -42,7 +42,7 @@ func (s *MetadataSrv) UpdateByHost(host *model.Host) {
 		_ = client.Close()
 	}()
 
-	meta, err := t.Where(t.HostID.Eq(host.ID)).FirstOrInit()
+	meta, err := t.Where(t.ConnectionID.Eq(conn.ID)).FirstOrInit()
 	if err != nil {
 		s.Logger.Error("failed to get metadata", zap.Error(err))
 		return

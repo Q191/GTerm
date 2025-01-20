@@ -9,8 +9,10 @@ import (
 	"github.com/MisakaTAT/GTerm/backend/pkg/terminal"
 	"github.com/MisakaTAT/GTerm/backend/pkg/terminal/adapter"
 	"github.com/MisakaTAT/GTerm/backend/types"
+	"github.com/MisakaTAT/GTerm/backend/utils/resp"
 	"github.com/google/wire"
 	"github.com/gorilla/websocket"
+	"go.bug.st/serial"
 	"go.uber.org/zap"
 	"net/http"
 	"strconv"
@@ -23,7 +25,7 @@ var TerminalSrvSet = wire.NewSet(wire.Struct(new(TerminalSrv), "*"))
 type TerminalSrv struct {
 	HTTPListenerPort *initialize.HTTPListenerPort
 	Logger           *zap.Logger
-	HostSrv          *HostSrv
+	ConnectionSrv    *ConnectionSrv
 	MetadataSrv      *MetadataSrv
 }
 
@@ -159,28 +161,28 @@ func (s *TerminalSrv) handleError(ws *websocket.Conn, err error) {
 }
 
 func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
-	host, err := s.HostSrv.FindByID(hostID)
+	conn, err := s.ConnectionSrv.FindByID(hostID)
 	if err != nil {
 		return fmt.Errorf("failed to find host: %v", err)
 	}
 
-	if host.Metadata == nil {
-		go s.MetadataSrv.UpdateByHost(host)
+	if conn.Metadata == nil {
+		go s.MetadataSrv.UpdateByConnection(conn)
 	}
 
 	sshConf := &adapter.SSHConfig{
-		Host:       host.Host,
-		Port:       host.Port,
-		User:       host.Credential.Username,
-		AuthMethod: host.Credential.AuthMethod,
+		Host:       conn.Host,
+		Port:       conn.Port,
+		User:       conn.Credential.Username,
+		AuthMethod: conn.Credential.AuthMethod,
 	}
 
-	switch host.Credential.AuthMethod {
+	switch conn.Credential.AuthMethod {
 	case enums.Password:
-		sshConf.Password = host.Credential.Password
+		sshConf.Password = conn.Credential.Password
 	case enums.PrivateKey:
-		sshConf.PrivateKey = host.Credential.PrivateKey
-		sshConf.KeyPassword = host.Credential.Passphrase
+		sshConf.PrivateKey = conn.Credential.PrivateKey
+		sshConf.KeyPassword = conn.Credential.Passphrase
 	}
 
 	ssh, err := adapter.NewSSH(sshConf, ws, s.Logger).Connect()
@@ -202,24 +204,27 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 	return nil
 }
 
-func (s *TerminalSrv) Serial(ws *websocket.Conn) error {
-	serial := adapter.NewSerial(ws, s.Logger)
+// func (s *TerminalSrv) Serial(ws *websocket.Conn) error {
+// 	serial := adapter.NewSerial(ws, s.Logger)
+//
+// 	// test code
+// 	serialPort := "/dev/cu.usbserial-2130"
+//
+// 	err := serial.Open(serialPort)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to open serial port: %v", err)
+// 	}
+//
+// 	term := terminal.NewTerminal(ws, serial, s.closeWsWrapper)
+// 	term.Start()
+//
+// 	return nil
+// }
 
-	ports := serial.SerialPorts()
-	if len(ports) == 0 {
-		return errors.New("no serial ports available")
-	}
-
-	// test code
-	serialPort := "/dev/cu.usbserial-2130"
-
-	err := serial.Open(serialPort)
+func (s *TerminalSrv) SerialPorts() *resp.Resp {
+	ports, err := serial.GetPortsList()
 	if err != nil {
-		return fmt.Errorf("failed to open serial port: %v", err)
+		return resp.FailWithMsg(err.Error())
 	}
-
-	term := terminal.NewTerminal(ws, serial, s.closeWsWrapper)
-	term.Start()
-
-	return nil
+	return resp.OkWithData(ports)
 }
