@@ -24,7 +24,7 @@ func main() {
 	app := cmd.NewApp()
 
 	if err := wails.Run(&options.App{
-		Title:     consts.ProjectName,
+		Title:     consts.ApplicationName,
 		Width:     1200,
 		Height:    760,
 		MinWidth:  800,
@@ -50,8 +50,8 @@ func main() {
 		Mac: &mac.Options{
 			TitleBar: mac.TitleBarHiddenInset(),
 			About: &mac.AboutInfo{
-				Title:   fmt.Sprintf("%s %s", consts.ProjectName, base.Version),
-				Message: "Copyright © 2023 OpenToolkitLab All rights reserved",
+				Title:   fmt.Sprintf("%s %s", consts.ApplicationName, base.Version),
+				Message: "Copyright © 2025 MisakaTAT All rights reserved",
 				Icon:    icon,
 			},
 			WebviewIsTransparent: false,

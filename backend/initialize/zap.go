@@ -14,7 +14,7 @@ import (
 )
 
 func InitZap() *zap.Logger {
-	logPath := path.Join(userdir.GetConfigHome(), consts.ProjectName, fmt.Sprintf("%s.log", consts.ProjectName))
+	logPath := path.Join(userdir.GetConfigHome(), consts.ApplicationName, fmt.Sprintf("%s.log", consts.ApplicationName))
 	config := zapcore.EncoderConfig{
 		MessageKey:   "msg",
 		LevelKey:     "level",
@@ -53,5 +53,5 @@ func writer(filename string) io.Writer {
 }
 
 func customEncodeTime(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString(fmt.Sprintf("[%s] %s", consts.ProjectName, t.Format("2006-01-02 15:04:05")))
+	enc.AppendString(fmt.Sprintf("[%s] %s", consts.ApplicationName, t.Format("2006-01-02 15:04:05")))
 }

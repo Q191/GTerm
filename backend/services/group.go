@@ -3,7 +3,7 @@ package services
 import (
 	"github.com/MisakaTAT/GTerm/backend/dal/model"
 	"github.com/MisakaTAT/GTerm/backend/dal/query"
-	"github.com/MisakaTAT/GTerm/backend/pkg/resp"
+	"github.com/MisakaTAT/GTerm/backend/utils/resp"
 	"github.com/google/wire"
 	"go.uber.org/zap"
 )

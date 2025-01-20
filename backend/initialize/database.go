@@ -17,7 +17,7 @@ type Database struct {
 
 func InitDatabase() *query.Query {
 	database := &Database{}
-	localStorage := storage.NewLocalStorage(fmt.Sprintf("%s.%s", consts.ProjectName, consts.DatabaseDriver))
+	localStorage := storage.NewLocalStorage(fmt.Sprintf("%s.%s", consts.ApplicationName, consts.DatabaseDriver))
 	if err := localStorage.CreateDirectory(); err != nil {
 		panic(err)
 	}

@@ -3,6 +3,7 @@ module github.com/MisakaTAT/GTerm
 go 1.23
 
 require (
+	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/glebarez/sqlite v1.11.0
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0

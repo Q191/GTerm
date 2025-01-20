@@ -14,7 +14,7 @@ type LocalStorage struct {
 }
 
 func NewLocalStorage(filename string) *LocalStorage {
-	return &LocalStorage{Path: path.Join(userdir.GetConfigHome(), consts.ProjectName, filename)}
+	return &LocalStorage{Path: path.Join(userdir.GetConfigHome(), consts.ApplicationName, filename)}
 }
 
 func (l *LocalStorage) CreateDirectory() error {

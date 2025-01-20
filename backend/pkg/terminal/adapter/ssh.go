@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/MisakaTAT/GTerm/backend/enums"
 	"github.com/MisakaTAT/GTerm/backend/pkg/terminal"
-	"github.com/MisakaTAT/GTerm/backend/pkg/types"
+	"github.com/MisakaTAT/GTerm/backend/types"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/ssh"

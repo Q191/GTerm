@@ -1,6 +1,6 @@
 package consts
 
 const (
-	ProjectName    = "GTerm"
-	DatabaseDriver = "sqlite3"
+	ApplicationName = "GTerm"
+	DatabaseDriver  = "sqlite3"
 )

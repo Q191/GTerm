@@ -3,7 +3,7 @@ package adapter
 import (
 	"encoding/json"
 	"github.com/MisakaTAT/GTerm/backend/pkg/terminal"
-	"github.com/MisakaTAT/GTerm/backend/pkg/types"
+	"github.com/MisakaTAT/GTerm/backend/types"
 	"github.com/gorilla/websocket"
 	"go.bug.st/serial"
 	"go.uber.org/zap"
