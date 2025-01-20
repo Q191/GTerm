@@ -265,7 +265,7 @@ const handleDropdownSelect = async (key: string) => {
         message.error(resp.msg);
         return;
       }
-      message.success('删除成功');
+      message.success(t('message.deleteSuccess'));
       await fetchData();
       break;
   }

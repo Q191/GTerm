@@ -12,19 +12,13 @@
     "basicConfig": "基础配置",
     "advancedConfig": "高级配置",
     "developing": "功能开发中...",
-    "label": "连接名称",
-    "group": "所属分组",
-    "host": "主机地址",
-    "port": "端口号",
     "authType": "认证方式",
-    "username": "用户名",
     "password": "密码",
     "privateKey": "私钥",
     "commonCredentialLib": "凭据",
     "commonCredential": "共享",
     "privateCredential": "私有",
     "credentialTooltip": "共享凭据：该认证信息将被添加至凭据库，可被其他连接复用\n私有凭据：仅当前连接可使用",
-    "passphrase": "密钥口令",
     "placeholder": {
       "label": "请输入连接名称",
       "group": "请选择所属分组",
@@ -60,9 +54,7 @@
   "message": {
     "createSuccess": "创建成功",
     "updateSuccess": "更新成功",
-    "deleteSuccess": "删除成功",
-    "operationSuccess": "操作成功",
-    "operationFailed": "操作失败"
+    "deleteSuccess": "删除成功"
   },
   "preferencesDialog": {
     "title": "偏好设置",
