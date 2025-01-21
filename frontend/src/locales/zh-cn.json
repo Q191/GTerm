@@ -21,6 +21,7 @@
     "credentialTooltip": "共享凭据：该认证信息将被添加至凭据库，可被其他连接复用\n私有凭据：仅当前连接可使用",
     "placeholder": {
       "label": "请输入连接名称",
+      "credentialLabel": "请输入凭据名称",
       "group": "请选择所属分组",
       "host": "请输入主机地址",
       "port": "请输入端口号",
@@ -29,7 +30,12 @@
       "privateKey": "请输入私钥内容",
       "passphrase": "请输入密钥口令",
       "selectCredential": "请选择凭据信息",
-      "serialPort": "请选择串口设备"
+      "serialPort": "请选择串口设备",
+      "connProtocol": "请选择连接协议",
+      "baudRate": "波特率",
+      "dataBits": "数据位",
+      "stopBits": "停止位",
+      "parity": "校验位"
     },
     "validation": {
       "labelRequired": "请输入连接名称",
@@ -39,7 +45,13 @@
       "passwordRequired": "请输入密码",
       "privateKeyRequired": "请输入私钥内容",
       "credentialRequired": "请选择凭据信息",
-      "portInvalid": "端口号必须在 1-65535 之间"
+      "credentialLabelRequired": "请输入凭据名称",
+      "portInvalid": "端口号必须在 1-65535 之间",
+      "serialPortRequired": "请选择串口",
+      "baudRateRequired": "请选择波特率",
+      "dataBitsRequired": "请选择数据位",
+      "stopBitsRequired": "请选择停止位",
+      "parityRequired": "请选择校验位"
     }
   },
   "groupDialog": {

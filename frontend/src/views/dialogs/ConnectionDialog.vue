@@ -23,140 +23,196 @@
             <n-select
               v-model:value="formValue.groupID"
               :options="groupOptions"
-              clearable
-              tag
               :placeholder="$t('connDialog.placeholder.group')"
             />
           </n-form-item>
 
-          <n-form-item path="serialPort">
+          <n-form-item path="connProtocol">
             <n-select
-              v-model:value="formValue.serialPort"
-              :options="serialPortsOptions"
-              clearable
-              tag
-              :placeholder="$t('connDialog.placeholder.serialPort')"
+              v-model:value="formValue.connProtocol"
+              :options="connProtocolOptions"
+              :placeholder="$t('connDialog.placeholder.connProtocol')"
             />
           </n-form-item>
 
-          <div class="flex items-center w-full gap-2">
-            <n-form-item path="host" class="flex-1">
-              <n-input v-model:value="formValue.host" clearable :placeholder="$t('connDialog.placeholder.host')" />
-            </n-form-item>
-            <n-form-item path="port" class="port-input">
-              <n-input-number
-                v-model:value="formValue.port"
-                :min="1"
-                :max="65535"
-                :show-button="false"
-                :placeholder="$t('connDialog.placeholder.port')"
-              />
-            </n-form-item>
-          </div>
-
-          <n-form-item :label="$t('connDialog.authType')" path="credential.authMethod">
-            <div class="flex items-center justify-between w-full">
-              <n-button-group>
-                <n-button
-                  :type="
-                    !formValue.isCommonCredential && formValue.credential?.authMethod === AuthMethod.Password
-                      ? 'primary'
-                      : 'default'
-                  "
-                  @click="handleCredentialTypeChange(CredentialType.Password)"
-                >
-                  <template #icon>
-                    <Icon icon="ph:password" />
-                  </template>
-                  {{ $t('connDialog.password') }}
-                </n-button>
-                <n-button
-                  :type="
-                    !formValue.isCommonCredential && formValue.credential?.authMethod === AuthMethod.PrivateKey
-                      ? 'primary'
-                      : 'default'
-                  "
-                  @click="handleCredentialTypeChange(CredentialType.PrivateKey)"
-                >
-                  <template #icon>
-                    <Icon icon="ph:key" />
-                  </template>
-                  {{ $t('connDialog.privateKey') }}
-                </n-button>
-                <n-button
-                  :type="formValue.isCommonCredential ? 'primary' : 'default'"
-                  @click="handleCredentialTypeChange(CredentialType.Common)"
-                >
-                  <template #icon>
-                    <Icon icon="ph:vault" />
-                  </template>
-                  {{ $t('connDialog.commonCredentialLib') }}
-                </n-button>
-              </n-button-group>
-              <n-tooltip v-if="!formValue.isCommonCredential && formValue.credential" trigger="hover" placement="right">
-                <template #trigger>
-                  <n-switch v-model:value="formValue.credential.isCommonCredential">
-                    <template #checked>{{ $t('connDialog.commonCredential') }}</template>
-                    <template #unchecked>{{ $t('connDialog.privateCredential') }}</template>
-                  </n-switch>
-                </template>
-                <span class="tooltip-text">{{ $t('connDialog.credentialTooltip') }}</span>
-              </n-tooltip>
-            </div>
-          </n-form-item>
-
-          <template v-if="formValue.isCommonCredential">
-            <n-form-item path="credentialID">
+          <template v-if="formValue.connProtocol === enums.ConnProtocol.SERIAL">
+            <n-form-item path="serialPort">
               <n-select
-                v-model:value="formValue.credentialID"
-                :options="credentialOptions"
-                clearable
-                :placeholder="$t('connDialog.placeholder.selectCredential')"
-                @update:value="handleSelectCredential"
+                v-model:value="formValue.serialPort"
+                :options="serialPortsOptions"
+                :placeholder="$t('connDialog.placeholder.serialPort')"
               />
             </n-form-item>
+
+            <n-form-item path="baudRate">
+              <n-select
+                v-model:value="formValue.baudRate"
+                :options="baudRateOptions"
+                :placeholder="$t('connDialog.placeholder.baudRate')"
+              />
+            </n-form-item>
+
+            <div class="flex items-center w-full gap-2">
+              <n-form-item path="dataBits" class="flex-1">
+                <n-select
+                  v-model:value="formValue.dataBits"
+                  :options="dataBitsOptions"
+                  :placeholder="$t('connDialog.placeholder.dataBits')"
+                />
+              </n-form-item>
+
+              <n-form-item path="stopBits" class="flex-1">
+                <n-select
+                  v-model:value="formValue.stopBits"
+                  :options="stopBitsOptions"
+                  :placeholder="$t('connDialog.placeholder.stopBits')"
+                />
+              </n-form-item>
+
+              <n-form-item path="parity" class="flex-1">
+                <n-select
+                  v-model:value="formValue.parity"
+                  :options="parityOptions"
+                  :placeholder="$t('connDialog.placeholder.parity')"
+                />
+              </n-form-item>
+            </div>
           </template>
 
-          <template v-else>
-            <n-form-item path="credential.username">
-              <n-input
-                v-model:value="formValue.credential!.username"
-                clearable
-                :placeholder="$t('connDialog.placeholder.username')"
-              />
+          <template v-if="formValue.connProtocol === enums.ConnProtocol.SSH">
+            <div class="flex items-center w-full gap-2">
+              <n-form-item path="host" class="flex-1">
+                <n-input v-model:value="formValue.host" clearable :placeholder="$t('connDialog.placeholder.host')" />
+              </n-form-item>
+              <n-form-item path="port" class="port-input">
+                <n-input-number
+                  v-model:value="formValue.port"
+                  :min="1"
+                  :max="65535"
+                  :show-button="false"
+                  :placeholder="$t('connDialog.placeholder.port')"
+                />
+              </n-form-item>
+            </div>
+
+            <n-form-item :label="$t('connDialog.authType')" path="credential.authMethod">
+              <div class="flex items-center justify-between w-full">
+                <n-button-group>
+                  <n-button
+                    :type="
+                      !formValue.isCommonCredential && formValue.credential?.authMethod === enums.AuthMethod.PASSWORD
+                        ? 'primary'
+                        : 'default'
+                    "
+                    @click="handleCredentialTypeChange(CredentialType.Password)"
+                  >
+                    <template #icon>
+                      <Icon icon="ph:password" />
+                    </template>
+                    {{ $t('connDialog.password') }}
+                  </n-button>
+                  <n-button
+                    :type="
+                      !formValue.isCommonCredential && formValue.credential?.authMethod === enums.AuthMethod.PRIVATEKEY
+                        ? 'primary'
+                        : 'default'
+                    "
+                    @click="handleCredentialTypeChange(CredentialType.PrivateKey)"
+                  >
+                    <template #icon>
+                      <Icon icon="ph:key" />
+                    </template>
+                    {{ $t('connDialog.privateKey') }}
+                  </n-button>
+                  <n-button
+                    :type="formValue.isCommonCredential ? 'primary' : 'default'"
+                    @click="handleCredentialTypeChange(CredentialType.Common)"
+                  >
+                    <template #icon>
+                      <Icon icon="ph:vault" />
+                    </template>
+                    {{ $t('connDialog.commonCredentialLib') }}
+                  </n-button>
+                </n-button-group>
+                <n-tooltip
+                  v-if="!formValue.isCommonCredential && formValue.credential"
+                  trigger="hover"
+                  placement="right"
+                >
+                  <template #trigger>
+                    <n-switch v-model:value="formValue.credential.isCommonCredential">
+                      <template #checked>{{ $t('connDialog.commonCredential') }}</template>
+                      <template #unchecked>{{ $t('connDialog.privateCredential') }}</template>
+                    </n-switch>
+                  </template>
+                  <span class="tooltip-text">{{ $t('connDialog.credentialTooltip') }}</span>
+                </n-tooltip>
+              </div>
             </n-form-item>
 
-            <template v-if="formValue.credential!.authMethod === AuthMethod.Password">
-              <n-form-item path="credential.password">
-                <n-input
-                  v-model:value="formValue.credential!.password"
-                  type="password"
-                  show-password-on="click"
+            <template v-if="formValue.isCommonCredential">
+              <n-form-item path="credentialID">
+                <n-select
+                  v-model:value="formValue.credentialID"
+                  :options="credentialOptions"
                   clearable
-                  :placeholder="$t('connDialog.placeholder.password')"
+                  :placeholder="$t('connDialog.placeholder.selectCredential')"
+                  @update:value="handleSelectCredential"
                 />
               </n-form-item>
             </template>
 
-            <template v-if="formValue.credential!.authMethod === AuthMethod.PrivateKey">
-              <n-form-item path="credential.privateKey">
+            <template v-else>
+              <template v-if="formValue.credential!.isCommonCredential">
+                <n-form-item path="credential.label">
+                  <n-input
+                    v-model:value="formValue.credential!.label"
+                    clearable
+                    :placeholder="$t('connDialog.placeholder.credentialLabel')"
+                  />
+                </n-form-item>
+              </template>
+
+              <n-form-item path="credential.username">
                 <n-input
-                  v-model:value="formValue.credential!.privateKey"
-                  type="textarea"
-                  :row="3"
+                  v-model:value="formValue.credential!.username"
                   clearable
-                  :placeholder="$t('connDialog.placeholder.privateKey')"
+                  :placeholder="$t('connDialog.placeholder.username')"
                 />
               </n-form-item>
-              <n-form-item path="credential.passphrase">
-                <n-input
-                  v-model:value="formValue.credential!.passphrase"
-                  type="password"
-                  show-password-on="click"
-                  clearable
-                  :placeholder="$t('connDialog.placeholder.passphrase')"
-                />
-              </n-form-item>
+
+              <template v-if="formValue.credential!.authMethod === enums.AuthMethod.PASSWORD">
+                <n-form-item path="credential.password">
+                  <n-input
+                    v-model:value="formValue.credential!.password"
+                    type="password"
+                    show-password-on="click"
+                    clearable
+                    :placeholder="$t('connDialog.placeholder.password')"
+                  />
+                </n-form-item>
+              </template>
+
+              <template v-if="formValue.credential!.authMethod === enums.AuthMethod.PRIVATEKEY">
+                <n-form-item path="credential.privateKey">
+                  <n-input
+                    v-model:value="formValue.credential!.privateKey"
+                    type="textarea"
+                    :row="3"
+                    clearable
+                    :placeholder="$t('connDialog.placeholder.privateKey')"
+                  />
+                </n-form-item>
+                <n-form-item path="credential.passphrase">
+                  <n-input
+                    v-model:value="formValue.credential!.passphrase"
+                    type="password"
+                    show-password-on="click"
+                    clearable
+                    :placeholder="$t('connDialog.placeholder.passphrase')"
+                  />
+                </n-form-item>
+              </template>
             </template>
           </template>
         </n-form>
@@ -175,7 +231,7 @@
 
 <script lang="ts" setup>
 import { useDialogStore } from '@/stores/dialog';
-import { model } from '@wailsApp/go/models';
+import { enums, model } from '@wailsApp/go/models';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
 import { CreateConnection, UpdateConnection } from '@wailsApp/go/services/ConnectionSrv';
 import { Icon } from '@iconify/vue';
@@ -209,24 +265,25 @@ const formRef = ref<FormInst | null>(null);
 const activeTab = ref('basic');
 const message = useMessage();
 
-const AuthMethod = {
-  Password: 0,
-  PrivateKey: 1,
-} as const;
-
 const CredentialType = {
   Password: 0,
   PrivateKey: 1,
   Common: 2,
 } as const;
 
+const connProtocolOptions = [
+  { label: enums.ConnProtocol.SSH, value: enums.ConnProtocol.SSH },
+  { label: enums.ConnProtocol.SERIAL, value: enums.ConnProtocol.SERIAL },
+];
+
 const defaultCredential = {
+  label: '',
   username: '',
   password: '',
   privateKey: '',
   passphrase: '',
   isCommonCredential: false,
-  authMethod: AuthMethod.Password,
+  authMethod: enums.AuthMethod.PASSWORD,
 };
 
 const defaultConnection = {
@@ -234,13 +291,17 @@ const defaultConnection = {
   host: '',
   port: 22,
   serialPort: null,
-  connProtocol: 0,
+  connProtocol: null,
   credentialID: null,
   isCommonCredential: false,
   groupID: null,
+  baudRate: 9600,
+  dataBits: 8,
+  stopBits: 0, // OneStopBit
+  parity: 0, // NoParity
 };
 
-const createCredential = (authMethod: number) =>
+const createCredential = (authMethod: enums.AuthMethod) =>
   model.Credential.createFrom({
     ...defaultCredential,
     authMethod,
@@ -252,7 +313,7 @@ const createConnection = (isCommon = false) => {
     isCommonCredential: isCommon,
   });
   if (!isCommon) {
-    conn.credential = createCredential(AuthMethod.Password);
+    conn.credential = createCredential(enums.AuthMethod.PASSWORD);
   }
   return conn;
 };
@@ -260,8 +321,8 @@ const createConnection = (isCommon = false) => {
 const formValue = ref(createConnection());
 
 const tempCachedCredentials = ref({
-  password: createCredential(AuthMethod.Password),
-  privateKey: createCredential(AuthMethod.PrivateKey),
+  password: createCredential(enums.AuthMethod.PASSWORD),
+  privateKey: createCredential(enums.AuthMethod.PRIVATEKEY),
 });
 
 const useCommonCredential = ref(false);
@@ -273,9 +334,9 @@ watch(
     if (newConnection) {
       formValue.value = model.Connection.createFrom(newConnection);
       if (newConnection.credential && !newConnection.isCommonCredential) {
-        if (newConnection.credential.authMethod === AuthMethod.Password) {
+        if (newConnection.credential.authMethod === enums.AuthMethod.PASSWORD) {
           tempCachedCredentials.value.password = model.Credential.createFrom(newConnection.credential);
-        } else if (newConnection.credential.authMethod === AuthMethod.PrivateKey) {
+        } else if (newConnection.credential.authMethod === enums.AuthMethod.PRIVATEKEY) {
           tempCachedCredentials.value.privateKey = model.Credential.createFrom(newConnection.credential);
         }
       }
@@ -284,8 +345,8 @@ watch(
     }
     formValue.value = createConnection();
     tempCachedCredentials.value = {
-      password: createCredential(AuthMethod.Password),
-      privateKey: createCredential(AuthMethod.PrivateKey),
+      password: createCredential(enums.AuthMethod.PASSWORD),
+      privateKey: createCredential(enums.AuthMethod.PRIVATEKEY),
     };
   },
   { immediate: true },
@@ -306,7 +367,7 @@ const handleCredentialTypeChange = (credentialType: number) => {
       ? tempCachedCredentials.value.password
       : tempCachedCredentials.value.privateKey;
   formValue.value.credential.authMethod =
-    credentialType === CredentialType.Password ? AuthMethod.Password : AuthMethod.PrivateKey;
+    credentialType === CredentialType.Password ? enums.AuthMethod.PASSWORD : enums.AuthMethod.PRIVATEKEY;
 };
 
 const handleSelectCredential = async (id: number) => {
@@ -318,6 +379,35 @@ const handleSelectCredential = async (id: number) => {
   formValue.value.isCommonCredential = true;
 };
 
+const baudRateOptions = [
+  { label: '9600', value: 9600 },
+  { label: '19200', value: 19200 },
+  { label: '38400', value: 38400 },
+  { label: '57600', value: 57600 },
+  { label: '115200', value: 115200 },
+];
+
+const parityOptions = [
+  { label: 'None', value: 0 }, // NoParity
+  { label: 'Odd', value: 1 }, // OddParity
+  { label: 'Even', value: 2 }, // EvenParity
+  { label: 'Mark', value: 3 }, // MarkParity
+  { label: 'Space', value: 4 }, // SpaceParity
+];
+
+const dataBitsOptions = [
+  { label: '5', value: 5 },
+  { label: '6', value: 6 },
+  { label: '7', value: 7 },
+  { label: '8', value: 8 },
+];
+
+const stopBitsOptions = [
+  { label: '1', value: 0 }, // OneStopBit
+  { label: '1.5', value: 1 }, // OnePointFiveStopBits
+  { label: '2', value: 2 }, // TwoStopBits
+];
+
 const rules = computed<FormRules>(() => ({
   label: {
     required: true,
@@ -325,12 +415,12 @@ const rules = computed<FormRules>(() => ({
     trigger: 'blur',
   },
   host: {
-    required: true,
+    required: formValue.value.connProtocol === enums.ConnProtocol.SSH,
     message: t('connDialog.validation.hostRequired'),
     trigger: 'blur',
   },
   port: {
-    required: true,
+    required: formValue.value.connProtocol === enums.ConnProtocol.SSH,
     type: 'number',
     message: t('connDialog.validation.portRequired'),
     trigger: ['blur', 'change'],
@@ -340,24 +430,60 @@ const rules = computed<FormRules>(() => ({
       }
     },
   },
+  serialPort: {
+    required: formValue.value.connProtocol === enums.ConnProtocol.SERIAL,
+    message: t('connDialog.validation.serialPortRequired'),
+    trigger: ['blur', 'change'],
+  },
+  baudRate: {
+    required: formValue.value.connProtocol === enums.ConnProtocol.SERIAL,
+    type: 'number',
+    message: t('connDialog.validation.baudRateRequired'),
+    trigger: ['blur', 'change'],
+  },
+  dataBits: {
+    required: formValue.value.connProtocol === enums.ConnProtocol.SERIAL,
+    type: 'number',
+    message: t('connDialog.validation.dataBitsRequired'),
+    trigger: ['blur', 'change'],
+  },
+  stopBits: {
+    required: formValue.value.connProtocol === enums.ConnProtocol.SERIAL,
+    type: 'number',
+    message: t('connDialog.validation.stopBitsRequired'),
+    trigger: ['blur', 'change'],
+  },
+  parity: {
+    required: formValue.value.connProtocol === enums.ConnProtocol.SERIAL,
+    type: 'number',
+    message: t('connDialog.validation.parityRequired'),
+    trigger: ['blur', 'change'],
+  },
   'credential.username': {
     required: !formValue.value.isCommonCredential,
     message: t('connDialog.validation.usernameRequired'),
     trigger: 'blur',
   },
   'credential.password': {
-    required: !formValue.value.isCommonCredential && formValue.value.credential?.authMethod === AuthMethod.Password,
+    required:
+      !formValue.value.isCommonCredential && formValue.value.credential?.authMethod === enums.AuthMethod.PASSWORD,
     message: t('connDialog.validation.passwordRequired'),
     trigger: 'blur',
   },
   'credential.privateKey': {
-    required: !formValue.value.isCommonCredential && formValue.value.credential?.authMethod === AuthMethod.PrivateKey,
+    required:
+      !formValue.value.isCommonCredential && formValue.value.credential?.authMethod === enums.AuthMethod.PRIVATEKEY,
     message: t('connDialog.validation.privateKeyRequired'),
     trigger: 'blur',
   },
   credentialID: {
     required: formValue.value.isCommonCredential,
     message: t('connDialog.validation.credentialRequired'),
+    trigger: ['blur', 'change'],
+  },
+  'credential.label': {
+    required: formValue.value.credential?.isCommonCredential,
+    message: t('connDialog.validation.credentialLabelRequired'),
     trigger: ['blur', 'change'],
   },
 }));
@@ -400,7 +526,7 @@ const initOptions = async () => {
     value: group.id,
   }));
   credentialOptions.value = credentials.map((credential: model.Credential) => ({
-    label: credential.name,
+    label: credential.label,
     value: credential.id,
   }));
   serialPortsOptions.value = serialPorts.map((serialPort: string[]) => ({
@@ -433,8 +559,8 @@ const handleConfirm = async () => {
 const resetForm = () => {
   formValue.value = createConnection();
   tempCachedCredentials.value = {
-    password: createCredential(AuthMethod.Password),
-    privateKey: createCredential(AuthMethod.PrivateKey),
+    password: createCredential(enums.AuthMethod.PASSWORD),
+    privateKey: createCredential(enums.AuthMethod.PRIVATEKEY),
   };
   activeTab.value = 'basic';
   dialogStore.closeConnDialog();

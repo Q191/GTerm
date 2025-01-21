@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"github.com/MisakaTAT/GTerm/backend/enums"
 	"github.com/MisakaTAT/GTerm/backend/initialize"
 	"github.com/MisakaTAT/GTerm/backend/services"
 	"github.com/google/wire"
@@ -34,5 +35,11 @@ func (a *App) Bind() (services []any) {
 	services = append(services, a.GroupSrv)
 	services = append(services, a.ConnectionSrv)
 	services = append(services, a.MetadataSrv)
+	return
+}
+
+func (a *App) Enums() (es []any) {
+	es = append(es, enums.AuthMethodEnums)
+	es = append(es, enums.ConnProtocolEnums)
 	return
 }

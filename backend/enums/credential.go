@@ -1,8 +1,16 @@
 package enums
 
-type AuthMethod = int
+import "strings"
+
+type AuthMethod string
 
 const (
-	Password AuthMethod = iota
-	PrivateKey
+	Password   AuthMethod = "Password"
+	PrivateKey AuthMethod = "PrivateKey"
 )
+
+var AuthMethodEnums = []AuthMethod{Password, PrivateKey}
+
+func (a AuthMethod) TSName() string {
+	return strings.ToUpper(string(a))
+}

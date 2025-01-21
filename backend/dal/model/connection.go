@@ -1,6 +1,9 @@
 package model
 
-import "github.com/MisakaTAT/GTerm/backend/enums"
+import (
+	"github.com/MisakaTAT/GTerm/backend/enums"
+	"go.bug.st/serial"
+)
 
 type Connection struct {
 	Common
@@ -14,6 +17,10 @@ type Connection struct {
 	IsCommonCredential bool               `gorm:"not null" json:"isCommonCredential"`
 	Metadata           *Metadata          `json:"metadata"`
 	GroupID            *uint              `json:"groupID"`
+	BaudRate           int                `json:"baudRate"`
+	DataBits           int                `json:"dataBits"`
+	StopBits           serial.StopBits    `json:"stopBits"`
+	Parity             serial.Parity      `json:"parity"`
 }
 
 func (c *Connection) TableName() string {

@@ -8,7 +8,7 @@ import (
 
 type Credential struct {
 	Common
-	Name                 string           `json:"name" gorm:"uniqueIndex;not null"`
+	Label                string           `json:"label" gorm:"uniqueIndex;not null"`
 	Username             string           `json:"username"`
 	IsCommonCredential   bool             `json:"isCommonCredential"`
 	AuthMethod           enums.AuthMethod `json:"authMethod"`

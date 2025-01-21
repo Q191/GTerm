@@ -40,7 +40,8 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			app.Startup(ctx)
 		},
-		Bind: app.Bind(),
+		Bind:     app.Bind(),
+		EnumBind: app.Enums(),
 		Windows: &windows.Options{
 			WebviewIsTransparent:              true,
 			WindowIsTranslucent:               true,

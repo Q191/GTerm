@@ -19,7 +19,7 @@ type ConnectionSrv struct {
 func (s *ConnectionSrv) CreateConnection(conn *model.Connection) *resp.Resp {
 	if err := s.Query.Transaction(func(tx *query.Query) error {
 		if conn.CredentialID == nil && conn.Credential != nil {
-			conn.Credential.Name = uuid.New().String()
+			conn.Credential.Label = uuid.New().String()
 			if err := tx.Credential.Create(conn.Credential); err != nil {
 				return err
 			}

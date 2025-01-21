@@ -85,7 +85,12 @@
               </div>
               <div class="card-info">
                 <div class="conn-name">{{ conn.label }}</div>
-                <div class="conn-addr">{{ conn.credential?.username }}@{{ conn.host }}</div>
+                <div v-if="conn.connProtocol === enums.ConnProtocol.SSH" class="conn-info">
+                  {{ conn.credential?.username }}@{{ conn.host }}
+                </div>
+                <div v-if="conn.connProtocol === enums.ConnProtocol.SERIAL" class="conn-info">
+                  {{ conn.serialPort }}
+                </div>
               </div>
             </div>
             <n-button circle text size="small" class="edit-btn" @click.stop="handleEditConn($event, conn)">
@@ -95,15 +100,10 @@
             </n-button>
           </div>
 
-          <div class="card-body">
-            <div class="conn-name">{{ conn.label }}</div>
-            <div class="conn-addr">{{ conn.credential?.username }}@{{ conn.host }}</div>
-          </div>
-
           <div class="card-footer">
             <div class="protocol-info">
               <icon :icon="getProtocolIcon(conn)" />
-              <span>{{ getProtocolName(conn) }}</span>
+              <span>{{ conn.connProtocol }}</span>
             </div>
             <div class="connection-tags" style="margin-left: auto">
               <n-tooltip trigger="hover" v-if="getConnCount(conn) > 0">
@@ -152,7 +152,7 @@ import type { DropdownOption } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
 import { ListConnection, DeleteConnection } from '@wailsApp/go/services/ConnectionSrv';
-import { model } from '@wailsApp/go/models';
+import { enums, model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
 import { useRouter } from 'vue-router';
 import { h, ref, computed, onMounted, watch, onUnmounted } from 'vue';
@@ -462,38 +462,19 @@ const getErrorConnCount = (conn: model.Connection) => {
 
 const getProtocolIcon = (conn: model.Connection) => {
   const protocol = conn.connProtocol;
-
   switch (protocol) {
-    case 0:
+    case enums.ConnProtocol.SSH:
       return 'ph:terminal-duotone';
-    case 1:
+    case enums.ConnProtocol.TELNET:
       return 'ph:broadcast-duotone';
-    case 2:
+    case enums.ConnProtocol.RDP:
       return 'ph:desktop-duotone';
-    case 3:
+    case enums.ConnProtocol.VNC:
       return 'ph:monitor-duotone';
-    case 4:
+    case enums.ConnProtocol.SERIAL:
       return 'ph:plug-duotone';
     default:
       return 'ph:gconn-duotone';
-  }
-};
-
-const getProtocolName = (conn: model.Connection) => {
-  const protocol = conn.connProtocol;
-  switch (protocol) {
-    case 0:
-      return 'SSH';
-    case 1:
-      return 'Telnet';
-    case 2:
-      return 'RDP';
-    case 3:
-      return 'VNC';
-    case 4:
-      return 'Serial';
-    default:
-      return 'Unknown';
   }
 };
 
@@ -752,7 +733,7 @@ onUnmounted(() => {
           text-overflow: ellipsis;
         }
 
-        .conn-addr {
+        .conn-info {
           font-size: 12px;
           color: v-bind('themeVars.textColor3');
           white-space: nowrap;
@@ -780,10 +761,6 @@ onUnmounted(() => {
         background: v-bind('`${themeVars.primaryColor}30`');
       }
     }
-  }
-
-  .card-body {
-    display: none;
   }
 
   .card-footer {
