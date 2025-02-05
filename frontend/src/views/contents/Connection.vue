@@ -482,10 +482,6 @@ const handleExpand = (keys: string[]) => {
   expandedKeys.value = keys;
 };
 
-onMounted(async () => {
-  await fetchData();
-});
-
 const themeVars = useThemeVars();
 
 const sidebarRef = ref<HTMLElement | null>(null);
@@ -524,7 +520,9 @@ const startResize = (e: MouseEvent) => {
   document.addEventListener('mouseup', handleMouseUp);
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchData();
+
   window.addEventListener('sidebar-width-change', ((e: CustomEvent) => {
     sidebarWidth.value = e.detail;
   }) as EventListener);

@@ -23,29 +23,32 @@
 
     <n-scrollbar class="content">
       <div class="content-wrapper">
-        <n-list hoverable clickable class="credential-list">
-          <n-list-item v-for="item in mockCredential" :key="item.id">
+        <n-list v-if="creds?.length" hoverable clickable class="credential-list">
+          <n-list-item v-for="v in creds" :key="v.id">
             <div class="credential-item">
               <n-thing>
                 <template #avatar>
-                  <div class="credential-type" :class="item.authType === 'password' ? 'success' : 'warning'">
-                    <icon :icon="item.authType === 'password' ? 'ph:password' : 'ph:key'" />
+                  <div
+                    class="credential-type"
+                    :class="v.authMethod === enums.AuthMethod.PASSWORD ? 'success' : 'warning'"
+                  >
+                    <icon :icon="v.authMethod === enums.AuthMethod.PASSWORD ? 'ph:password' : 'ph:key'" />
                   </div>
                 </template>
                 <template #header>
                   <div class="credential-header">
-                    <span class="name">{{ item.name }}</span>
+                    <span class="name">{{ v.label }}</span>
                   </div>
                 </template>
                 <template #description>
                   <div class="credential-info">
                     <span class="info-item">
                       <icon icon="ph:user" />
-                      {{ item.username }}
+                      {{ v.username }}
                     </span>
                     <span class="info-item">
                       <icon icon="ph:clock" />
-                      {{ item.createdAt }} 创建
+                      {{ formatTime(v.createdAt) }}
                     </span>
                   </div>
                 </template>
@@ -53,13 +56,13 @@
               <div class="credential-actions">
                 <n-tooltip trigger="hover">
                   <template #trigger>
-                    <n-button circle text>
+                    <n-button circle text @click="handleCopy(v)">
                       <template #icon>
-                        <icon :icon="item.authType === 'password' ? 'ph:copy' : 'ph:file-text'" />
+                        <icon :icon="v.authMethod === enums.AuthMethod.PASSWORD ? 'ph:copy' : 'ph:file-text'" />
                       </template>
                     </n-button>
                   </template>
-                  {{ item.authType === 'password' ? '复制密码' : '查看密钥' }}
+                  {{ v.authMethod === enums.AuthMethod.PASSWORD ? '复制密码' : '查看密钥' }}
                 </n-tooltip>
                 <n-tooltip trigger="hover">
                   <template #trigger>
@@ -85,6 +88,7 @@
             </div>
           </n-list-item>
         </n-list>
+        <n-empty v-else class="credential-empty" description="暂无可用凭据" />
       </div>
     </n-scrollbar>
   </div>
@@ -92,89 +96,55 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NInput, NInputGroup, NList, NListItem, NTag, NThing, NScrollbar, useThemeVars } from 'naive-ui';
+import {
+  NButton,
+  NInput,
+  NInputGroup,
+  NList,
+  NListItem,
+  NTag,
+  NThing,
+  NScrollbar,
+  useThemeVars,
+  useMessage,
+  NEmpty,
+} from 'naive-ui';
 import { ref } from 'vue';
+import { ListCredential } from '@wailsApp/go/services/CredentialSrv';
+import { enums, model } from '@wailsApp/go/models';
+import dayjs from 'dayjs';
 
-interface CredentialItem {
-  id: number;
-  name: string;
-  username: string;
-  authType: 'password' | 'private_key';
-  createdAt: string;
-}
+const message = useMessage();
 
-const mockCredential = ref<CredentialItem[]>([
-  {
-    id: 1,
-    name: 'root@192.168.1.100',
-    username: 'root',
-    authType: 'password',
-    createdAt: '2024-01-20',
-  },
-  {
-    id: 2,
-    name: 'admin@example.com',
-    username: 'admin',
-    authType: 'private_key',
-    createdAt: '2024-01-19',
-  },
-  {
-    id: 3,
-    name: 'dev@staging-server',
-    username: 'developer',
-    authType: 'private_key',
-    createdAt: '2024-01-18',
-  },
-  {
-    id: 4,
-    name: 'ubuntu@aws-ec2',
-    username: 'ubuntu',
-    authType: 'private_key',
-    createdAt: '2024-01-17',
-  },
-  {
-    id: 5,
-    name: 'jenkins@ci-server',
-    username: 'jenkins',
-    authType: 'password',
-    createdAt: '2024-01-16',
-  },
-  {
-    id: 6,
-    name: 'gitlab@runner',
-    username: 'gitlab-runner',
-    authType: 'private_key',
-    createdAt: '2024-01-15',
-  },
-  {
-    id: 7,
-    name: 'mysql@db-server',
-    username: 'mysql',
-    authType: 'password',
-    createdAt: '2024-01-14',
-  },
-  {
-    id: 8,
-    name: 'nginx@web-server',
-    username: 'www-data',
-    authType: 'password',
-    createdAt: '2024-01-13',
-  },
-  {
-    id: 9,
-    name: 'redis@cache-server',
-    username: 'redis',
-    authType: 'password',
-    createdAt: '2024-01-12',
-  },
-  {
-    id: 10,
-    name: 'elastic@es-node',
-    username: 'elastic',
-    authType: 'private_key',
-    createdAt: '2024-01-11',
-  },
-]);
+const handleCopy = async (credential: model.Credential) => {
+  if (credential.authMethod === enums.AuthMethod.PASSWORD) {
+    try {
+      await navigator.clipboard.writeText(credential.password);
+      message.success('密码已复制到剪贴板');
+    } catch (err) {
+      message.error('复制失败');
+    }
+  }
+};
+
+const formatTime = (time: string) => {
+  return dayjs(time).format('YYYY-MM-DD HH:mm');
+};
+
+const creds = ref<model.Credential[]>();
+
+const fetchCredentials = async () => {
+  const resp = await ListCredential();
+  if (!resp.ok) {
+    message.error(resp.msg);
+  }
+  return resp.data;
+};
+
+onMounted(async () => {
+  const [credsData] = await Promise.all([fetchCredentials()]);
+  creds.value = credsData;
+});
 
 const themeVars = useThemeVars();
 </script>
@@ -324,5 +294,11 @@ const themeVars = useThemeVars();
       background-color: v-bind('themeVars.hoverColor');
     }
   }
+}
+
+.credential-empty {
+  margin: 120px auto;
+  width: 100%;
+  max-width: 800px;
 }
 </style>

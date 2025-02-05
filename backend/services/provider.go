@@ -8,4 +8,5 @@ var SetProvider = wire.NewSet(
 	GroupSrvSet,
 	ConnectionSrvSet,
 	MetadataSrvSet,
+	CredentialSrvSet,
 )

@@ -38,6 +38,10 @@ func NewApp() *App {
 		Logger: logger,
 		Query:  query,
 	}
+	credentialSrv := &services.CredentialSrv{
+		Logger: logger,
+		Query:  query,
+	}
 	app := &App{
 		HTTPListenerPort: httpListenerPort,
 		Logger:           logger,
@@ -46,6 +50,7 @@ func NewApp() *App {
 		GroupSrv:         groupSrv,
 		ConnectionSrv:    connectionSrv,
 		MetadataSrv:      metadataSrv,
+		CredentialSrv:    credentialSrv,
 	}
 	return app
 }
