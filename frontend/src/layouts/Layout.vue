@@ -10,7 +10,7 @@
       </n-layout-sider>
       <n-layout-content>
         <router-view v-slot="{ Component }">
-          <keep-alive :include="['Terminal']">
+          <keep-alive>
             <component :is="Component" />
           </keep-alive>
         </router-view>
