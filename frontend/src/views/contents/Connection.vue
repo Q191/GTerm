@@ -570,11 +570,12 @@ onUnmounted(() => {
       display: flex;
       align-items: center;
       gap: 4px;
+      margin-left: auto;
     }
   }
 
   .list-content {
-    padding: 2px 4px 2px 4px;
+    padding: 2px 4px;
     height: calc(100vh - 80px);
     overflow-y: auto;
     scroll-behavior: smooth;
@@ -615,11 +616,6 @@ onUnmounted(() => {
         transform: translate(-50%, -50%);
       }
     }
-  }
-
-  .list-footer {
-    padding: 6px;
-    border-top: 1px solid v-bind('themeVars.borderColor');
   }
 }
 
@@ -787,6 +783,7 @@ onUnmounted(() => {
       display: flex;
       gap: 4px;
       align-items: center;
+      margin-left: auto;
     }
 
     :deep(.n-tag) {

@@ -52,8 +52,8 @@
               />
             </n-form-item>
 
-            <div class="flex items-center w-full gap-2">
-              <n-form-item path="dataBits" class="flex-1">
+            <div class="form-row">
+              <n-form-item path="dataBits" class="form-item">
                 <n-select
                   v-model:value="formValue.dataBits"
                   :options="dataBitsOptions"
@@ -61,7 +61,7 @@
                 />
               </n-form-item>
 
-              <n-form-item path="stopBits" class="flex-1">
+              <n-form-item path="stopBits" class="form-item">
                 <n-select
                   v-model:value="formValue.stopBits"
                   :options="stopBitsOptions"
@@ -69,7 +69,7 @@
                 />
               </n-form-item>
 
-              <n-form-item path="parity" class="flex-1">
+              <n-form-item path="parity" class="form-item">
                 <n-select
                   v-model:value="formValue.parity"
                   :options="parityOptions"
@@ -80,8 +80,8 @@
           </template>
 
           <template v-if="formValue.connProtocol === enums.ConnProtocol.SSH">
-            <div class="flex items-center w-full gap-2">
-              <n-form-item path="host" class="flex-1">
+            <div class="form-row">
+              <n-form-item path="host" class="form-item">
                 <n-input v-model:value="formValue.host" clearable :placeholder="$t('connDialog.placeholder.host')" />
               </n-form-item>
               <n-form-item path="port" class="port-input">
@@ -96,7 +96,7 @@
             </div>
 
             <n-form-item :label="$t('connDialog.authType')" path="credential.authMethod">
-              <div class="flex items-center justify-between w-full">
+              <div class="auth-type-container">
                 <n-button-group>
                   <n-button
                     :type="
@@ -568,28 +568,30 @@ const resetForm = () => {
 </script>
 
 <style lang="less" scoped>
-:deep(.n-form-item .n-form-item-label) {
-  font-size: 13px;
+.form-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+
+  .form-item {
+    flex: 1;
+  }
 }
 
-:deep(.n-input) {
-  font-size: 13px;
-}
-
-.tooltip-text {
-  white-space: pre-line;
+.auth-type-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .port-input {
-  width: 140px;
-  flex-shrink: 0;
+  width: 120px;
+}
 
-  :deep(.n-input-number) {
-    width: 100%;
-  }
-
-  :deep(.n-form-item-label) {
-    width: 40px !important;
-  }
+.tooltip-text {
+  font-size: 12px;
+  line-height: 1.5;
 }
 </style>

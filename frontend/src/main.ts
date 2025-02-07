@@ -4,7 +4,6 @@ import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './App.vue';
 import '@/styles/basic.less';
-import 'tailwindcss/tailwind.css';
 
 async function setupApp() {
   const app = createApp(App);

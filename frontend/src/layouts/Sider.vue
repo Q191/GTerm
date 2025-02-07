@@ -1,10 +1,10 @@
 <template>
-  <div class="flex flex-col h-full menu-background">
-    <div class="flex-grow flex flex-col items-center pt-2">
+  <div class="sider-container menu-background">
+    <div class="top-menu">
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
-            class="w-11 h-[38px] mb-1 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer top-menu-item"
+            class="menu-item top-menu-item"
             :class="{ active: selectedKey === 'Connection' }"
             @click="handleSelect('Connection')"
           >
@@ -19,7 +19,7 @@
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
           <div
-            class="w-11 h-[38px] mb-1 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer top-menu-item"
+            class="menu-item top-menu-item"
             :class="{ active: selectedKey === 'Credential' }"
             @click="handleSelect('Credential')"
           >
@@ -32,7 +32,7 @@
       </n-tooltip>
     </div>
 
-    <div class="pb-2 flex flex-col justify-center items-center">
+    <div class="bottom-menu">
       <n-dropdown
         :options="[
           {
@@ -58,9 +58,7 @@
       >
         <n-tooltip placement="right" trigger="hover">
           <template #trigger>
-            <div
-              class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer bottom-menu-item"
-            >
+            <div class="menu-item bottom-menu-item">
               <n-icon size="x-large">
                 <icon icon="ph:gear-six" />
               </n-icon>
@@ -72,10 +70,7 @@
 
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
-          <div
-            class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer bottom-menu-item"
-            @click="toggleTheme"
-          >
+          <div class="menu-item bottom-menu-item" @click="toggleTheme">
             <n-icon size="x-large">
               <icon :icon="prefStore.isDark ? 'ph:sun' : 'ph:moon'" />
             </n-icon>
@@ -86,10 +81,7 @@
 
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
-          <div
-            class="w-11 h-9 mt-2 flex justify-center items-center hover:bg-custom-hover rounded cursor-pointer bottom-menu-item"
-            @click="openGithub"
-          >
+          <div class="menu-item bottom-menu-item" @click="openGithub">
             <n-icon size="x-large">
               <icon icon="ph:github-logo" />
             </n-icon>
@@ -159,15 +151,45 @@ const openGithub = () => {
 </script>
 
 <style lang="less" scoped>
-.menu-background {
-  height: calc(100vh - 38px);
+.sider-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-.hover\:bg-custom-hover:hover {
-  background-color: v-bind('themeVars.hoverColor');
+.top-menu {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.bottom-menu {
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-item {
+  width: 44px;
+  height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: v-bind('themeVars.hoverColor');
+  }
 }
 
 .top-menu-item {
+  margin-bottom: 4px;
+
   &:hover {
     color: v-bind('themeVars.primaryColor');
   }
@@ -191,8 +213,15 @@ const openGithub = () => {
 }
 
 .bottom-menu-item {
+  height: 36px;
+  margin-top: 8px;
+
   &:hover {
     color: v-bind('themeVars.primaryColor');
   }
+}
+
+.menu-background {
+  height: calc(100vh - 38px);
 }
 </style>

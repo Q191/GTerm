@@ -1,5 +1,5 @@
 <template>
-  <n-layout class="h-screen">
+  <n-layout class="layout-container">
     <n-layout-header bordered>
       <Header ref="headerRef" />
     </n-layout-header>
@@ -35,3 +35,9 @@ provide(
   computed(() => headerRef.value?.connectionTabsRef),
 );
 </script>
+
+<style lang="less" scoped>
+.layout-container {
+  height: 100vh;
+}
+</style>

@@ -1,23 +1,23 @@
 <template>
-  <div class="connection-tabs flex items-center h-10">
+  <div class="connection-tabs">
     <div
       v-for="tab in tabs"
       :key="tab.id"
-      class="tab-item flex items-center px-3 h-10 cursor-pointer relative"
+      class="tab-item"
       :class="{ active: tab.id === activeTab }"
       @click="switchTab(tab.id)"
     >
-      <div class="status-dot mr-1" :class="tabStatus[tab.id]" />
-      <n-icon size="16" class="mr-1 flex-shrink-0">
+      <div class="status-dot" :class="tabStatus[tab.id]" />
+      <n-icon size="16" class="terminal-icon">
         <icon icon="ph:terminal-duotone" />
       </n-icon>
       <n-tooltip trigger="hover">
         <template #trigger>
-          <span class="text-sm tab-label">{{ tab.label }}</span>
+          <span class="tab-label">{{ tab.label }}</span>
         </template>
         {{ tab.label }}
       </n-tooltip>
-      <n-button circle text size="tiny" class="ml-1 close-btn flex-shrink-0" @click.stop="closeTab(tab.id)">
+      <n-button circle text size="tiny" class="close-btn" @click.stop="closeTab(tab.id)">
         <template #icon>
           <icon icon="ph:x-bold" />
         </template>
@@ -87,6 +87,10 @@ defineExpose({
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  display: flex;
+  align-items: center;
+  height: 40px;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -100,6 +104,9 @@ defineExpose({
   align-items: center;
   width: 160px;
   min-width: 160px;
+  height: 40px;
+  padding: 0 12px;
+  cursor: pointer;
 
   .tab-label {
     overflow: hidden;
@@ -107,6 +114,7 @@ defineExpose({
     white-space: nowrap;
     flex: 1;
     color: v-bind('themeVars.textColorBase');
+    font-size: 14px;
   }
 
   &:hover {
@@ -120,10 +128,17 @@ defineExpose({
   .close-btn {
     opacity: 0;
     transition: opacity 0.2s;
+    margin-left: 4px;
+    flex-shrink: 0;
   }
 
   &:hover .close-btn {
     opacity: 1;
+  }
+
+  .terminal-icon {
+    margin-right: 4px;
+    flex-shrink: 0;
   }
 }
 
@@ -131,6 +146,7 @@ defineExpose({
   width: 6px;
   height: 6px;
   border-radius: 50%;
+  margin-right: 4px;
 
   &.connected {
     background-color: v-bind('themeVars.successColor');

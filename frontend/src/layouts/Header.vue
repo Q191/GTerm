@@ -1,22 +1,22 @@
 <template>
-  <div ref="widthRef" class="flex items-center justify-between h-12 header rounded-t-lg">
+  <div ref="widthRef" class="header">
     <div
-      class="flex items-center absolute transition-all duration-300 ease-in-out"
+      class="logo-container"
       :class="{
-        'pl-2': !isDarwin,
-        'pl-20': isDarwin,
-        'left-1/2 -translate-x-1/2': !hasConnections,
-        'left-0 translate-x-0': hasConnections,
+        'padding-left-small': !isDarwin,
+        'padding-left-large': isDarwin,
+        'center-position': !hasConnections,
+        'left-position': hasConnections,
       }"
     >
-      <div class="flex items-center" @click="toConnection">
-        <img src="@/assets/images/icon.png" alt="Logo" class="w-6 h-6" />
-        <span class="pl-2 text-base font-semibold" :class="{ hidden: hasConnections }">GTerm</span>
+      <div class="logo-wrapper" @click="toConnection">
+        <img src="@/assets/images/icon.png" alt="Logo" class="logo-image" />
+        <span class="app-title" :class="{ hidden: hasConnections }">GTerm</span>
       </div>
-      <ConnectionTabs v-if="hasConnections" ref="connectionTabsRef" class="ml-4" />
+      <ConnectionTabs v-if="hasConnections" ref="connectionTabsRef" class="connection-tabs-container" />
     </div>
 
-    <div v-if="!isDarwin" class="flex items-center ml-auto">
+    <div v-if="!isDarwin" class="window-controls">
       <div class="window-control-btn" @click="WindowMinimise">
         <n-icon size="16"><icon icon="ph:minus-bold" /></n-icon>
       </div>
@@ -26,7 +26,7 @@
           <span v-else><icon icon="ph:corners-out-bold" /></span>
         </n-icon>
       </div>
-      <div class="window-control-btn close-btn rounded-tr-lg" @click="Quit">
+      <div class="window-control-btn close-btn" @click="Quit">
         <n-icon size="16"><icon icon="ph:x-bold" /></n-icon>
       </div>
     </div>
@@ -81,6 +81,66 @@ onMounted(async () => {
   --wails-draggable: drag;
   width: 100%;
   height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.logo-container {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+
+  &.padding-left-small {
+    padding-left: 8px;
+  }
+
+  &.padding-left-large {
+    padding-left: 80px;
+  }
+
+  &.center-position {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &.left-position {
+    left: 0;
+    transform: translateX(0);
+  }
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.logo-image {
+  width: 24px;
+  height: 24px;
+}
+
+.app-title {
+  padding-left: 8px;
+  font-size: 14px;
+  font-weight: 600;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.connection-tabs-container {
+  margin-left: 16px;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 .window-control-btn {
@@ -95,12 +155,14 @@ onMounted(async () => {
   &:hover {
     background-color: rgba(0, 0, 0, 0.06);
   }
-}
 
-.close-btn {
-  &:hover {
-    background-color: #e54d42;
-    color: #fff;
+  &.close-btn {
+    border-top-right-radius: 8px;
+
+    &:hover {
+      background-color: #e54d42;
+      color: #fff;
+    }
   }
 }
 </style>
