@@ -33,17 +33,64 @@
           </div>
         </div>
         <div class="list-content">
-          <n-tree
-            block-line
-            :data="treeData"
-            :pattern="searchText"
-            :show-irrelevant-nodes="false"
-            :selected-keys="selectedKeys"
-            :expanded-keys="expandedKeys"
-            :node-props="nodeProps"
-            @update:selected-keys="handleSelect"
-            @update:expanded-keys="handleExpand"
-          />
+          <!-- 资产列表部分 -->
+          <div class="section-header">
+            <div class="section-title">资产列表</div>
+            <n-button text size="tiny" @click="assetListCollapsed = !assetListCollapsed">
+              <template #icon>
+                <icon :icon="assetListCollapsed ? 'ph:caret-right' : 'ph:caret-down'" />
+              </template>
+            </n-button>
+          </div>
+          <div class="asset-list" v-show="!assetListCollapsed">
+            <div
+              v-for="conn in filteredAssets"
+              :key="conn.id"
+              class="asset-item"
+              @click="handleSelectConn(conn)"
+              @contextmenu="handleConnContextMenu($event, conn)"
+            >
+              <div class="asset-icon">
+                <icon :icon="getDeviceIcon(conn)" />
+              </div>
+              <div class="asset-info">
+                <div class="asset-name">{{ conn.label }}</div>
+              </div>
+              <div class="asset-tags">
+                <n-tag v-if="getConnCount(conn) > 0" size="tiny" type="success">{{ getConnCount(conn) }}</n-tag>
+                <n-tag v-if="getErrorConnCount(conn) > 0" size="tiny" type="error">{{ getErrorConnCount(conn) }}</n-tag>
+              </div>
+            </div>
+          </div>
+
+          <!-- 分组列表部分 -->
+          <div class="section-header">
+            <div class="section-title">资产分组</div>
+            <n-button text size="tiny" @click="groupListCollapsed = !groupListCollapsed">
+              <template #icon>
+                <icon :icon="groupListCollapsed ? 'ph:caret-right' : 'ph:caret-down'" />
+              </template>
+            </n-button>
+          </div>
+          <div class="group-list" v-show="!groupListCollapsed">
+            <div
+              v-for="group in filteredGroups"
+              :key="group.id"
+              class="group-item"
+              :class="{ active: selectedGroup?.id === group.id }"
+              @click="handleSelectGroup(group)"
+              @contextmenu="handleGroupContextMenu($event, group)"
+            >
+              <div class="group-icon">
+                <icon :icon="getGroupConnCount(group) > 0 ? 'ph:folders-duotone' : 'ph:folder-dashed-duotone'" />
+              </div>
+              <div class="group-info">
+                <div class="group-name">{{ group.name }}</div>
+              </div>
+              <div class="group-count">{{ getGroupConnCount(group) }}</div>
+            </div>
+          </div>
+
           <n-dropdown
             trigger="manual"
             placement="bottom-start"
@@ -65,14 +112,6 @@
         <div class="header-left">
           <h2>{{ selectedGroup ? selectedGroup.name : $t('sider.assets') }}</h2>
           <n-badge :value="filteredConns.length" show-zero type="success" />
-        </div>
-        <div class="header-right">
-          <n-button v-if="selectedGroup" text @click="handleSelect([])">
-            <template #icon>
-              <icon icon="ph:arrow-left" />
-            </template>
-            {{ $t('connection.back') }}
-          </n-button>
         </div>
       </div>
 
@@ -147,7 +186,7 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NTag, NTooltip, NTree, NDropdown, NResult, NBadge, NInput, useMessage, useThemeVars } from 'naive-ui';
+import { NButton, NTag, NTooltip, NDropdown, NResult, NBadge, NInput, useMessage, useThemeVars } from 'naive-ui';
 import type { DropdownOption } from 'naive-ui';
 import { useDialogStore } from '@/stores/dialog';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
@@ -168,15 +207,15 @@ const groups = ref<model.Group[]>();
 const conns = ref<model.Connection[]>();
 const selectedGroup = ref<model.Group | null>(null);
 
-const selectedKeys = ref<string[]>([]);
-const expandedKeys = ref<string[]>([]);
-
 const showDropdown = ref(false);
 const dropdownX = ref(0);
 const dropdownY = ref(0);
 const dropdownOptions = ref<DropdownOption[]>([]);
 
 const searchText = ref('');
+
+const assetListCollapsed = ref(false);
+const groupListCollapsed = ref(false);
 
 const updateDropdownOptions = (type: 'group' | 'conn') => {
   if (type === 'group') {
@@ -209,38 +248,6 @@ const updateDropdownOptions = (type: 'group' | 'conn') => {
 };
 
 const currentContextNode = ref<any>(null);
-
-const nodeProps = ({ option }: { option: any }) => {
-  return {
-    onClick() {
-      if (option.key.startsWith('group-')) {
-        const groupId = parseInt(option.key.replace('group-', ''));
-        const group = groups.value?.find(g => g.id === groupId);
-        if (group) {
-          const groupConns = conns.value?.filter(conn => conn.groupID === group.id) || [];
-          if (groupConns.length > 0) {
-            selectedGroup.value = group;
-            selectedKeys.value = [option.key];
-          }
-        }
-      }
-    },
-    onContextmenu(e: MouseEvent) {
-      currentContextNode.value = option;
-      dropdownX.value = e.clientX;
-      dropdownY.value = e.clientY;
-      showDropdown.value = true;
-
-      if (option.key.startsWith('group-')) {
-        updateDropdownOptions('group');
-      } else if (option.key.startsWith('conn-')) {
-        updateDropdownOptions('conn');
-      }
-
-      e.preventDefault();
-    },
-  };
-};
 
 const handleDropdownSelect = async (key: string) => {
   showDropdown.value = false;
@@ -276,88 +283,6 @@ const handleClickoutside = () => {
   showDropdown.value = false;
 };
 
-const treeData = computed(() => {
-  if (!groups.value) return [];
-
-  const treeNodes = [];
-
-  treeNodes.push(
-    ...groups.value.map(group => {
-      const groupConns = conns.value?.filter(conn => conn.groupID === group.id) || [];
-      const isEmpty = groupConns.length === 0;
-      return {
-        key: `group-${group.id}`,
-        label: group.name,
-        children: isEmpty
-          ? undefined
-          : groupConns.map(conn => ({
-              key: `conn-${conn.id}`,
-              label: conn.label,
-              isLeaf: true,
-              prefix: () =>
-                h(Icon, {
-                  icon: getDeviceIcon(conn),
-                  style: {
-                    fontSize: '1.2rem',
-                  },
-                }),
-            })),
-        isLeaf: isEmpty,
-        prefix: () => {
-          const expanded = expandedKeys.value.includes(`group-${group.id}`);
-          return h(Icon, {
-            icon: isEmpty ? 'ph:folder-dashed-duotone' : expanded ? 'ph:folder-open-duotone' : 'ph:folders-duotone',
-            style: { fontSize: '1.2rem' },
-          });
-        },
-      };
-    }),
-  );
-
-  const ungroupedConns = conns.value?.filter(conn => !conn.groupID) || [];
-  if (ungroupedConns.length > 0) {
-    treeNodes.push(
-      ...ungroupedConns.map(conn => ({
-        key: `conn-${conn.id}`,
-        label: conn.label,
-        isLeaf: true,
-        prefix: () =>
-          h(Icon, {
-            icon: getDeviceIcon(conn),
-            style: {
-              fontSize: '1.2rem',
-            },
-          }),
-      })),
-    );
-  }
-
-  return treeNodes;
-});
-
-const handleSelect = (keys: string[]) => {
-  if (keys.length > 0) {
-    const key = keys[0];
-    if (key.startsWith('conn-')) {
-      const connId = parseInt(key.replace('conn-', ''));
-      const conn = conns.value?.find(h => h.id === connId);
-      if (conn) {
-        toTerminal(conn);
-      }
-    } else if (key.startsWith('group-')) {
-      const groupId = parseInt(key.replace('group-', ''));
-      const group = groups.value?.find(g => g.id === groupId);
-      if (group) {
-        selectedGroup.value = group;
-        selectedKeys.value = keys;
-      }
-    }
-  } else {
-    selectedGroup.value = null;
-    selectedKeys.value = [];
-  }
-};
-
 const filteredConns = computed(() => {
   if (!selectedGroup.value) return conns.value || [];
   return conns.value?.filter(conn => conn.groupID === selectedGroup.value?.id) || [];
@@ -384,11 +309,6 @@ const toTerminal = (conn: model.Connection) => {
 const handleEditConn = (event: MouseEvent, conn: model.Connection) => {
   event.preventDefault();
   dialogStore.openConnDialog(true, conn);
-};
-
-const handleEditGroup = (event: MouseEvent) => {
-  event.preventDefault();
-  dialogStore.openGroupDialog();
 };
 
 const fetchGroups = async () => {
@@ -478,10 +398,6 @@ const getProtocolIcon = (conn: model.Connection) => {
   }
 };
 
-const handleExpand = (keys: string[]) => {
-  expandedKeys.value = keys;
-};
-
 const themeVars = useThemeVars();
 
 const sidebarRef = ref<HTMLElement | null>(null);
@@ -533,6 +449,56 @@ onUnmounted(() => {
     sidebarWidth.value = e.detail;
   }) as EventListener);
 });
+
+const filteredAssets = computed(() => {
+  if (!searchText.value) return conns.value || [];
+  return (
+    conns.value?.filter(
+      conn =>
+        conn.label.toLowerCase().includes(searchText.value.toLowerCase()) ||
+        conn.host?.toLowerCase().includes(searchText.value.toLowerCase()),
+    ) || []
+  );
+});
+
+const filteredGroups = computed(() => {
+  if (!searchText.value) return groups.value || [];
+  return groups.value?.filter(group => group.name.toLowerCase().includes(searchText.value.toLowerCase())) || [];
+});
+
+const getGroupConnCount = (group: model.Group) => {
+  return conns.value?.filter(conn => conn.groupID === group.id).length || 0;
+};
+
+const handleSelectConn = (conn: model.Connection) => {
+  toTerminal(conn);
+};
+
+const handleSelectGroup = (group: model.Group | null) => {
+  if (selectedGroup.value?.id === group?.id) {
+    selectedGroup.value = null;
+  } else {
+    selectedGroup.value = group;
+  }
+};
+
+const handleConnContextMenu = (event: MouseEvent, conn: model.Connection) => {
+  event.preventDefault();
+  dropdownX.value = event.clientX;
+  dropdownY.value = event.clientY;
+  showDropdown.value = true;
+  currentContextNode.value = { key: `conn-${conn.id}` };
+  updateDropdownOptions('conn');
+};
+
+const handleGroupContextMenu = (event: MouseEvent, group: model.Group) => {
+  event.preventDefault();
+  dropdownX.value = event.clientX;
+  dropdownY.value = event.clientY;
+  showDropdown.value = true;
+  currentContextNode.value = { key: `group-${group.id}` };
+  updateDropdownOptions('group');
+};
 </script>
 
 <style lang="less" scoped>
@@ -643,18 +609,6 @@ onUnmounted(() => {
         font-weight: 600;
         color: v-bind('themeVars.textColorBase');
         margin: 0;
-      }
-    }
-
-    .header-right {
-      :deep(.n-button) {
-        font-size: 13px;
-        color: v-bind('themeVars.textColor3');
-        transition: color 0.2s ease;
-
-        &:hover {
-          color: v-bind('themeVars.primaryColor');
-        }
       }
     }
   }
@@ -819,5 +773,102 @@ onUnmounted(() => {
   margin-left: -2px;
   border-right: 1px solid v-bind('themeVars.borderColor');
   background: transparent;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 4px;
+
+  .section-title {
+    padding: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: v-bind('themeVars.textColor3');
+  }
+
+  :deep(.n-button) {
+    width: 16px;
+    height: 16px;
+    color: v-bind('themeVars.textColor3');
+
+    .n-button__icon {
+      font-size: 14px;
+    }
+  }
+}
+
+.asset-list,
+.group-list {
+  .asset-item,
+  .group-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    margin: 0 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: v-bind('`${themeVars.primaryColor}10`');
+    }
+
+    .asset-icon,
+    .group-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: v-bind('`${themeVars.primaryColor}20`');
+      color: v-bind('themeVars.primaryColor');
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .asset-info,
+    .group-info {
+      flex: 1;
+      min-width: 0;
+      margin-left: 6px;
+
+      .asset-name,
+      .group-name {
+        font-size: 12px;
+        font-weight: 500;
+        color: v-bind('themeVars.textColorBase');
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .asset-tags {
+      display: flex;
+      gap: 4px;
+      margin-left: 6px;
+    }
+
+    .group-count {
+      font-size: 12px;
+      color: v-bind('themeVars.textColor3');
+      margin-left: 6px;
+      min-width: 16px;
+      text-align: right;
+    }
+  }
+
+  .group-item {
+    &.active {
+      background: v-bind('`${themeVars.primaryColor}20`');
+
+      .group-name {
+        color: v-bind('themeVars.primaryColor');
+      }
+    }
+  }
 }
 </style>
