@@ -825,7 +825,7 @@ const handleGroupContextMenu = (event: MouseEvent, group: model.Group) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 16px;
       flex-shrink: 0;
     }
 
@@ -837,8 +837,7 @@ const handleGroupContextMenu = (event: MouseEvent, group: model.Group) => {
 
       .asset-name,
       .group-name {
-        font-size: 12px;
-        font-weight: 500;
+        font-size: 14px;
         color: v-bind('themeVars.textColorBase');
         white-space: nowrap;
         overflow: hidden;
