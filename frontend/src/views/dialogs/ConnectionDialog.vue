@@ -100,7 +100,7 @@
                 <n-button-group>
                   <n-button
                     :type="
-                      !formValue.isCommonCredential && formValue.credential?.authMethod === enums.AuthMethod.PASSWORD
+                      !formValue.useCommonCredential && formValue.credential?.authMethod === enums.AuthMethod.PASSWORD
                         ? 'primary'
                         : 'default'
                     "
@@ -113,7 +113,7 @@
                   </n-button>
                   <n-button
                     :type="
-                      !formValue.isCommonCredential && formValue.credential?.authMethod === enums.AuthMethod.PRIVATEKEY
+                      !formValue.useCommonCredential && formValue.credential?.authMethod === enums.AuthMethod.PRIVATEKEY
                         ? 'primary'
                         : 'default'
                     "
@@ -125,7 +125,7 @@
                     {{ $t('connDialog.privateKey') }}
                   </n-button>
                   <n-button
-                    :type="formValue.isCommonCredential ? 'primary' : 'default'"
+                    :type="formValue.useCommonCredential ? 'primary' : 'default'"
                     @click="handleCredentialTypeChange(CredentialType.Common)"
                   >
                     <template #icon>
@@ -134,23 +134,10 @@
                     {{ $t('connDialog.commonCredentialLib') }}
                   </n-button>
                 </n-button-group>
-                <n-tooltip
-                  v-if="!formValue.isCommonCredential && formValue.credential"
-                  trigger="hover"
-                  placement="right"
-                >
-                  <template #trigger>
-                    <n-switch v-model:value="formValue.credential.isCommonCredential">
-                      <template #checked>{{ $t('connDialog.commonCredential') }}</template>
-                      <template #unchecked>{{ $t('connDialog.privateCredential') }}</template>
-                    </n-switch>
-                  </template>
-                  <span class="tooltip-text">{{ $t('connDialog.credentialTooltip') }}</span>
-                </n-tooltip>
               </div>
             </n-form-item>
 
-            <template v-if="formValue.isCommonCredential">
+            <template v-if="formValue.useCommonCredential">
               <n-form-item path="credentialID">
                 <n-select
                   v-model:value="formValue.credentialID"
@@ -163,16 +150,6 @@
             </template>
 
             <template v-else>
-              <template v-if="formValue.credential!.isCommonCredential">
-                <n-form-item path="credential.label">
-                  <n-input
-                    v-model:value="formValue.credential!.label"
-                    clearable
-                    :placeholder="$t('connDialog.placeholder.credentialLabel')"
-                  />
-                </n-form-item>
-              </template>
-
               <n-form-item path="credential.username">
                 <n-input
                   v-model:value="formValue.credential!.username"
@@ -250,8 +227,6 @@ import {
   NTabPane,
   NTabs,
   useMessage,
-  NSwitch,
-  NTooltip,
   NEmpty,
 } from 'naive-ui';
 import { SelectMixedOption } from 'naive-ui/es/select/src/interface';
@@ -293,7 +268,7 @@ const defaultConnection = {
   serialPort: null,
   connProtocol: null,
   credentialID: null,
-  isCommonCredential: false,
+  useCommonCredential: false,
   groupID: null,
   baudRate: 9600,
   dataBits: 8,
@@ -310,7 +285,7 @@ const createCredential = (authMethod: enums.AuthMethod) =>
 const createConnection = (isCommon = false) => {
   const conn = model.Connection.createFrom({
     ...defaultConnection,
-    isCommonCredential: isCommon,
+    useCommonCredential: isCommon,
   });
   if (!isCommon) {
     conn.credential = createCredential(enums.AuthMethod.PASSWORD);
@@ -333,14 +308,14 @@ watch(
   newConnection => {
     if (newConnection) {
       formValue.value = model.Connection.createFrom(newConnection);
-      if (newConnection.credential && !newConnection.isCommonCredential) {
+      if (newConnection.credential && !newConnection.useCommonCredential) {
         if (newConnection.credential.authMethod === enums.AuthMethod.PASSWORD) {
           tempCachedCredentials.value.password = model.Credential.createFrom(newConnection.credential);
         } else if (newConnection.credential.authMethod === enums.AuthMethod.PRIVATEKEY) {
           tempCachedCredentials.value.privateKey = model.Credential.createFrom(newConnection.credential);
         }
       }
-      useCommonCredential.value = newConnection.isCommonCredential;
+      useCommonCredential.value = newConnection.useCommonCredential;
       return;
     }
     formValue.value = createConnection();
@@ -355,12 +330,12 @@ watch(
 const handleCredentialTypeChange = (credentialType: number) => {
   if (credentialType === CredentialType.Common) {
     // 切换到凭据库模式
-    formValue.value.isCommonCredential = true;
+    formValue.value.useCommonCredential = true;
     formValue.value.credentialID = undefined;
     return;
   }
   // 切换到密码或私钥认证
-  formValue.value.isCommonCredential = false;
+  formValue.value.useCommonCredential = false;
   formValue.value.credentialID = undefined;
   formValue.value.credential =
     credentialType === CredentialType.Password
@@ -376,7 +351,7 @@ const handleSelectCredential = async (id: number) => {
     return;
   }
   formValue.value.credentialID = id;
-  formValue.value.isCommonCredential = true;
+  formValue.value.useCommonCredential = true;
 };
 
 const baudRateOptions = [
@@ -460,30 +435,25 @@ const rules = computed<FormRules>(() => ({
     trigger: ['blur', 'change'],
   },
   'credential.username': {
-    required: !formValue.value.isCommonCredential,
+    required: !formValue.value.useCommonCredential,
     message: t('connDialog.validation.usernameRequired'),
     trigger: 'blur',
   },
   'credential.password': {
     required:
-      !formValue.value.isCommonCredential && formValue.value.credential?.authMethod === enums.AuthMethod.PASSWORD,
+      !formValue.value.useCommonCredential && formValue.value.credential?.authMethod === enums.AuthMethod.PASSWORD,
     message: t('connDialog.validation.passwordRequired'),
     trigger: 'blur',
   },
   'credential.privateKey': {
     required:
-      !formValue.value.isCommonCredential && formValue.value.credential?.authMethod === enums.AuthMethod.PRIVATEKEY,
+      !formValue.value.useCommonCredential && formValue.value.credential?.authMethod === enums.AuthMethod.PRIVATEKEY,
     message: t('connDialog.validation.privateKeyRequired'),
     trigger: 'blur',
   },
   credentialID: {
-    required: formValue.value.isCommonCredential,
+    required: formValue.value.useCommonCredential,
     message: t('connDialog.validation.credentialRequired'),
-    trigger: ['blur', 'change'],
-  },
-  'credential.label': {
-    required: formValue.value.credential?.isCommonCredential,
-    message: t('connDialog.validation.credentialLabelRequired'),
     trigger: ['blur', 'change'],
   },
 }));

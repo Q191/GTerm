@@ -14,7 +14,7 @@ type Connection struct {
 	ConnProtocol       enums.ConnProtocol `gorm:"not null" json:"connProtocol"`
 	CredentialID       *uint              `gorm:"not null" json:"credentialID"`
 	Credential         *Credential        `json:"credential"`
-	IsCommonCredential bool               `gorm:"not null" json:"isCommonCredential"`
+	UseCommonCredential bool               `gorm:"not null" json:"useCommonCredential"`
 	Metadata           *Metadata          `json:"metadata"`
 	GroupID            *uint              `json:"groupID"`
 	BaudRate           int                `json:"baudRate"`

@@ -19,6 +19,7 @@ type ConnectionSrv struct {
 func (s *ConnectionSrv) CreateConnection(conn *model.Connection) *resp.Resp {
 	if err := s.Query.Transaction(func(tx *query.Query) error {
 		if conn.CredentialID == nil && conn.Credential != nil {
+			conn.Credential.IsCommonCredential = false
 			conn.Credential.Label = uuid.New().String()
 			if err := tx.Credential.Create(conn.Credential); err != nil {
 				return err
@@ -54,7 +55,7 @@ func (s *ConnectionSrv) DeleteConnection(id uint) *resp.Resp {
 		if err != nil {
 			return err
 		}
-		if !conn.IsCommonCredential && conn.CredentialID != nil {
+		if !conn.UseCommonCredential && conn.CredentialID != nil {
 			if _, err = tx.Credential.Where(tx.Credential.ID.Eq(*conn.CredentialID)).Unscoped().Delete(); err != nil {
 				return err
 			}
