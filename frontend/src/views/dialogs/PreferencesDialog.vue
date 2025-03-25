@@ -7,7 +7,7 @@
     :negative-text="$t('preferencesDialog.cancel')"
     :positive-text="$t('preferencesDialog.confirm')"
     preset="dialog"
-    style="width: 650px"
+    style="width: 600px"
     :title="$t('preferencesDialog.title')"
     transform-origin="center"
     @positive-click="handleSubmit"
@@ -123,7 +123,6 @@ const handleSubmit = () => {
   height: 90px;
   border-radius: 8px;
   overflow: hidden;
-  border: 2px solid transparent;
   transition: border-color 0.2s;
 }
 

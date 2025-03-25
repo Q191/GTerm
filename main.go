@@ -26,9 +26,9 @@ func main() {
 	if err := wails.Run(&options.App{
 		Title:     consts.ApplicationName,
 		Width:     1200,
-		Height:    760,
-		MinWidth:  800,
-		MinHeight: 600,
+		Height:    800,
+		MinWidth:  1024,
+		MinHeight: 768,
 		Frameless: !app.PreferencesSrv.IsDarwin(),
 		AssetServer: &assetserver.Options{
 			Assets: assets,

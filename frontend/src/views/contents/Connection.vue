@@ -12,7 +12,7 @@
           <div class="header-right">
             <n-tooltip trigger="hover">
               <template #trigger>
-                <n-button text size="large" @click="dialogStore.openGroupDialog">
+                <n-button text size="large" @click="handleAddGroup">
                   <template #icon>
                     <icon icon="ph:folder-plus" />
                   </template>
@@ -22,7 +22,7 @@
             </n-tooltip>
             <n-tooltip trigger="hover">
               <template #trigger>
-                <n-button text size="large" @click="dialogStore.openConnDialog()">
+                <n-button text size="large" @click="handleAddConn">
                   <template #icon>
                     <icon icon="ph:plus" />
                   </template>
@@ -132,7 +132,7 @@
                 </div>
               </div>
             </div>
-            <n-button circle text size="small" class="edit-btn" @click.stop="handleEditConn($event, conn)">
+            <n-button circle text size="small" class="edit-btn" @click.stop="handleEditConn(conn)">
               <template #icon>
                 <icon icon="ph:pencil-simple" class="edit-icon" />
               </template>
@@ -181,6 +181,19 @@
         />
       </div>
     </div>
+
+    <connection-dialog
+      v-model:show="showConnDialog"
+      :is-edit="isEditConn"
+      :connection="editConnection"
+      @success="handleConnSuccess"
+    />
+    <group-dialog
+      v-model:show="showGroupDialog"
+      :is-edit="isEditGroup"
+      :group="editGroup"
+      @success="handleGroupSuccess"
+    />
   </div>
 </template>
 
@@ -188,7 +201,6 @@
 import { Icon } from '@iconify/vue';
 import { NButton, NTag, NTooltip, NDropdown, NResult, NBadge, NInput, useMessage, useThemeVars } from 'naive-ui';
 import type { DropdownOption } from 'naive-ui';
-import { useDialogStore } from '@/stores/dialog';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
 import { ListConnection, DeleteConnection } from '@wailsApp/go/services/ConnectionSrv';
 import { enums, model } from '@wailsApp/go/models';
@@ -196,8 +208,9 @@ import { useConnectionStore } from '@/stores/connection';
 import { useRouter } from 'vue-router';
 import { h, ref, computed, onMounted, watch, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import ConnectionDialog from '@/views/dialogs/ConnectionDialog.vue';
+import GroupDialog from '@/views/dialogs/GroupDialog.vue';
 
-const dialogStore = useDialogStore();
 const router = useRouter();
 const message = useMessage();
 const connStore = useConnectionStore();
@@ -216,6 +229,16 @@ const searchText = ref('');
 
 const assetListCollapsed = ref(false);
 const groupListCollapsed = ref(false);
+
+// 对话框状态
+const showConnDialog = ref(false);
+const showGroupDialog = ref(false);
+const isEditConn = ref(false);
+const isEditGroup = ref(false);
+const editConnection = ref<model.Connection | undefined>(undefined);
+const editGroup = ref<model.Group | undefined>(undefined);
+
+const currentContextNode = ref<any>(null);
 
 const updateDropdownOptions = (type: 'group' | 'conn') => {
   if (type === 'group') {
@@ -247,8 +270,6 @@ const updateDropdownOptions = (type: 'group' | 'conn') => {
   }
 };
 
-const currentContextNode = ref<any>(null);
-
 const handleDropdownSelect = async (key: string) => {
   showDropdown.value = false;
   if (!currentContextNode.value) return;
@@ -257,14 +278,14 @@ const handleDropdownSelect = async (key: string) => {
 
   switch (key) {
     case 'edit-group':
-      dialogStore.openGroupDialog();
+      handleEditGroup();
       break;
     case 'delete-group':
       // TODO: 实现删除分组功能
       break;
     case 'edit-conn':
       const conn = conns.value?.find(h => h.id === connId);
-      if (conn) dialogStore.openConnDialog(true, conn);
+      if (conn) handleEditConn(conn);
       break;
     case 'delete-conn':
       const resp = await DeleteConnection(connId);
@@ -288,12 +309,6 @@ const filteredConns = computed(() => {
   return conns.value?.filter(conn => conn.groupID === selectedGroup.value?.id) || [];
 });
 
-watch([() => dialogStore.connDialogVisible, () => dialogStore.groupDialogVisible], ([connVisible, groupVisible]) => {
-  if (!connVisible || !groupVisible) {
-    fetchData();
-  }
-});
-
 const toTerminal = (conn: model.Connection) => {
   const connection = {
     id: Date.now(),
@@ -306,9 +321,36 @@ const toTerminal = (conn: model.Connection) => {
   router.push({ name: 'Terminal' });
 };
 
-const handleEditConn = (event: MouseEvent, conn: model.Connection) => {
-  event.preventDefault();
-  dialogStore.openConnDialog(true, conn);
+const handleEditConn = (conn: model.Connection) => {
+  isEditConn.value = true;
+  editConnection.value = conn;
+  showConnDialog.value = true;
+};
+
+const handleConnSuccess = () => {
+  fetchData();
+};
+
+const handleAddConn = () => {
+  isEditConn.value = false;
+  editConnection.value = undefined;
+  showConnDialog.value = true;
+};
+
+const handleAddGroup = () => {
+  isEditGroup.value = false;
+  editGroup.value = undefined;
+  showGroupDialog.value = true;
+};
+
+const handleEditGroup = () => {
+  isEditGroup.value = true;
+  editGroup.value = undefined;
+  showGroupDialog.value = true;
+};
+
+const handleGroupSuccess = () => {
+  fetchData();
 };
 
 const fetchGroups = async () => {

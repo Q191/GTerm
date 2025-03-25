@@ -19,6 +19,19 @@
     "commonCredential": "共享",
     "privateCredential": "私有",
     "credentialTooltip": "共享凭据：该认证信息将被添加至凭据库，可被其他连接复用\n私有凭据：仅当前连接可使用",
+    "label": "连接名称",
+    "group": "所属分组",
+    "connProtocol": "连接协议",
+    "serialPort": "串口设备",
+    "baudRate": "波特率",
+    "dataBits": "数据位",
+    "stopBits": "停止位",
+    "parity": "校验位",
+    "host": "主机地址",
+    "port": "端口号",
+    "username": "用户名",
+    "credential": "凭据信息",
+    "passphrase": "密钥口令",
     "placeholder": {
       "label": "请输入连接名称",
       "credentialLabel": "请输入凭据名称",
@@ -51,7 +64,8 @@
       "baudRateRequired": "请选择波特率",
       "dataBitsRequired": "请选择数据位",
       "stopBitsRequired": "请选择停止位",
-      "parityRequired": "请选择校验位"
+      "parityRequired": "请选择校验位",
+      "connProtocolRequired": "请选择连接协议"
     }
   },
   "groupDialog": {
@@ -137,6 +151,31 @@
     "connection": {
       "active": "活跃会话",
       "disconnected": "已断开"
+    }
+  },
+  "credentialDialog": {
+    "title": "添加凭据",
+    "editTitle": "编辑凭据",
+    "label": "名称",
+    "authType": "认证类型",
+    "username": "用户名",
+    "password": "密码",
+    "privateKey": "私钥",
+    "passphrase": "私钥密码",
+    "confirm": "确定",
+    "cancel": "取消",
+    "placeholder": {
+      "label": "请输入凭据名称",
+      "username": "请输入用户名",
+      "password": "请输入密码",
+      "privateKey": "请输入私钥",
+      "passphrase": "请输入私钥密码"
+    },
+    "validation": {
+      "labelRequired": "请输入凭据名称",
+      "usernameRequired": "请输入用户名",
+      "passwordRequired": "请输入密码",
+      "privateKeyRequired": "请输入私钥"
     }
   }
 }

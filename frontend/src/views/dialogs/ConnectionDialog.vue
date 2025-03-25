@@ -1,12 +1,12 @@
 <template>
   <n-modal
-    v-model:show="dialogStore.connDialogVisible"
-    :close-on-esc="true"
+    v-model:show="visible"
+    close-on-esc
     :negative-text="$t('connDialog.cancel')"
     :on-close="resetForm"
     :positive-text="$t('connDialog.confirm')"
     :show-icon="false"
-    :title="dialogStore.isEditMode ? $t('connDialog.editTitle') : $t('connDialog.title')"
+    :title="isEdit ? $t('connDialog.editTitle') : $t('connDialog.title')"
     preset="dialog"
     style="width: 600px"
     transform-origin="center"
@@ -14,185 +14,188 @@
   >
     <n-tabs animated type="line" placement="left" v-model:value="activeTab">
       <n-tab-pane name="basic" :tab="$t('connDialog.basicConfig')">
-        <n-form ref="formRef" :model="formValue" :rules="rules" :show-label="false">
-          <n-form-item path="label">
-            <n-input v-model:value="formValue.label" clearable :placeholder="$t('connDialog.placeholder.label')" />
-          </n-form-item>
+        <n-scrollbar style="max-height: 70vh; padding-right: 12px">
+          <n-form ref="formRef" :model="formValue" :rules="rules">
+            <n-form-item path="label" :label="$t('connDialog.label')">
+              <n-input v-model:value="formValue.label" clearable :placeholder="$t('connDialog.placeholder.label')" />
+            </n-form-item>
 
-          <n-form-item path="groupID">
-            <n-select
-              v-model:value="formValue.groupID"
-              :options="groupOptions"
-              :placeholder="$t('connDialog.placeholder.group')"
-            />
-          </n-form-item>
-
-          <n-form-item path="connProtocol">
-            <n-select
-              v-model:value="formValue.connProtocol"
-              :options="connProtocolOptions"
-              :placeholder="$t('connDialog.placeholder.connProtocol')"
-            />
-          </n-form-item>
-
-          <template v-if="formValue.connProtocol === enums.ConnProtocol.SERIAL">
-            <n-form-item path="serialPort">
+            <n-form-item path="groupID" :label="$t('connDialog.group')">
               <n-select
-                v-model:value="formValue.serialPort"
-                :options="serialPortsOptions"
-                :placeholder="$t('connDialog.placeholder.serialPort')"
+                v-model:value="formValue.groupID"
+                :options="groupOptions"
+                :placeholder="$t('connDialog.placeholder.group')"
               />
             </n-form-item>
 
-            <n-form-item path="baudRate">
+            <n-form-item path="connProtocol" :label="$t('connDialog.connProtocol')">
               <n-select
-                v-model:value="formValue.baudRate"
-                :options="baudRateOptions"
-                :placeholder="$t('connDialog.placeholder.baudRate')"
+                v-model:value="formValue.connProtocol"
+                :options="connProtocolOptions"
+                :placeholder="$t('connDialog.placeholder.connProtocol')"
               />
             </n-form-item>
 
-            <div class="form-row">
-              <n-form-item path="dataBits" class="form-item">
+            <template v-if="formValue.connProtocol === enums.ConnProtocol.SERIAL">
+              <n-form-item path="serialPort" :label="$t('connDialog.serialPort')">
                 <n-select
-                  v-model:value="formValue.dataBits"
-                  :options="dataBitsOptions"
-                  :placeholder="$t('connDialog.placeholder.dataBits')"
+                  v-model:value="formValue.serialPort"
+                  :options="serialPortsOptions"
+                  :placeholder="$t('connDialog.placeholder.serialPort')"
                 />
               </n-form-item>
 
-              <n-form-item path="stopBits" class="form-item">
+              <n-form-item path="baudRate" :label="$t('connDialog.baudRate')">
                 <n-select
-                  v-model:value="formValue.stopBits"
-                  :options="stopBitsOptions"
-                  :placeholder="$t('connDialog.placeholder.stopBits')"
+                  v-model:value="formValue.baudRate"
+                  :options="baudRateOptions"
+                  :placeholder="$t('connDialog.placeholder.baudRate')"
                 />
               </n-form-item>
 
-              <n-form-item path="parity" class="form-item">
-                <n-select
-                  v-model:value="formValue.parity"
-                  :options="parityOptions"
-                  :placeholder="$t('connDialog.placeholder.parity')"
-                />
-              </n-form-item>
-            </div>
-          </template>
+              <div class="form-row">
+                <n-form-item path="dataBits" :label="$t('connDialog.dataBits')" class="form-item">
+                  <n-select
+                    v-model:value="formValue.dataBits"
+                    :options="dataBitsOptions"
+                    :placeholder="$t('connDialog.placeholder.dataBits')"
+                  />
+                </n-form-item>
 
-          <template v-if="formValue.connProtocol === enums.ConnProtocol.SSH">
-            <div class="form-row">
-              <n-form-item path="host" class="form-item">
-                <n-input v-model:value="formValue.host" clearable :placeholder="$t('connDialog.placeholder.host')" />
-              </n-form-item>
-              <n-form-item path="port" class="port-input">
-                <n-input-number
-                  v-model:value="formValue.port"
-                  :min="1"
-                  :max="65535"
-                  :show-button="false"
-                  :placeholder="$t('connDialog.placeholder.port')"
-                />
-              </n-form-item>
-            </div>
+                <n-form-item path="stopBits" :label="$t('connDialog.stopBits')" class="form-item">
+                  <n-select
+                    v-model:value="formValue.stopBits"
+                    :options="stopBitsOptions"
+                    :placeholder="$t('connDialog.placeholder.stopBits')"
+                  />
+                </n-form-item>
 
-            <n-form-item :label="$t('connDialog.authType')" path="credential.authMethod">
-              <div class="auth-type-container">
-                <n-button-group>
-                  <n-button
-                    :type="
-                      !formValue.useCommonCredential && formValue.credential?.authMethod === enums.AuthMethod.PASSWORD
-                        ? 'primary'
-                        : 'default'
-                    "
-                    @click="handleCredentialTypeChange(CredentialType.Password)"
-                  >
-                    <template #icon>
-                      <Icon icon="ph:password" />
-                    </template>
-                    {{ $t('connDialog.password') }}
-                  </n-button>
-                  <n-button
-                    :type="
-                      !formValue.useCommonCredential && formValue.credential?.authMethod === enums.AuthMethod.PRIVATEKEY
-                        ? 'primary'
-                        : 'default'
-                    "
-                    @click="handleCredentialTypeChange(CredentialType.PrivateKey)"
-                  >
-                    <template #icon>
-                      <Icon icon="ph:key" />
-                    </template>
-                    {{ $t('connDialog.privateKey') }}
-                  </n-button>
-                  <n-button
-                    :type="formValue.useCommonCredential ? 'primary' : 'default'"
-                    @click="handleCredentialTypeChange(CredentialType.Common)"
-                  >
-                    <template #icon>
-                      <Icon icon="ph:vault" />
-                    </template>
-                    {{ $t('connDialog.commonCredentialLib') }}
-                  </n-button>
-                </n-button-group>
+                <n-form-item path="parity" :label="$t('connDialog.parity')" class="form-item">
+                  <n-select
+                    v-model:value="formValue.parity"
+                    :options="parityOptions"
+                    :placeholder="$t('connDialog.placeholder.parity')"
+                  />
+                </n-form-item>
               </div>
-            </n-form-item>
-
-            <template v-if="formValue.useCommonCredential">
-              <n-form-item path="credentialID">
-                <n-select
-                  v-model:value="formValue.credentialID"
-                  :options="credentialOptions"
-                  clearable
-                  :placeholder="$t('connDialog.placeholder.selectCredential')"
-                  @update:value="handleSelectCredential"
-                />
-              </n-form-item>
             </template>
 
-            <template v-else>
-              <n-form-item path="credential.username">
-                <n-input
-                  v-model:value="formValue.credential!.username"
-                  clearable
-                  :placeholder="$t('connDialog.placeholder.username')"
-                />
+            <template v-if="formValue.connProtocol === enums.ConnProtocol.SSH">
+              <div class="form-row">
+                <n-form-item path="host" :label="$t('connDialog.host')" class="form-item">
+                  <n-input v-model:value="formValue.host" clearable :placeholder="$t('connDialog.placeholder.host')" />
+                </n-form-item>
+                <n-form-item path="port" :label="$t('connDialog.port')" class="port-input">
+                  <n-input-number
+                    v-model:value="formValue.port"
+                    :min="1"
+                    :max="65535"
+                    :show-button="false"
+                    :placeholder="$t('connDialog.placeholder.port')"
+                  />
+                </n-form-item>
+              </div>
+
+              <n-form-item :label="$t('connDialog.authType')" path="credential.authMethod">
+                <div class="auth-type-container">
+                  <n-button-group>
+                    <n-button
+                      :type="
+                        !formValue.useCommonCredential && formValue.credential?.authMethod === enums.AuthMethod.PASSWORD
+                          ? 'primary'
+                          : 'default'
+                      "
+                      @click="handleCredentialTypeChange(CredentialType.Password)"
+                    >
+                      <template #icon>
+                        <Icon icon="ph:password" />
+                      </template>
+                      {{ $t('connDialog.password') }}
+                    </n-button>
+                    <n-button
+                      :type="
+                        !formValue.useCommonCredential &&
+                        formValue.credential?.authMethod === enums.AuthMethod.PRIVATEKEY
+                          ? 'primary'
+                          : 'default'
+                      "
+                      @click="handleCredentialTypeChange(CredentialType.PrivateKey)"
+                    >
+                      <template #icon>
+                        <Icon icon="ph:key" />
+                      </template>
+                      {{ $t('connDialog.privateKey') }}
+                    </n-button>
+                    <n-button
+                      :type="formValue.useCommonCredential ? 'primary' : 'default'"
+                      @click="handleCredentialTypeChange(CredentialType.Common)"
+                    >
+                      <template #icon>
+                        <Icon icon="ph:vault" />
+                      </template>
+                      {{ $t('connDialog.commonCredentialLib') }}
+                    </n-button>
+                  </n-button-group>
+                </div>
               </n-form-item>
 
-              <template v-if="formValue.credential!.authMethod === enums.AuthMethod.PASSWORD">
-                <n-form-item path="credential.password">
-                  <n-input
-                    v-model:value="formValue.credential!.password"
-                    type="password"
-                    show-password-on="click"
+              <template v-if="formValue.useCommonCredential">
+                <n-form-item path="credentialID" :label="$t('connDialog.credential')">
+                  <n-select
+                    v-model:value="formValue.credentialID"
+                    :options="credentialOptions"
                     clearable
-                    :placeholder="$t('connDialog.placeholder.password')"
+                    :placeholder="$t('connDialog.placeholder.selectCredential')"
+                    @update:value="handleSelectCredential"
                   />
                 </n-form-item>
               </template>
 
-              <template v-if="formValue.credential!.authMethod === enums.AuthMethod.PRIVATEKEY">
-                <n-form-item path="credential.privateKey">
+              <template v-else>
+                <n-form-item path="credential.username" :label="$t('connDialog.username')">
                   <n-input
-                    v-model:value="formValue.credential!.privateKey"
-                    type="textarea"
-                    :row="3"
+                    v-model:value="formValue.credential!.username"
                     clearable
-                    :placeholder="$t('connDialog.placeholder.privateKey')"
+                    :placeholder="$t('connDialog.placeholder.username')"
                   />
                 </n-form-item>
-                <n-form-item path="credential.passphrase">
-                  <n-input
-                    v-model:value="formValue.credential!.passphrase"
-                    type="password"
-                    show-password-on="click"
-                    clearable
-                    :placeholder="$t('connDialog.placeholder.passphrase')"
-                  />
-                </n-form-item>
+
+                <template v-if="formValue.credential!.authMethod === enums.AuthMethod.PASSWORD">
+                  <n-form-item path="credential.password" :label="$t('connDialog.password')">
+                    <n-input
+                      v-model:value="formValue.credential!.password"
+                      type="password"
+                      show-password-on="click"
+                      clearable
+                      :placeholder="$t('connDialog.placeholder.password')"
+                    />
+                  </n-form-item>
+                </template>
+
+                <template v-if="formValue.credential!.authMethod === enums.AuthMethod.PRIVATEKEY">
+                  <n-form-item path="credential.privateKey" :label="$t('connDialog.privateKey')">
+                    <n-input
+                      v-model:value="formValue.credential!.privateKey"
+                      type="textarea"
+                      :autosize="{ minRows: 3, maxRows: 3 }"
+                      clearable
+                      :placeholder="$t('connDialog.placeholder.privateKey')"
+                    />
+                  </n-form-item>
+                  <n-form-item path="credential.passphrase" :label="$t('connDialog.passphrase')">
+                    <n-input
+                      v-model:value="formValue.credential!.passphrase"
+                      type="password"
+                      show-password-on="click"
+                      clearable
+                      :placeholder="$t('connDialog.placeholder.passphrase')"
+                    />
+                  </n-form-item>
+                </template>
               </template>
             </template>
-          </template>
-        </n-form>
+          </n-form>
+        </n-scrollbar>
       </n-tab-pane>
 
       <n-tab-pane name="advanced" :tab="$t('connDialog.advancedConfig')">
@@ -207,7 +210,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useDialogStore } from '@/stores/dialog';
 import { enums, model } from '@wailsApp/go/models';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
 import { CreateConnection, UpdateConnection } from '@wailsApp/go/services/ConnectionSrv';
@@ -235,10 +237,25 @@ import { useI18n } from 'vue-i18n';
 import { SerialPorts } from '@wailsApp/go/services/TerminalSrv';
 
 const { t } = useI18n();
-const dialogStore = useDialogStore();
 const formRef = ref<FormInst | null>(null);
 const activeTab = ref('basic');
 const message = useMessage();
+
+const props = defineProps<{
+  show: boolean;
+  isEdit: boolean;
+  connection?: model.Connection;
+}>();
+
+const emit = defineEmits<{
+  (e: 'update:show', value: boolean): void;
+  (e: 'success'): void;
+}>();
+
+const visible = computed({
+  get: () => props.show,
+  set: value => emit('update:show', value),
+});
 
 const CredentialType = {
   Password: 0,
@@ -304,7 +321,7 @@ const useCommonCredential = ref(false);
 const credentialOptions = ref<SelectMixedOption[]>([]);
 
 watch(
-  () => dialogStore.editConnection,
+  () => props.connection,
   newConnection => {
     if (newConnection) {
       formValue.value = model.Connection.createFrom(newConnection);
@@ -387,6 +404,11 @@ const rules = computed<FormRules>(() => ({
   label: {
     required: true,
     message: t('connDialog.validation.labelRequired'),
+    trigger: 'blur',
+  },
+  connProtocol: {
+    required: true,
+    message: t('connDialog.validation.connProtocolRequired'),
     trigger: 'blur',
   },
   host: {
@@ -510,17 +532,16 @@ onMounted(initOptions);
 const handleConfirm = async () => {
   try {
     await formRef.value?.validate();
-    const resp = dialogStore.isEditMode
-      ? await UpdateConnection(formValue.value)
-      : await CreateConnection(formValue.value);
+    const resp = props.isEdit ? await UpdateConnection(formValue.value) : await CreateConnection(formValue.value);
 
     if (!resp.ok) {
       message.error(resp.msg);
       return false;
     }
 
-    message.success(dialogStore.isEditMode ? t('message.updateSuccess') : t('message.createSuccess'));
-    dialogStore.closeConnDialog();
+    message.success(props.isEdit ? t('message.updateSuccess') : t('message.createSuccess'));
+    emit('update:show', false);
+    emit('success');
   } catch (errors) {
     return false;
   }
@@ -533,7 +554,7 @@ const resetForm = () => {
     privateKey: createCredential(enums.AuthMethod.PRIVATEKEY),
   };
   activeTab.value = 'basic';
-  dialogStore.closeConnDialog();
+  emit('update:show', false);
 };
 </script>
 

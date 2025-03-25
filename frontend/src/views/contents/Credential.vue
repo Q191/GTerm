@@ -11,7 +11,7 @@
               <icon icon="ph:magnifying-glass" />
             </template>
           </n-input>
-          <n-button type="primary" ghost>
+          <n-button type="primary" ghost @click="handleAdd">
             <template #icon>
               <icon icon="ph:plus-bold" />
             </template>
@@ -66,7 +66,7 @@
                 </n-tooltip>
                 <n-tooltip trigger="hover">
                   <template #trigger>
-                    <n-button circle text>
+                    <n-button circle text @click="handleEdit(v)">
                       <template #icon>
                         <icon icon="ph:pencil-simple" />
                       </template>
@@ -76,7 +76,7 @@
                 </n-tooltip>
                 <n-tooltip trigger="hover">
                   <template #trigger>
-                    <n-button circle text type="error">
+                    <n-button circle text type="error" @click="handleDelete(v)">
                       <template #icon>
                         <icon icon="ph:trash" />
                       </template>
@@ -91,6 +91,13 @@
         <n-empty v-else class="credential-empty" description="暂无可用凭据" />
       </div>
     </n-scrollbar>
+
+    <credential-dialog
+      v-model:show="showDialog"
+      :is-edit="isEdit"
+      :credential="editCredential"
+      @success="handleSuccess"
+    />
   </div>
 </template>
 
@@ -102,19 +109,22 @@ import {
   NInputGroup,
   NList,
   NListItem,
-  NTag,
   NThing,
   NScrollbar,
   useThemeVars,
   useMessage,
   NEmpty,
 } from 'naive-ui';
-import { ref } from 'vue';
-import { ListCredential } from '@wailsApp/go/services/CredentialSrv';
+import { ref, onMounted } from 'vue';
+import { ListCredential, DeleteCredential } from '@wailsApp/go/services/CredentialSrv';
 import { enums, model } from '@wailsApp/go/models';
 import dayjs from 'dayjs';
+import CredentialDialog from '@/views/dialogs/CredentialDialog.vue';
 
 const message = useMessage();
+const showDialog = ref(false);
+const isEdit = ref(false);
+const editCredential = ref<model.Credential | undefined>(undefined);
 
 const handleCopy = async (credential: model.Credential) => {
   if (credential.authMethod === enums.AuthMethod.PASSWORD) {
@@ -127,6 +137,30 @@ const handleCopy = async (credential: model.Credential) => {
   }
 };
 
+const handleEdit = (credential: model.Credential) => {
+  console.log('准备编辑凭据:', credential);
+  isEdit.value = true;
+  editCredential.value = credential;
+  showDialog.value = true;
+};
+
+const handleDelete = async (credential: model.Credential) => {
+  console.log('准备删除凭据:', credential);
+  const resp = await DeleteCredential(credential.id);
+  if (!resp.ok) {
+    message.error(resp.msg);
+    return;
+  }
+  message.success('删除成功');
+  await fetchCredentials();
+};
+
+const handleAdd = () => {
+  isEdit.value = false;
+  editCredential.value = undefined;
+  showDialog.value = true;
+};
+
 const formatTime = (time: string) => {
   return dayjs(time).format('YYYY-MM-DD HH:mm');
 };
@@ -134,11 +168,19 @@ const formatTime = (time: string) => {
 const creds = ref<model.Credential[]>();
 
 const fetchCredentials = async () => {
+  console.log('开始获取凭据列表');
   const resp = await ListCredential();
   if (!resp.ok) {
     message.error(resp.msg);
   }
+  console.log('获取凭据列表完成:', resp.data);
+  creds.value = resp.data;
   return resp.data;
+};
+
+const handleSuccess = () => {
+  console.log('收到凭据操作成功事件');
+  fetchCredentials();
 };
 
 onMounted(async () => {

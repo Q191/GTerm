@@ -1,23 +1,19 @@
 <template>
-  <NMessageProvider placement="bottom-right">
-    <NConfigProvider :theme="currentTheme" :theme-overrides="currentThemeOverrides" :hljs="hljs">
+  <n-message-provider placement="bottom-right">
+    <n-config-provider :theme="currentTheme" :theme-overrides="currentThemeOverrides" :hljs="hljs">
       <router-view />
-      <AboutDialog />
-      <ConnectionDialog />
-      <GroupDialog />
-      <PreferencesDialog />
-    </NConfigProvider>
-  </NMessageProvider>
+      <about-dialog />
+      <preferences-dialog />
+    </n-config-provider>
+  </n-message-provider>
 </template>
 
 <script lang="ts" setup>
 import { usePreferencesStore } from '@/stores/preferences';
 import { darkThemeOverrides, themeOverrides } from '@/themes/naive-theme';
 import AboutDialog from '@/views/dialogs/AboutDialog.vue';
-import ConnectionDialog from '@/views/dialogs/ConnectionDialog.vue';
 import PreferencesDialog from '@/views/dialogs/PreferencesDialog.vue';
 import { darkTheme, NConfigProvider, NMessageProvider } from 'naive-ui';
-import GroupDialog from '@/views/dialogs/GroupDialog.vue';
 import hljs from 'highlight.js/lib/core';
 import bash from 'highlight.js/lib/languages/bash';
 
