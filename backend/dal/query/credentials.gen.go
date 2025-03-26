@@ -31,10 +31,10 @@ func newCredential(db *gorm.DB, opts ...gen.DOOption) credential {
 	_credential.CreatedAt = field.NewTime(tableName, "created_at")
 	_credential.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_credential.DeletedAt = field.NewField(tableName, "deleted_at")
-	_credential.Name = field.NewString(tableName, "name")
+	_credential.Label = field.NewString(tableName, "label")
 	_credential.Username = field.NewString(tableName, "username")
 	_credential.IsCommonCredential = field.NewBool(tableName, "is_common_credential")
-	_credential.AuthMethod = field.NewInt(tableName, "auth_method")
+	_credential.AuthMethod = field.NewString(tableName, "auth_method")
 	_credential.PasswordCiphertext = field.NewString(tableName, "password_ciphertext")
 	_credential.PasswordSalt = field.NewString(tableName, "password_salt")
 	_credential.PrivateKeyCiphertext = field.NewString(tableName, "private_key_ciphertext")
@@ -55,10 +55,10 @@ type credential struct {
 	CreatedAt            field.Time
 	UpdatedAt            field.Time
 	DeletedAt            field.Field
-	Name                 field.String
+	Label                field.String
 	Username             field.String
 	IsCommonCredential   field.Bool
-	AuthMethod           field.Int
+	AuthMethod           field.String
 	PasswordCiphertext   field.String
 	PasswordSalt         field.String
 	PrivateKeyCiphertext field.String
@@ -85,10 +85,10 @@ func (c *credential) updateTableName(table string) *credential {
 	c.CreatedAt = field.NewTime(table, "created_at")
 	c.UpdatedAt = field.NewTime(table, "updated_at")
 	c.DeletedAt = field.NewField(table, "deleted_at")
-	c.Name = field.NewString(table, "name")
+	c.Label = field.NewString(table, "label")
 	c.Username = field.NewString(table, "username")
 	c.IsCommonCredential = field.NewBool(table, "is_common_credential")
-	c.AuthMethod = field.NewInt(table, "auth_method")
+	c.AuthMethod = field.NewString(table, "auth_method")
 	c.PasswordCiphertext = field.NewString(table, "password_ciphertext")
 	c.PasswordSalt = field.NewString(table, "password_salt")
 	c.PrivateKeyCiphertext = field.NewString(table, "private_key_ciphertext")
@@ -116,7 +116,7 @@ func (c *credential) fillFieldMap() {
 	c.fieldMap["created_at"] = c.CreatedAt
 	c.fieldMap["updated_at"] = c.UpdatedAt
 	c.fieldMap["deleted_at"] = c.DeletedAt
-	c.fieldMap["name"] = c.Name
+	c.fieldMap["label"] = c.Label
 	c.fieldMap["username"] = c.Username
 	c.fieldMap["is_common_credential"] = c.IsCommonCredential
 	c.fieldMap["auth_method"] = c.AuthMethod

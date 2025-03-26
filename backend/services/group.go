@@ -32,9 +32,17 @@ func (s *GroupSrv) UpdateGroup(group *model.Group) *resp.Resp {
 }
 
 func (s *GroupSrv) DeleteGroup(id uint) *resp.Resp {
-	t := s.Query.Group
-	_, err := t.Where(t.ID.Eq(id)).Delete()
-	if err != nil {
+	if err := s.Query.Transaction(func(tx *query.Query) error {
+		_, err := tx.Connection.Where(tx.Connection.GroupID.Eq(id)).UpdateSimple(tx.Connection.GroupID.Null())
+		if err != nil {
+			return err
+		}
+		_, err = tx.Group.Where(tx.Group.ID.Eq(id)).Delete()
+		if err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
 	return resp.Ok()

@@ -17,7 +17,12 @@
         <n-scrollbar style="max-height: 70vh; padding-right: 12px">
           <n-form ref="formRef" :model="formValue" :rules="rules">
             <n-form-item path="label" :label="$t('connDialog.label')">
-              <n-input v-model:value="formValue.label" clearable :placeholder="$t('connDialog.placeholder.label')" />
+              <n-input
+                v-model:value="formValue.label"
+                clearable
+                :placeholder="$t('connDialog.placeholder.label')"
+                :allow-input="value => !/\s/.test(value)"
+              />
             </n-form-item>
 
             <n-form-item path="groupID" :label="$t('connDialog.group')">
@@ -83,7 +88,12 @@
             <template v-if="formValue.connProtocol === enums.ConnProtocol.SSH">
               <div class="form-row">
                 <n-form-item path="host" :label="$t('connDialog.host')" class="form-item">
-                  <n-input v-model:value="formValue.host" clearable :placeholder="$t('connDialog.placeholder.host')" />
+                  <n-input
+                    v-model:value="formValue.host"
+                    clearable
+                    :placeholder="$t('connDialog.placeholder.host')"
+                    :allow-input="value => !/\s/.test(value)"
+                  />
                 </n-form-item>
                 <n-form-item path="port" :label="$t('connDialog.port')" class="port-input">
                   <n-input-number
@@ -157,6 +167,7 @@
                     v-model:value="formValue.credential!.username"
                     clearable
                     :placeholder="$t('connDialog.placeholder.username')"
+                    :allow-input="value => !/\s/.test(value)"
                   />
                 </n-form-item>
 
@@ -168,6 +179,7 @@
                       show-password-on="click"
                       clearable
                       :placeholder="$t('connDialog.placeholder.password')"
+                      :allow-input="value => !/\s/.test(value)"
                     />
                   </n-form-item>
                 </template>
@@ -180,6 +192,7 @@
                       :autosize="{ minRows: 3, maxRows: 3 }"
                       clearable
                       :placeholder="$t('connDialog.placeholder.privateKey')"
+                      :allow-input="value => !/\s/.test(value)"
                     />
                   </n-form-item>
                   <n-form-item path="credential.passphrase" :label="$t('connDialog.passphrase')">
@@ -189,6 +202,7 @@
                       show-password-on="click"
                       clearable
                       :placeholder="$t('connDialog.placeholder.passphrase')"
+                      :allow-input="value => !/\s/.test(value)"
                     />
                   </n-form-item>
                 </template>
@@ -235,6 +249,7 @@ import { SelectMixedOption } from 'naive-ui/es/select/src/interface';
 import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { SerialPorts } from '@wailsApp/go/services/TerminalSrv';
+import { ListCredential } from '@wailsApp/go/services/CredentialSrv';
 
 const { t } = useI18n();
 const formRef = ref<FormInst | null>(null);
@@ -349,6 +364,7 @@ const handleCredentialTypeChange = (credentialType: number) => {
     // 切换到凭据库模式
     formValue.value.useCommonCredential = true;
     formValue.value.credentialID = undefined;
+    formValue.value.credential = undefined;
     return;
   }
   // 切换到密码或私钥认证
@@ -477,6 +493,12 @@ const rules = computed<FormRules>(() => ({
     required: formValue.value.useCommonCredential,
     message: t('connDialog.validation.credentialRequired'),
     trigger: ['blur', 'change'],
+    validator: (rule, value) => {
+      if (formValue.value.useCommonCredential && !value) {
+        return new Error(t('connDialog.validation.credentialRequired'));
+      }
+      return true;
+    },
   },
 }));
 
@@ -503,12 +525,12 @@ const fetchSerialPorts = async () => {
 };
 
 const fetchCredentials = async () => {
-  // const resp = await ListCredentials();
-  // if (!resp.ok) {
-  // message.error(resp.msg);
-  return [];
-  // }
-  // return resp.data || [];
+  const resp = await ListCredential();
+  if (!resp.ok) {
+    message.error(resp.msg);
+    return [];
+  }
+  return resp.data || [];
 };
 
 const initOptions = async () => {
@@ -543,6 +565,7 @@ const handleConfirm = async () => {
     emit('update:show', false);
     emit('success');
   } catch (errors) {
+    console.error('表单验证错误:', errors);
     return false;
   }
 };

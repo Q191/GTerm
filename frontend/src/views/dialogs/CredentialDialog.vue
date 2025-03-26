@@ -15,7 +15,12 @@
     <n-scrollbar style="max-height: 70vh; padding-right: 12px">
       <n-form ref="formRef" :model="formValue" :rules="rules">
         <n-form-item path="label" :label="$t('credentialDialog.label')">
-          <n-input v-model:value="formValue.label" clearable :placeholder="$t('credentialDialog.placeholder.label')" />
+          <n-input
+            v-model:value="formValue.label"
+            clearable
+            :placeholder="$t('credentialDialog.placeholder.label')"
+            :allow-input="value => !/\s/.test(value)"
+          />
         </n-form-item>
 
         <n-form-item :label="$t('credentialDialog.authType')" path="authMethod">
@@ -48,6 +53,7 @@
             v-model:value="formValue.username"
             clearable
             :placeholder="$t('credentialDialog.placeholder.username')"
+            :allow-input="value => !/\s/.test(value)"
           />
         </n-form-item>
 
@@ -59,6 +65,7 @@
               show-password-on="click"
               clearable
               :placeholder="$t('credentialDialog.placeholder.password')"
+              :allow-input="value => !/\s/.test(value)"
             />
           </n-form-item>
         </template>
@@ -80,6 +87,7 @@
               show-password-on="click"
               clearable
               :placeholder="$t('credentialDialog.placeholder.passphrase')"
+              :allow-input="value => !/\s/.test(value)"
             />
           </n-form-item>
         </template>
@@ -176,7 +184,6 @@ const rules = computed<FormRules>(() => ({
 const handleConfirm = async () => {
   try {
     await formRef.value?.validate();
-    console.log('表单验证通过，准备提交数据');
     const resp = props.isEdit ? await UpdateCredential(formValue.value) : await CreateCredential(formValue.value);
 
     if (!resp.ok) {
@@ -184,18 +191,15 @@ const handleConfirm = async () => {
       return false;
     }
 
-    console.log('操作成功，准备关闭对话框并触发刷新');
     message.success(props.isEdit ? t('message.updateSuccess') : t('message.createSuccess'));
     emit('update:show', false);
     emit('success');
   } catch (errors) {
-    console.log('操作失败:', errors);
     return false;
   }
 };
 
 const resetForm = () => {
-  console.log('重置表单');
   formValue.value = model.Credential.createFrom(defaultCredential);
   emit('update:show', false);
 };

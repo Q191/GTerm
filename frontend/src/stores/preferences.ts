@@ -4,16 +4,21 @@ import { i18n } from '@/utils/i18n';
 
 export { languageOptions };
 
-type Language = 'zh' | 'en';
+type Language = 'zh';
 type ThemeMode = 'light' | 'dark' | 'auto';
 
 const getInitialLanguage = (): Language => {
   const storedLang = localStorage.getItem('language');
-  if (storedLang === 'zh' || storedLang === 'en') {
+  if (storedLang === 'zh') {
     return storedLang;
   }
   const browserLang = navigator.language.toLowerCase();
-  return browserLang.startsWith('zh') ? 'zh' : 'en';
+  // 尝试匹配浏览器语言
+  if (browserLang.startsWith('zh')) {
+    return 'zh';
+  }
+  // 默认使用中文
+  return 'zh';
 };
 
 export const usePreferencesStore = defineStore('preferences', {
@@ -33,9 +38,8 @@ export const usePreferencesStore = defineStore('preferences', {
 
     updateLanguageBySystem() {
       const browserLang = navigator.language.toLowerCase();
-      const newLang: Language = browserLang.startsWith('zh') ? 'zh' : 'en';
-      if (!localStorage.getItem('language')) {
-        this.updateLanguage(newLang);
+      if (browserLang.startsWith('zh') && !localStorage.getItem('language')) {
+        this.updateLanguage('zh');
       }
     },
 

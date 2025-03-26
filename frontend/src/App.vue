@@ -1,7 +1,9 @@
 <template>
   <n-message-provider placement="bottom-right">
     <n-config-provider :theme="currentTheme" :theme-overrides="currentThemeOverrides" :hljs="hljs">
-      <router-view />
+      <n-dialog-provider>
+        <router-view />
+      </n-dialog-provider>
       <about-dialog />
       <preferences-dialog />
     </n-config-provider>
@@ -13,7 +15,7 @@ import { usePreferencesStore } from '@/stores/preferences';
 import { darkThemeOverrides, themeOverrides } from '@/themes/naive-theme';
 import AboutDialog from '@/views/dialogs/AboutDialog.vue';
 import PreferencesDialog from '@/views/dialogs/PreferencesDialog.vue';
-import { darkTheme, NConfigProvider, NMessageProvider } from 'naive-ui';
+import { darkTheme, NConfigProvider, NMessageProvider, NDialogProvider } from 'naive-ui';
 import hljs from 'highlight.js/lib/core';
 import bash from 'highlight.js/lib/languages/bash';
 

@@ -6,7 +6,7 @@
       </div>
       <div class="actions">
         <n-input-group>
-          <n-input placeholder="搜索凭据...">
+          <n-input placeholder="搜索凭据..." :allow-input="value => !/\s/.test(value)">
             <template #prefix>
               <icon icon="ph:magnifying-glass" />
             </template>
@@ -138,14 +138,12 @@ const handleCopy = async (credential: model.Credential) => {
 };
 
 const handleEdit = (credential: model.Credential) => {
-  console.log('准备编辑凭据:', credential);
   isEdit.value = true;
   editCredential.value = credential;
   showDialog.value = true;
 };
 
 const handleDelete = async (credential: model.Credential) => {
-  console.log('准备删除凭据:', credential);
   const resp = await DeleteCredential(credential.id);
   if (!resp.ok) {
     message.error(resp.msg);
@@ -168,18 +166,15 @@ const formatTime = (time: string) => {
 const creds = ref<model.Credential[]>();
 
 const fetchCredentials = async () => {
-  console.log('开始获取凭据列表');
   const resp = await ListCredential();
   if (!resp.ok) {
     message.error(resp.msg);
   }
-  console.log('获取凭据列表完成:', resp.data);
   creds.value = resp.data;
   return resp.data;
 };
 
 const handleSuccess = () => {
-  console.log('收到凭据操作成功事件');
   fetchCredentials();
 };
 

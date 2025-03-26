@@ -3,7 +3,13 @@
     <div class="sidebar" ref="sidebarRef" :style="{ width: sidebarWidth + 'px' }">
       <div class="groups-list">
         <div class="list-header">
-          <n-input v-model:value="searchText" size="small" clearable :placeholder="$t('connection.search')">
+          <n-input
+            v-model:value="searchText"
+            size="small"
+            clearable
+            :placeholder="$t('connection.search')"
+            :allow-input="value => !/\s/.test(value)"
+          >
             <template #prefix>
               <icon icon="ph:magnifying-glass" />
             </template>
@@ -55,10 +61,6 @@
               </div>
               <div class="asset-info">
                 <div class="asset-name">{{ conn.label }}</div>
-              </div>
-              <div class="asset-tags">
-                <n-tag v-if="getConnCount(conn) > 0" size="tiny" type="success">{{ getConnCount(conn) }}</n-tag>
-                <n-tag v-if="getErrorConnCount(conn) > 0" size="tiny" type="error">{{ getErrorConnCount(conn) }}</n-tag>
               </div>
             </div>
           </div>
@@ -199,9 +201,20 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NTag, NTooltip, NDropdown, NResult, NBadge, NInput, useMessage, useThemeVars } from 'naive-ui';
+import {
+  NButton,
+  NTag,
+  NTooltip,
+  NDropdown,
+  NResult,
+  NBadge,
+  NInput,
+  useMessage,
+  useThemeVars,
+  useDialog,
+} from 'naive-ui';
 import type { DropdownOption } from 'naive-ui';
-import { ListGroup } from '@wailsApp/go/services/GroupSrv';
+import { ListGroup, DeleteGroup } from '@wailsApp/go/services/GroupSrv';
 import { ListConnection, DeleteConnection } from '@wailsApp/go/services/ConnectionSrv';
 import { enums, model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
@@ -239,6 +252,8 @@ const editConnection = ref<model.Connection | undefined>(undefined);
 const editGroup = ref<model.Group | undefined>(undefined);
 
 const currentContextNode = ref<any>(null);
+
+const dialog = useDialog();
 
 const updateDropdownOptions = (type: 'group' | 'conn') => {
   if (type === 'group') {
@@ -281,7 +296,7 @@ const handleDropdownSelect = async (key: string) => {
       handleEditGroup();
       break;
     case 'delete-group':
-      // TODO: 实现删除分组功能
+      await handleDeleteGroup();
       break;
     case 'edit-conn':
       const conn = conns.value?.find(h => h.id === connId);
@@ -344,9 +359,14 @@ const handleAddGroup = () => {
 };
 
 const handleEditGroup = () => {
-  isEditGroup.value = true;
-  editGroup.value = undefined;
-  showGroupDialog.value = true;
+  if (!currentContextNode.value) return;
+  const groupId = parseInt(currentContextNode.value.key.replace('group-', ''));
+  const group = groups.value?.find(g => g.id === groupId);
+  if (group) {
+    isEditGroup.value = true;
+    editGroup.value = group;
+    showGroupDialog.value = true;
+  }
 };
 
 const handleGroupSuccess = () => {
@@ -540,6 +560,29 @@ const handleGroupContextMenu = (event: MouseEvent, group: model.Group) => {
   showDropdown.value = true;
   currentContextNode.value = { key: `group-${group.id}` };
   updateDropdownOptions('group');
+};
+
+const handleDeleteGroup = async () => {
+  if (!currentContextNode.value) return;
+  const groupId = parseInt(currentContextNode.value.key.replace('group-', ''));
+  const group = groups.value?.find(g => g.id === groupId);
+  if (!group) return;
+
+  dialog.warning({
+    title: t('connection.delete.group.title'),
+    content: t('connection.delete.group.content', { name: group.name }),
+    positiveText: t('connection.delete.group.confirm'),
+    negativeText: t('connection.delete.group.cancel'),
+    onPositiveClick: async () => {
+      const resp = await DeleteGroup(groupId);
+      if (!resp.ok) {
+        message.error(resp.msg);
+        return;
+      }
+      message.success(t('message.deleteSuccess'));
+      await fetchData();
+    },
+  });
 };
 </script>
 
@@ -885,12 +928,6 @@ const handleGroupContextMenu = (event: MouseEvent, group: model.Group) => {
         overflow: hidden;
         text-overflow: ellipsis;
       }
-    }
-
-    .asset-tags {
-      display: flex;
-      gap: 4px;
-      margin-left: 6px;
     }
 
     .group-count {

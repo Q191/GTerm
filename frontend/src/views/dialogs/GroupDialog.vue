@@ -14,7 +14,12 @@
   >
     <n-form ref="formRef" :model="formValue" :rules="rules">
       <n-form-item path="name" :label="$t('groupDialog.name')">
-        <n-input v-model:value="formValue.name" clearable :placeholder="$t('groupDialog.placeholder.name')" />
+        <n-input
+          v-model:value="formValue.name"
+          clearable
+          :placeholder="$t('groupDialog.placeholder.name')"
+          :allow-input="value => !/\s/.test(value)"
+        />
       </n-form-item>
     </n-form>
   </n-modal>

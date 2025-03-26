@@ -37,8 +37,32 @@ func (s *ConnectionSrv) CreateConnection(conn *model.Connection) *resp.Resp {
 }
 
 func (s *ConnectionSrv) UpdateConnection(conn *model.Connection) *resp.Resp {
-	t := s.Query.Connection
-	if _, err := t.Where(t.ID.Eq(conn.ID)).Updates(conn); err != nil {
+	if err := s.Query.Transaction(func(tx *query.Query) error {
+		oldConn, err := tx.Connection.Where(tx.Connection.ID.Eq(conn.ID)).First()
+		if err != nil {
+			return err
+		}
+		if oldConn.UseCommonCredential && !conn.UseCommonCredential {
+			if conn.Credential != nil {
+				conn.Credential.IsCommonCredential = false
+				conn.Credential.Label = uuid.New().String()
+				if err = tx.Credential.Create(conn.Credential); err != nil {
+					return err
+				}
+				conn.CredentialID = &conn.Credential.ID
+			}
+		}
+
+		if !oldConn.UseCommonCredential && conn.UseCommonCredential {
+			if oldConn.CredentialID != nil {
+				if _, err = tx.Credential.Where(tx.Credential.ID.Eq(*oldConn.CredentialID)).Unscoped().Delete(); err != nil {
+					return err
+				}
+			}
+		}
+
+		return tx.Connection.Where(tx.Connection.ID.Eq(conn.ID)).Save(conn)
+	}); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
 	return resp.Ok()

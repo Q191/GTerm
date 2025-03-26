@@ -70,9 +70,13 @@
   },
   "groupDialog": {
     "title": "新建分组",
+    "editTitle": "编辑分组",
     "name": "分组名称",
     "cancel": "取消",
     "confirm": "确定",
+    "placeholder": {
+      "name": "请输入分组名称"
+    },
     "validation": {
       "nameRequired": "请输入分组名称"
     }
@@ -151,6 +155,14 @@
     "connection": {
       "active": "活跃会话",
       "disconnected": "已断开"
+    },
+    "delete": {
+      "group": {
+        "title": "删除分组",
+        "content": "删除分组「{name}」后，该分组下的所有连接将被移出此分组。是否继续？",
+        "confirm": "删除",
+        "cancel": "取消"
+      }
     }
   },
   "credentialDialog": {

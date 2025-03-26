@@ -35,10 +35,14 @@ func newConnection(db *gorm.DB, opts ...gen.DOOption) connection {
 	_connection.Host = field.NewString(tableName, "host")
 	_connection.Port = field.NewUint(tableName, "port")
 	_connection.SerialPort = field.NewString(tableName, "serial_port")
-	_connection.ConnProtocol = field.NewInt(tableName, "conn_protocol")
+	_connection.ConnProtocol = field.NewString(tableName, "conn_protocol")
 	_connection.CredentialID = field.NewUint(tableName, "credential_id")
-	_connection.IsCommonCredential = field.NewBool(tableName, "is_common_credential")
+	_connection.UseCommonCredential = field.NewBool(tableName, "use_common_credential")
 	_connection.GroupID = field.NewUint(tableName, "group_id")
+	_connection.BaudRate = field.NewInt(tableName, "baud_rate")
+	_connection.DataBits = field.NewInt(tableName, "data_bits")
+	_connection.StopBits = field.NewInt(tableName, "stop_bits")
+	_connection.Parity = field.NewInt(tableName, "parity")
 	_connection.Metadata = connectionHasOneMetadata{
 		db: db.Session(&gorm.Session{}),
 
@@ -59,20 +63,24 @@ func newConnection(db *gorm.DB, opts ...gen.DOOption) connection {
 type connection struct {
 	connectionDo
 
-	ALL                field.Asterisk
-	ID                 field.Uint
-	CreatedAt          field.Time
-	UpdatedAt          field.Time
-	DeletedAt          field.Field
-	Label              field.String
-	Host               field.String
-	Port               field.Uint
-	SerialPort         field.String
-	ConnProtocol       field.Int
-	CredentialID       field.Uint
-	IsCommonCredential field.Bool
-	GroupID            field.Uint
-	Metadata           connectionHasOneMetadata
+	ALL                 field.Asterisk
+	ID                  field.Uint
+	CreatedAt           field.Time
+	UpdatedAt           field.Time
+	DeletedAt           field.Field
+	Label               field.String
+	Host                field.String
+	Port                field.Uint
+	SerialPort          field.String
+	ConnProtocol        field.String
+	CredentialID        field.Uint
+	UseCommonCredential field.Bool
+	GroupID             field.Uint
+	BaudRate            field.Int
+	DataBits            field.Int
+	StopBits            field.Int
+	Parity              field.Int
+	Metadata            connectionHasOneMetadata
 
 	Credential connectionBelongsToCredential
 
@@ -99,10 +107,14 @@ func (c *connection) updateTableName(table string) *connection {
 	c.Host = field.NewString(table, "host")
 	c.Port = field.NewUint(table, "port")
 	c.SerialPort = field.NewString(table, "serial_port")
-	c.ConnProtocol = field.NewInt(table, "conn_protocol")
+	c.ConnProtocol = field.NewString(table, "conn_protocol")
 	c.CredentialID = field.NewUint(table, "credential_id")
-	c.IsCommonCredential = field.NewBool(table, "is_common_credential")
+	c.UseCommonCredential = field.NewBool(table, "use_common_credential")
 	c.GroupID = field.NewUint(table, "group_id")
+	c.BaudRate = field.NewInt(table, "baud_rate")
+	c.DataBits = field.NewInt(table, "data_bits")
+	c.StopBits = field.NewInt(table, "stop_bits")
+	c.Parity = field.NewInt(table, "parity")
 
 	c.fillFieldMap()
 
@@ -119,7 +131,7 @@ func (c *connection) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *connection) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 14)
+	c.fieldMap = make(map[string]field.Expr, 18)
 	c.fieldMap["id"] = c.ID
 	c.fieldMap["created_at"] = c.CreatedAt
 	c.fieldMap["updated_at"] = c.UpdatedAt
@@ -130,8 +142,12 @@ func (c *connection) fillFieldMap() {
 	c.fieldMap["serial_port"] = c.SerialPort
 	c.fieldMap["conn_protocol"] = c.ConnProtocol
 	c.fieldMap["credential_id"] = c.CredentialID
-	c.fieldMap["is_common_credential"] = c.IsCommonCredential
+	c.fieldMap["use_common_credential"] = c.UseCommonCredential
 	c.fieldMap["group_id"] = c.GroupID
+	c.fieldMap["baud_rate"] = c.BaudRate
+	c.fieldMap["data_bits"] = c.DataBits
+	c.fieldMap["stop_bits"] = c.StopBits
+	c.fieldMap["parity"] = c.Parity
 
 }
 
