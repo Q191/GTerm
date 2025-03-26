@@ -7,10 +7,7 @@
   "frontend:dev:watcher": "pnpm run dev",
   "frontend:dev:serverUrl": "auto",
   "info": {
-    "companyName": "OpenToolkitLab",
     "productName": "GTerm",
-    "productVersion": "1.0.0",
-    "copyright": "Copyright © 2024",
-    "comments": ""
+    "copyright": "Copyright © 2024 - 2025 MisakaTAT. All rights reserved."
   }
 }
