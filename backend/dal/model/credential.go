@@ -27,7 +27,7 @@ func (c *Credential) TableName() string {
 	return "credentials"
 }
 
-func (c *Credential) BeforeCreate(tx *gorm.DB) error {
+func (c *Credential) BeforeSave(tx *gorm.DB) error {
 	cred, err := encrypt.NewCredential()
 	if err != nil {
 		return err

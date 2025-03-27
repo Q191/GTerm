@@ -51,6 +51,14 @@ func (s *ConnectionSrv) UpdateConnection(conn *model.Connection) *resp.Resp {
 				}
 				conn.CredentialID = &conn.Credential.ID
 			}
+		} else if !oldConn.UseCommonCredential && !conn.UseCommonCredential {
+			if oldConn.CredentialID != nil && conn.Credential != nil {
+				conn.Credential.ID = *oldConn.CredentialID
+				conn.Credential.IsCommonCredential = false
+				if err = tx.Credential.Where(tx.Credential.ID.Eq(*oldConn.CredentialID)).Save(conn.Credential); err != nil {
+					return err
+				}
+			}
 		}
 
 		if !oldConn.UseCommonCredential && conn.UseCommonCredential {
