@@ -26,10 +26,10 @@
 </template>
 
 <script lang="ts" setup>
-import { enums, model } from '@wailsApp/go/models';
+import { model } from '@wailsApp/go/models';
 import { CreateGroup, UpdateGroup } from '@wailsApp/go/services/GroupSrv';
 import { FormInst, FormRules, NForm, NFormItem, NInput, NModal, useMessage } from 'naive-ui';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, onMounted, onUpdated } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -52,23 +52,15 @@ const visible = computed({
   set: value => emit('update:show', value),
 });
 
-const defaultGroup = {
+const defaultGroup: Partial<model.Group> = {
   name: '',
 };
 
-const formValue = ref(model.Group.createFrom(defaultGroup));
+function createGroupObject(): model.Group {
+  return { ...defaultGroup } as model.Group;
+}
 
-watch(
-  () => props.group,
-  newGroup => {
-    if (newGroup) {
-      formValue.value = model.Group.createFrom(newGroup);
-      return;
-    }
-    formValue.value = model.Group.createFrom(defaultGroup);
-  },
-  { immediate: true },
-);
+const formValue = ref<model.Group>(createGroupObject());
 
 const rules: FormRules = {
   name: {
@@ -77,6 +69,26 @@ const rules: FormRules = {
     trigger: 'blur',
   },
 };
+
+const initDialog = () => {
+  if (props.group) {
+    formValue.value = { ...props.group } as model.Group;
+  } else {
+    formValue.value = createGroupObject();
+  }
+};
+
+onUpdated(() => {
+  if (props.show) {
+    initDialog();
+  }
+});
+
+onMounted(() => {
+  if (props.show) {
+    initDialog();
+  }
+});
 
 const handleConfirm = async () => {
   try {
@@ -97,7 +109,7 @@ const handleConfirm = async () => {
 };
 
 const resetForm = () => {
-  formValue.value = model.Group.createFrom(defaultGroup);
+  formValue.value = createGroupObject();
   emit('update:show', false);
 };
 </script>

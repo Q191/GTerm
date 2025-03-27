@@ -92,8 +92,8 @@
       </div>
     </n-scrollbar>
 
-    <credential-dialog
-      v-model:show="showDialog"
+    <credential-modal
+      v-model:show="showModal"
       :is-edit="isEdit"
       :credential="editCredential"
       @success="handleSuccess"
@@ -119,10 +119,10 @@ import { ref, onMounted } from 'vue';
 import { ListCredential, DeleteCredential } from '@wailsApp/go/services/CredentialSrv';
 import { enums, model } from '@wailsApp/go/models';
 import dayjs from 'dayjs';
-import CredentialDialog from '@/views/dialogs/CredentialDialog.vue';
+import CredentialModal from '@/views/modals/CredentialModal.vue';
 
 const message = useMessage();
-const showDialog = ref(false);
+const showModal = ref(false);
 const isEdit = ref(false);
 const editCredential = ref<model.Credential | undefined>(undefined);
 
@@ -140,7 +140,7 @@ const handleCopy = async (credential: model.Credential) => {
 const handleEdit = (credential: model.Credential) => {
   isEdit.value = true;
   editCredential.value = credential;
-  showDialog.value = true;
+  showModal.value = true;
 };
 
 const handleDelete = async (credential: model.Credential) => {
@@ -156,7 +156,7 @@ const handleDelete = async (credential: model.Credential) => {
 const handleAdd = () => {
   isEdit.value = false;
   editCredential.value = undefined;
-  showDialog.value = true;
+  showModal.value = true;
 };
 
 const formatTime = (time: string) => {

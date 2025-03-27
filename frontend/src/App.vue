@@ -4,8 +4,8 @@
       <n-dialog-provider>
         <router-view />
       </n-dialog-provider>
-      <about-dialog />
-      <preferences-dialog />
+      <about-modal />
+      <preferences-modal />
     </n-config-provider>
   </n-message-provider>
 </template>
@@ -13,8 +13,8 @@
 <script lang="ts" setup>
 import { usePreferencesStore } from '@/stores/preferences';
 import { darkThemeOverrides, themeOverrides } from '@/themes/naive-theme';
-import AboutDialog from '@/views/dialogs/AboutDialog.vue';
-import PreferencesDialog from '@/views/dialogs/PreferencesDialog.vue';
+import AboutModal from '@/views/modals/AboutModal.vue';
+import PreferencesModal from '@/views/modals/PreferencesModal.vue';
 import { darkTheme, NConfigProvider, NMessageProvider, NDialogProvider } from 'naive-ui';
 import hljs from 'highlight.js/lib/core';
 import bash from 'highlight.js/lib/languages/bash';

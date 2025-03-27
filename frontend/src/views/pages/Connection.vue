@@ -184,14 +184,14 @@
       </div>
     </div>
 
-    <connection-dialog
-      v-model:show="showConnDialog"
+    <connection-modal
+      v-model:show="showConnModal"
       :is-edit="isEditConn"
       :connection="editConnection"
       @success="handleConnSuccess"
     />
-    <group-dialog
-      v-model:show="showGroupDialog"
+    <group-modal
+      v-model:show="showGroupModal"
       :is-edit="isEditGroup"
       :group="editGroup"
       @success="handleGroupSuccess"
@@ -219,10 +219,10 @@ import { ListConnection, DeleteConnection } from '@wailsApp/go/services/Connecti
 import { enums, model } from '@wailsApp/go/models';
 import { useConnectionStore } from '@/stores/connection';
 import { useRouter } from 'vue-router';
-import { h, ref, computed, onMounted, watch, onUnmounted } from 'vue';
+import { h, ref, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import ConnectionDialog from '@/views/dialogs/ConnectionDialog.vue';
-import GroupDialog from '@/views/dialogs/GroupDialog.vue';
+import ConnectionModal from '@/views/modals/ConnectionModal.vue';
+import GroupModal from '@/views/modals/GroupModal.vue';
 
 const router = useRouter();
 const message = useMessage();
@@ -244,8 +244,8 @@ const assetListCollapsed = ref(false);
 const groupListCollapsed = ref(false);
 
 // 对话框状态
-const showConnDialog = ref(false);
-const showGroupDialog = ref(false);
+const showConnModal = ref(false);
+const showGroupModal = ref(false);
 const isEditConn = ref(false);
 const isEditGroup = ref(false);
 const editConnection = ref<model.Connection | undefined>(undefined);
@@ -339,7 +339,7 @@ const toTerminal = (conn: model.Connection) => {
 const handleEditConn = (conn: model.Connection) => {
   isEditConn.value = true;
   editConnection.value = conn;
-  showConnDialog.value = true;
+  showConnModal.value = true;
 };
 
 const handleConnSuccess = () => {
@@ -349,13 +349,13 @@ const handleConnSuccess = () => {
 const handleAddConn = () => {
   isEditConn.value = false;
   editConnection.value = undefined;
-  showConnDialog.value = true;
+  showConnModal.value = true;
 };
 
 const handleAddGroup = () => {
   isEditGroup.value = false;
   editGroup.value = undefined;
-  showGroupDialog.value = true;
+  showGroupModal.value = true;
 };
 
 const handleEditGroup = () => {
@@ -365,7 +365,7 @@ const handleEditGroup = () => {
   if (group) {
     isEditGroup.value = true;
     editGroup.value = group;
-    showGroupDialog.value = true;
+    showGroupModal.value = true;
   }
 };
 

@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/terminal',
         name: 'Terminal',
-        component: () => import('@/views/contents/Terminal.vue'),
+        component: () => import('@/views/pages/Terminal.vue'),
       },
       {
         path: 'content',
@@ -20,12 +20,12 @@ const routes: Array<RouteRecordRaw> = [
           {
             path: 'connection',
             name: 'Connection',
-            component: () => import('@/views/contents/Connection.vue'),
+            component: () => import('@/views/pages/Connection.vue'),
           },
           {
             path: 'credential',
             name: 'Credential',
-            component: () => import('@/views/contents/Credential.vue'),
+            component: () => import('@/views/pages/Credential.vue'),
           },
         ],
       },

@@ -27,8 +27,8 @@
           <div class="auth-type-container">
             <n-button-group>
               <n-button
-                :type="formValue.authMethod === enums.AuthMethod.PASSWORD ? 'primary' : 'default'"
-                @click="handleAuthTypeChange(enums.AuthMethod.PASSWORD)"
+                :type="formValue.authMethod === AuthMethod.PASSWORD ? 'primary' : 'default'"
+                @click="handleAuthTypeChange(AuthMethod.PASSWORD)"
               >
                 <template #icon>
                   <Icon icon="ph:password" />
@@ -36,8 +36,8 @@
                 {{ $t('credentialDialog.password') }}
               </n-button>
               <n-button
-                :type="formValue.authMethod === enums.AuthMethod.PRIVATEKEY ? 'primary' : 'default'"
-                @click="handleAuthTypeChange(enums.AuthMethod.PRIVATEKEY)"
+                :type="formValue.authMethod === AuthMethod.PRIVATEKEY ? 'primary' : 'default'"
+                @click="handleAuthTypeChange(AuthMethod.PRIVATEKEY)"
               >
                 <template #icon>
                   <Icon icon="ph:key" />
@@ -57,7 +57,7 @@
           />
         </n-form-item>
 
-        <template v-if="formValue.authMethod === enums.AuthMethod.PASSWORD">
+        <template v-if="formValue.authMethod === AuthMethod.PASSWORD">
           <n-form-item path="password" :label="$t('credentialDialog.password')">
             <n-input
               v-model:value="formValue.password"
@@ -70,7 +70,7 @@
           </n-form-item>
         </template>
 
-        <template v-if="formValue.authMethod === enums.AuthMethod.PRIVATEKEY">
+        <template v-if="formValue.authMethod === AuthMethod.PRIVATEKEY">
           <n-form-item path="privateKey" :label="$t('credentialDialog.privateKey')">
             <n-input
               v-model:value="formValue.privateKey"
@@ -101,9 +101,22 @@ import { enums, model } from '@wailsApp/go/models';
 import { CreateCredential, UpdateCredential } from '@wailsApp/go/services/CredentialSrv';
 import { Icon } from '@iconify/vue';
 
-import { FormInst, FormRules, NForm, NFormItem, NInput, NModal, NButton, NButtonGroup, useMessage } from 'naive-ui';
-import { ref, computed, watch } from 'vue';
+import {
+  FormInst,
+  FormRules,
+  NForm,
+  NFormItem,
+  NInput,
+  NModal,
+  NButton,
+  NButtonGroup,
+  useMessage,
+  NScrollbar,
+} from 'naive-ui';
+import { ref, computed, onMounted, onUpdated } from 'vue';
 import { useI18n } from 'vue-i18n';
+
+const { AuthMethod } = enums;
 
 const props = defineProps<{
   show: boolean;
@@ -125,32 +138,24 @@ const visible = computed({
   set: value => emit('update:show', value),
 });
 
-const defaultCredential = {
+const defaultCredential: Partial<model.Credential> = {
   label: '',
   username: '',
   password: '',
   privateKey: '',
   passphrase: '',
-  authMethod: enums.AuthMethod.PASSWORD,
+  authMethod: AuthMethod.PASSWORD,
 };
 
-const formValue = ref(model.Credential.createFrom(defaultCredential));
+function createCredentialObject(): model.Credential {
+  return { ...defaultCredential } as model.Credential;
+}
 
-watch(
-  () => props.credential,
-  newCredential => {
-    if (newCredential) {
-      formValue.value = model.Credential.createFrom(newCredential);
-      return;
-    }
-    formValue.value = model.Credential.createFrom(defaultCredential);
-  },
-  { immediate: true },
-);
+const formValue = ref<model.Credential>(createCredentialObject());
 
 const handleAuthTypeChange = (authMethod: enums.AuthMethod) => {
   formValue.value.authMethod = authMethod;
-  if (authMethod === enums.AuthMethod.PASSWORD) {
+  if (authMethod === AuthMethod.PASSWORD) {
     formValue.value.privateKey = '';
     formValue.value.passphrase = '';
   } else {
@@ -170,16 +175,36 @@ const rules = computed<FormRules>(() => ({
     trigger: 'blur',
   },
   password: {
-    required: formValue.value.authMethod === enums.AuthMethod.PASSWORD,
+    required: formValue.value.authMethod === AuthMethod.PASSWORD,
     message: t('credentialDialog.validation.passwordRequired'),
     trigger: 'blur',
   },
   privateKey: {
-    required: formValue.value.authMethod === enums.AuthMethod.PRIVATEKEY,
+    required: formValue.value.authMethod === AuthMethod.PRIVATEKEY,
     message: t('credentialDialog.validation.privateKeyRequired'),
     trigger: 'blur',
   },
 }));
+
+const initDialog = () => {
+  if (props.credential) {
+    formValue.value = { ...props.credential } as model.Credential;
+  } else {
+    formValue.value = createCredentialObject();
+  }
+};
+
+onUpdated(() => {
+  if (props.show) {
+    initDialog();
+  }
+});
+
+onMounted(() => {
+  if (props.show) {
+    initDialog();
+  }
+});
 
 const handleConfirm = async () => {
   try {
@@ -200,7 +225,7 @@ const handleConfirm = async () => {
 };
 
 const resetForm = () => {
-  formValue.value = model.Credential.createFrom(defaultCredential);
+  formValue.value = createCredentialObject();
   emit('update:show', false);
 };
 </script>
