@@ -358,11 +358,30 @@ defineOptions({ name: 'Terminal' });
   height: calc(100vh - 38px);
 
   :deep(.xterm) {
-    height: calc(100vh - 38px);
-    padding: 8px 0px 8px 8px;
+    height: calc(100vh - 54px);
+    padding: 8px 16px 8px 8px;
+
+    .xterm-screen {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
 
     .xterm-viewport {
-      overflow: hidden;
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      }
     }
   }
 
