@@ -8,3 +8,4 @@ frontend/package.json.md5
 frontend/wailsjs
 frontend/pnpm-lock.yaml
 frontend/.idea
+.DS_Store
