@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { baseTheme } from '@/themes/xtermjs-theme';
-import { WebSocketPort } from '@wailsApp/go/services/TerminalSrv';
+import { WebsocketPort } from '@wailsApp/go/services/TerminalSrv';
 import { CanvasAddon } from '@xterm/addon-canvas';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
@@ -175,7 +175,7 @@ const initializeWebsocket = async (id: number, hostId: number) => {
       errorDetails: '',
     });
 
-    const port = await WebSocketPort();
+    const port = await WebsocketPort();
     sockets.value[id] = new WebSocket(`ws://localhost:${port}/ws/terminal?hostId=${hostId}`);
     const socket = sockets.value[id];
     if (!socket) return;

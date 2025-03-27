@@ -26,10 +26,10 @@ func NewApp() *App {
 		Query:  query,
 	}
 	terminalSrv := &services.TerminalSrv{
-		HTTPListenerPort: httpListenerPort,
 		Logger:           logger,
 		ConnectionSrv:    connectionSrv,
 		MetadataSrv:      metadataSrv,
+		HTTPListenerPort: httpListenerPort,
 	}
 	preferencesSrv := &services.PreferencesSrv{
 		Logger: logger,
@@ -42,6 +42,10 @@ func NewApp() *App {
 		Logger: logger,
 		Query:  query,
 	}
+	websocketSrv := &services.WebsocketSrv{
+		TerminalSrv: terminalSrv,
+		Logger:      logger,
+	}
 	app := &App{
 		HTTPListenerPort: httpListenerPort,
 		Logger:           logger,
@@ -51,6 +55,7 @@ func NewApp() *App {
 		ConnectionSrv:    connectionSrv,
 		MetadataSrv:      metadataSrv,
 		CredentialSrv:    credentialSrv,
+		WebsocketSrv:     websocketSrv,
 	}
 	return app
 }

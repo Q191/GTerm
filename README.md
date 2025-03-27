@@ -30,9 +30,9 @@ This is the first development preview version of GTerm. Due to my full-time work
 
 ## Dependencies
 
-- Go 1.20+
-- NPM (Node 15+)
-- Wails CLI v2.9.1
+- Go 1.24.1
+- PNPM (Node 18+)
+- Wails CLI v2.10.1
 
 ## Development
 

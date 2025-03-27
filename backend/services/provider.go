@@ -9,4 +9,5 @@ var SetProvider = wire.NewSet(
 	ConnectionSrvSet,
 	MetadataSrvSet,
 	CredentialSrvSet,
+	WebsocketSrvSet,
 )

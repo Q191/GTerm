@@ -22,11 +22,12 @@ type App struct {
 	ConnectionSrv    *services.ConnectionSrv
 	MetadataSrv      *services.MetadataSrv
 	CredentialSrv    *services.CredentialSrv
+	WebsocketSrv     *services.WebsocketSrv
 }
 
 func (a *App) Startup(ctx context.Context) {
 	a.context = ctx
-	http.Handle("/ws/terminal", http.HandlerFunc(a.TerminalSrv.Startup))
+	http.Handle("/ws/terminal", http.HandlerFunc(a.WebsocketSrv.TerminalHandle))
 	// runtime.LogSetLogLevel(ctx, logger.INFO)
 }
 
