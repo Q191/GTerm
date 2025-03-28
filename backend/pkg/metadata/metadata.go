@@ -18,12 +18,12 @@ type SessionMetadata struct {
 }
 
 var universalCommands = []string{
-	"cat /etc/os-release",            // Linux发行版
 	"show version",                   // 网络设备通用
 	"display version",                // 华为等
 	"get system info",                // H3C等
 	"uname -a",                       // Unix/Linux
 	"ver",                            // Windows
+	"cat /etc/os-release",            // Linux发行版
 	"service-control --status --all", // vCenter
 }
 
@@ -167,25 +167,7 @@ var serverVendorKeywords = map[string][]string{
 		"pop!_os", "pop os",
 	},
 	"oracle": {
-		"oracle linux", "ol",
-	},
-	"void": {
-		"void", "void linux",
-	},
-	"nixos": {
-		"nixos", "nix",
-	},
-	"clearlinux": {
-		"clear linux", "clearlinux",
-	},
-	"slackware": {
-		"slackware", "slackware linux",
-	},
-	"mageia": {
-		"mageia", "mageia linux",
-	},
-	"mx": {
-		"mx", "mx linux",
+		"oracle linux",
 	},
 
 	// BSD系统
@@ -196,18 +178,6 @@ var serverVendorKeywords = map[string][]string{
 	"openbsd": {
 		"openbsd", "openbsd open bsd", "openbsd 7",
 		"openbsd current", "openbsd stable",
-	},
-	"netbsd": {
-		"netbsd", "netbsd net bsd", "netbsd 9",
-		"netbsd 10", "netbsd pkgsrc",
-	},
-	"trueos": {
-		"trueos", "trueos true os", "truenas core",
-		"truenas scale", "truenas enterprise",
-	},
-	"dragonflybsd": {
-		"dragonfly bsd", "dragonflybsd", "dragonfly",
-		"dfly", "dragonfly 6",
 	},
 
 	// 其他操作系统
@@ -221,37 +191,9 @@ var serverVendorKeywords = map[string][]string{
 		"macos ventura", "macos sonoma", "macos monterey",
 		"macos big sur", "macos catalina",
 	},
-	"solaris": {
-		"solaris", "oracle solaris", "sun solaris",
-		"illumos", "openindiana", "omnios",
-	},
-	"aix": {
-		"aix", "ibm aix", "aix unix",
-		"aix 7", "aix 6", "ibm power systems",
-	},
-	"hpux": {
-		"hp-ux", "hpux", "hp unix",
-		"hp-ux 11i", "hp-ux 11.31",
-	},
 	"proxmox": {
 		"proxmox", "proxmox ve", "proxmox virtual environment",
 		"pve", "proxmox backup server", "proxmox 8",
-	},
-	"android": {
-		"android", "android os", "android aosp",
-		"android 14", "android 13", "android 12",
-	},
-	"ios": {
-		"ios", "apple ios", "ipados",
-		"ios 17", "ios 16", "ios 15",
-	},
-	"haiku": {
-		"haiku", "haiku os", "beos",
-		"haiku release", "haiku beta",
-	},
-	"reactos": {
-		"reactos", "react os", "open source windows",
-		"reactos 0.4",
 	},
 	"chromeos": {
 		"chrome os", "chromeos", "chromium os",
