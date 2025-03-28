@@ -949,11 +949,6 @@ const handleDeleteGroup = async () => {
       justify-content: center;
       font-size: 16px;
       flex-shrink: 0;
-
-      // :deep(svg) {
-      //   width: 16px;
-      //   height: 16px;
-      // }
     }
 
     .asset-info,
