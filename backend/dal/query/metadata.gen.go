@@ -32,7 +32,8 @@ func newMetadata(db *gorm.DB, opts ...gen.DOOption) metadata {
 	_metadata.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_metadata.DeletedAt = field.NewField(tableName, "deleted_at")
 	_metadata.ConnectionID = field.NewUint(tableName, "connection_id")
-	_metadata.OS = field.NewString(tableName, "os")
+	_metadata.Vendor = field.NewString(tableName, "vendor")
+	_metadata.Type = field.NewString(tableName, "type")
 
 	_metadata.fillFieldMap()
 
@@ -48,7 +49,8 @@ type metadata struct {
 	UpdatedAt    field.Time
 	DeletedAt    field.Field
 	ConnectionID field.Uint
-	OS           field.String
+	Vendor       field.String
+	Type         field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -70,7 +72,8 @@ func (m *metadata) updateTableName(table string) *metadata {
 	m.UpdatedAt = field.NewTime(table, "updated_at")
 	m.DeletedAt = field.NewField(table, "deleted_at")
 	m.ConnectionID = field.NewUint(table, "connection_id")
-	m.OS = field.NewString(table, "os")
+	m.Vendor = field.NewString(table, "vendor")
+	m.Type = field.NewString(table, "type")
 
 	m.fillFieldMap()
 
@@ -87,13 +90,14 @@ func (m *metadata) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (m *metadata) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 6)
+	m.fieldMap = make(map[string]field.Expr, 7)
 	m.fieldMap["id"] = m.ID
 	m.fieldMap["created_at"] = m.CreatedAt
 	m.fieldMap["updated_at"] = m.UpdatedAt
 	m.fieldMap["deleted_at"] = m.DeletedAt
 	m.fieldMap["connection_id"] = m.ConnectionID
-	m.fieldMap["os"] = m.OS
+	m.fieldMap["vendor"] = m.Vendor
+	m.fieldMap["type"] = m.Type
 }
 
 func (m metadata) clone(db *gorm.DB) metadata {

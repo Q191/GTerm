@@ -43,6 +43,7 @@ func newConnection(db *gorm.DB, opts ...gen.DOOption) connection {
 	_connection.DataBits = field.NewInt(tableName, "data_bits")
 	_connection.StopBits = field.NewInt(tableName, "stop_bits")
 	_connection.Parity = field.NewInt(tableName, "parity")
+	_connection.Theme = field.NewString(tableName, "theme")
 	_connection.Metadata = connectionHasOneMetadata{
 		db: db.Session(&gorm.Session{}),
 
@@ -80,6 +81,7 @@ type connection struct {
 	DataBits            field.Int
 	StopBits            field.Int
 	Parity              field.Int
+	Theme               field.String
 	Metadata            connectionHasOneMetadata
 
 	Credential connectionBelongsToCredential
@@ -115,6 +117,7 @@ func (c *connection) updateTableName(table string) *connection {
 	c.DataBits = field.NewInt(table, "data_bits")
 	c.StopBits = field.NewInt(table, "stop_bits")
 	c.Parity = field.NewInt(table, "parity")
+	c.Theme = field.NewString(table, "theme")
 
 	c.fillFieldMap()
 
@@ -131,7 +134,7 @@ func (c *connection) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *connection) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 18)
+	c.fieldMap = make(map[string]field.Expr, 19)
 	c.fieldMap["id"] = c.ID
 	c.fieldMap["created_at"] = c.CreatedAt
 	c.fieldMap["updated_at"] = c.UpdatedAt
@@ -148,6 +151,7 @@ func (c *connection) fillFieldMap() {
 	c.fieldMap["data_bits"] = c.DataBits
 	c.fieldMap["stop_bits"] = c.StopBits
 	c.fieldMap["parity"] = c.Parity
+	c.fieldMap["theme"] = c.Theme
 
 }
 

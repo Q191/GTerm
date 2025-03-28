@@ -57,7 +57,7 @@
               @contextmenu="handleConnContextMenu($event, conn)"
             >
               <div class="asset-icon">
-                <icon :icon="getDeviceIcon(conn)" />
+                <icon :icon="getSessionIcon(conn)" />
               </div>
               <div class="asset-info">
                 <div class="asset-name">{{ conn.label }}</div>
@@ -122,7 +122,7 @@
           <div class="card-header">
             <div class="card-left">
               <div class="os-icon">
-                <icon :icon="getDeviceIcon(conn)" />
+                <icon :icon="getSessionIcon(conn)" />
               </div>
               <div class="card-info">
                 <div class="conn-name">{{ conn.label }}</div>
@@ -396,43 +396,48 @@ const fetchData = async () => {
   conns.value = connsData;
 };
 
-const osIconMap = new Map([
-  [['cisco ios', 'cisco ios-xe', 'cisco ios-xr', 'cisco nx-os', 'cisco asa', 'cisco'], 'simple-icons:cisco'],
-  [['huawei vrp', 'huawei', 'huawei ce', 'huawei ne', 'huawei s', 'huawei ar', 'huawei usg'], 'simple-icons:huawei'],
-  [['fortinet', 'fortigate', 'fortios', 'fortimanager', 'fortianalyzer'], 'simple-icons:fortinet'],
-  [['mikrotik', 'routeros'], 'simple-icons:mikrotik'],
-  [['pfsense', 'opnsense'], 'simple-icons:pfsense'],
-  [['juniper', 'junos', 'juniper ex', 'juniper mx', 'juniper srx'], 'simple-icons:juniper'],
-  [['hp', 'hpe', 'hp procurve', 'hp comware', 'hpe aruba'], 'simple-icons:hp'],
-  [['dell', 'dell emc', 'dell networking'], 'simple-icons:dell'],
-  [['red hat enterprise', 'red hat', 'rhel', 'redhat'], 'simple-icons:redhat'],
-  [['ubuntu', 'ubuntu server', 'xubuntu', 'kubuntu'], 'simple-icons:ubuntu'],
-  [['centos stream', 'centos'], 'simple-icons:centos'],
-  [['debian gnu', 'debian'], 'simple-icons:debian'],
-  [['opensuse leap', 'opensuse tumbleweed', 'opensuse', 'suse'], 'simple-icons:opensuse'],
-  [['fedora server', 'fedora workstation', 'fedora'], 'simple-icons:fedora'],
-  [['alma linux', 'almalinux'], 'simple-icons:almalinux'],
-  [['kali linux', 'kalilinux', 'kali'], 'simple-icons:kalilinux'],
-  [['arch linux', 'archlinux', 'arch', 'manjaro'], 'simple-icons:archlinux'],
-  [['rocky linux', 'rockylinux', 'rocky'], 'simple-icons:rockylinux'],
-  [['alpine linux', 'alpinelinux', 'alpine'], 'simple-icons:alpinelinux'],
-  [['gentoo linux', 'gentoo'], 'simple-icons:gentoo'],
-  [['raspberry pi os', 'raspbian'], 'simple-icons:raspberrypi'],
-  [['mint', 'linux mint'], 'simple-icons:linuxmint'],
-  [['elementary os', 'elementary'], 'simple-icons:elementary'],
-  [['zorin os', 'zorin'], 'simple-icons:zorinos'],
-  [['pop!_os', 'pop os', 'popos'], 'simple-icons:popos'],
-  [['linux'], 'simple-icons:linux'],
-]);
+const vendorIconMap: Record<string, string> = {
+  cisco: 'simple-icons:cisco',
+  huawei: 'simple-icons:huawei',
+  fortinet: 'simple-icons:fortinet',
+  mikrotik: 'simple-icons:mikrotik',
+  pfsense: 'simple-icons:pfsense',
+  juniper: 'simple-icons:juniper',
+  hp: 'simple-icons:hp',
+  dell: 'simple-icons:dell',
+  redhat: 'simple-icons:redhat',
+  ubuntu: 'simple-icons:ubuntu',
+  centos: 'simple-icons:centos',
+  debian: 'simple-icons:debian',
+  opensuse: 'simple-icons:opensuse',
+  fedora: 'simple-icons:fedora',
+  almalinux: 'simple-icons:almalinux',
+  kalilinux: 'simple-icons:kalilinux',
+  archlinux: 'simple-icons:archlinux',
+  rockylinux: 'simple-icons:rockylinux',
+  alpinelinux: 'simple-icons:alpinelinux',
+  gentoo: 'simple-icons:gentoo',
+  raspberrypi: 'simple-icons:raspberrypi',
+  linuxmint: 'simple-icons:linuxmint',
+  elementary: 'simple-icons:elementary',
+  zorinos: 'simple-icons:zorinos',
+  popos: 'simple-icons:popos',
+  linux: 'simple-icons:linux',
+};
 
-const getDeviceIcon = (conn: model.Connection) => {
-  const os = conn.metadata?.os?.toLowerCase() || '';
-  for (const [keys, icon] of osIconMap) {
-    if (keys.some(key => os.includes(key))) {
-      return icon;
-    }
+const getSessionIcon = (conn: model.Connection) => {
+  const vendor = conn.metadata?.vendor || '';
+  if (vendor && vendor in vendorIconMap) {
+    return vendorIconMap[vendor];
   }
-  return 'ph:computer-tower';
+
+  const type = conn.metadata?.type || '';
+  if (type === 'server') {
+    return 'ph:hard-drives';
+  } else if (type === 'network') {
+    return 'ph:network';
+  }
+  return 'ph:ghost';
 };
 
 const getConnCount = (conn: model.Connection) => {

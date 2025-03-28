@@ -21,7 +21,7 @@ type Connection struct {
 	DataBits            int                `json:"dataBits"`
 	StopBits            serial.StopBits    `json:"stopBits"`
 	Parity              serial.Parity      `json:"parity"`
-	Theme               string             `json:"theme" gorm:"default:'Default'"`
+	Theme               string             `json:"theme" gorm:"not null,default:'Default'"`
 }
 
 func (c *Connection) TableName() string {

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/MisakaTAT/GTerm/backend/enums"
 	"golang.org/x/crypto/ssh"
-	"net"
 	"strings"
 	"time"
 )
@@ -181,11 +180,16 @@ func NewExec(conf *Config) (*ssh.Client, error) {
 	}
 
 	c := &ssh.ClientConfig{
-		User:    conf.User,
-		Auth:    auth,
-		Timeout: 10 * time.Second,
-		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			return nil
+		User:            conf.User,
+		Auth:            auth,
+		Timeout:         10 * time.Second,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		HostKeyAlgorithms: []string{
+			ssh.KeyAlgoRSASHA512,
+			ssh.KeyAlgoRSASHA256,
+			ssh.KeyAlgoRSA,
+			ssh.KeyAlgoECDSA256,
+			ssh.KeyAlgoED25519,
 		},
 	}
 

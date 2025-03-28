@@ -12,7 +12,6 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/crypto/ssh"
 	"io"
-	"net"
 	"sync"
 	"time"
 )
@@ -98,11 +97,16 @@ func (s *SSH) Connect() (*SSH, error) {
 	}
 
 	config := &ssh.ClientConfig{
-		User:    s.conf.User,
-		Auth:    auth,
-		Timeout: 10 * time.Second,
-		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			return nil
+		User:            s.conf.User,
+		Auth:            auth,
+		Timeout:         10 * time.Second,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		HostKeyAlgorithms: []string{
+			ssh.KeyAlgoRSASHA512,
+			ssh.KeyAlgoRSASHA256,
+			ssh.KeyAlgoRSA,
+			ssh.KeyAlgoECDSA256,
+			ssh.KeyAlgoED25519,
 		},
 	}
 

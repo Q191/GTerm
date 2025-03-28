@@ -48,9 +48,10 @@ func (s *MetadataSrv) UpdateByConnection(conn *model.Connection) {
 		return
 	}
 
-	osRelease := metadata.NewMetadata(client).GetOSRelease()
-	if osRelease != nil {
-		meta.OS = osRelease.PrettyName
+	metaInfo := metadata.NewMetadata(client).Parser()
+	if metaInfo != nil {
+		meta.Vendor = metaInfo.Vendor
+		meta.Type = metaInfo.Type
 	}
 
 	if err = t.Save(meta); err != nil {
