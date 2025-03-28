@@ -402,7 +402,7 @@ const vendorIconMap: Record<string, string> = {
   fortinet: 'simple-icons:fortinet',
   mikrotik: 'simple-icons:mikrotik',
   pfsense: 'simple-icons:pfsense',
-  juniper: 'simple-icons:juniper',
+  juniper: 'simple-icons:junipernetworks',
   hp: 'simple-icons:hp',
   dell: 'simple-icons:dell',
   redhat: 'simple-icons:redhat',

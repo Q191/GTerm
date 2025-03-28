@@ -12,12 +12,16 @@ This is the first development preview version of GTerm. Due to my full-time work
 <td><img src="docs/preview/main-light.png" alt="Light Mode Main Interface" width="400"/></td>
 </tr>
 <tr>
-<td><img src="docs/preview/new-conn-dark.png" alt="New Connection Dialog" width="400"/></td>
-<td><img src="docs/preview/new-cred-dark.png" alt="New Credentials Dialog" width="400"/></td>
+<td><img src="docs/preview/session-dark.png" alt="Dark Mode Session View" width="400"/></td>
+<td><img src="docs/preview/session-light.png" alt="Light Mode Session View" width="400"/></td>
 </tr>
 <tr>
-<td><img src="docs/preview/session-dark.png" alt="Session Management" width="400"/></td>
-<td><img src="docs/preview/perf-dark.png" alt="Performance Monitoring" width="400"/></td>
+<td><img src="docs/preview/cred.png" alt="Credentials Management" width="400"/></td>
+<td><img src="docs/preview/new-session.png" alt="Session Management" width="400"/></td>
+</tr>
+<tr>
+<td><img src="docs/preview/perf.png" alt="Performance Monitoring" width="400"/></td>
+<td><img src="docs/preview/new-session-perf.png" alt="New Session Performance" width="400"/></td>
 </tr>
 </table>
 
