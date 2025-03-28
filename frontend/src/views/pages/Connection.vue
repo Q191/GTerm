@@ -423,6 +423,7 @@ const vendorIconMap: Record<string, string> = {
   zorinos: 'simple-icons:zorinos',
   popos: 'simple-icons:popos',
   linux: 'simple-icons:linux',
+  vmware: 'simple-icons:vmware',
 };
 
 const getSessionIcon = (conn: model.Connection) => {
