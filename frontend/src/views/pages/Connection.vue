@@ -57,7 +57,7 @@
               @contextmenu="handleConnContextMenu($event, conn)"
             >
               <div class="asset-icon">
-                <icon :icon="getSessionIcon(conn)" />
+                <icon :icon="getSessionIcon(conn).icon" :class="{ 'text-logo': getSessionIcon(conn).isText }" />
               </div>
               <div class="asset-info">
                 <div class="asset-name">{{ conn.label }}</div>
@@ -121,8 +121,8 @@
         <div v-for="conn in filteredConns" :key="conn.id" class="conn-card" @click="toTerminal(conn)">
           <div class="card-header">
             <div class="card-left">
-              <div class="os-icon">
-                <icon :icon="getSessionIcon(conn)" />
+              <div class="os-icon" :class="{ 'text-logo': getSessionIcon(conn).isText }">
+                <icon :icon="getSessionIcon(conn).icon" />
               </div>
               <div class="card-info">
                 <div class="conn-name">{{ conn.label }}</div>
@@ -426,19 +426,36 @@ const vendorIconMap: Record<string, string> = {
   vmware: 'simple-icons:vmware',
 };
 
+const isTextLogo = (vendor: string) => {
+  const textLogoVendors = ['cisco', 'juniper', 'vmware'];
+  return textLogoVendors.includes(vendor.toLowerCase());
+};
+
 const getSessionIcon = (conn: model.Connection) => {
   const vendor = conn.metadata?.vendor || '';
   if (vendor && vendor in vendorIconMap) {
-    return vendorIconMap[vendor];
+    return {
+      icon: vendorIconMap[vendor],
+      isText: isTextLogo(vendor),
+    };
   }
 
   const type = conn.metadata?.type || '';
   if (type === 'server') {
-    return 'ph:hard-drives';
+    return {
+      icon: 'ph:hard-drives',
+      isText: false,
+    };
   } else if (type === 'network') {
-    return 'ph:network';
+    return {
+      icon: 'ph:network',
+      isText: false,
+    };
   }
-  return 'ph:ghost';
+  return {
+    icon: 'ph:ghost',
+    isText: false,
+  };
 };
 
 const getConnCount = (conn: model.Connection) => {
@@ -758,6 +775,19 @@ const handleDeleteGroup = async () => {
         justify-content: center;
         font-size: 22px;
         flex-shrink: 0;
+
+        &.text-logo {
+          :deep(svg) {
+            width: 80%;
+            height: 100%;
+          }
+        }
+
+        :deep(svg) {
+          width: 70%;
+          height: 100%;
+          object-fit: contain;
+        }
       }
 
       .card-info {
@@ -919,6 +949,11 @@ const handleDeleteGroup = async () => {
       justify-content: center;
       font-size: 16px;
       flex-shrink: 0;
+
+      // :deep(svg) {
+      //   width: 16px;
+      //   height: 16px;
+      // }
     }
 
     .asset-info,
