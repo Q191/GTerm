@@ -10,6 +10,7 @@ interface Connection {
   connectionError?: boolean;
   errorMessage?: string;
   errorDetails?: string;
+  theme?: string;
 }
 
 export const useConnectionStore = defineStore('connection', () => {

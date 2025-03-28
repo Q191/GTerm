@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { baseTheme } from '@/themes/xtermjs-theme';
+import { defaultTheme, loadTheme } from '@/themes/xtermjs';
 import { WebsocketPort } from '@wailsApp/go/services/TerminalSrv';
 import { CanvasAddon } from '@xterm/addon-canvas';
 import { FitAddon } from '@xterm/addon-fit';
@@ -101,16 +101,20 @@ const fitXterm = throttle((id: number) => {
   }
 }, 50);
 
-const initializeTerminal = (id: number) => {
+const initializeTerminal = async (id: number) => {
   if (terminals.value[id]) return;
 
+  const conn = connectionStore.connections.find(c => c.id === id);
+  if (!conn) return;
+
+  const theme = await loadTheme(conn.theme || 'Default');
   terminals.value[id] = new Terminal({
     convertEol: true,
     disableStdin: false,
     fontSize: 16,
     cursorBlink: true,
     cursorStyle: 'bar',
-    theme: baseTheme,
+    theme: theme,
   });
 };
 
@@ -314,8 +318,8 @@ const registerToTabs = async () => {
 watchEffect(async () => {
   const connections = connectionStore.connections;
   for (const conn of connections) {
-    if (!terminals.value[conn.id]) {
-      initializeTerminal(conn.id);
+    if (conn.id === activeConn.value?.id && !terminals.value[conn.id]) {
+      await initializeTerminal(conn.id);
       await nextTick();
       await initializeXterm(conn.id);
       if (!sockets.value[conn.id]) {

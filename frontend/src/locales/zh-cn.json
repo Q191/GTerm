@@ -4,12 +4,13 @@
     "github": "源码",
     "website": "官网"
   },
-  "connDialog": {
+  "connModal": {
     "title": "新建连接",
     "editTitle": "编辑连接",
     "cancel": "取消",
     "confirm": "确定",
     "basicConfig": "基础配置",
+    "personalConfig": "个性配置",
     "advancedConfig": "高级配置",
     "developing": "功能开发中...",
     "authType": "认证方式",
@@ -18,7 +19,6 @@
     "commonCredentialLib": "凭据",
     "commonCredential": "共享",
     "privateCredential": "私有",
-    "credentialTooltip": "共享凭据：该认证信息将被添加至凭据库，可被其他连接复用\n私有凭据：仅当前连接可使用",
     "label": "连接名称",
     "group": "所属分组",
     "connProtocol": "连接协议",
@@ -32,6 +32,7 @@
     "username": "用户名",
     "credential": "凭据信息",
     "passphrase": "密钥口令",
+    "theme": "终端主题",
     "placeholder": {
       "label": "请输入连接名称",
       "credentialLabel": "请输入凭据名称",
@@ -48,7 +49,8 @@
       "baudRate": "波特率",
       "dataBits": "数据位",
       "stopBits": "停止位",
-      "parity": "校验位"
+      "parity": "校验位",
+      "theme": "请选择终端主题"
     },
     "validation": {
       "labelRequired": "请输入连接名称",
@@ -68,7 +70,7 @@
       "connProtocolRequired": "请选择连接协议"
     }
   },
-  "groupDialog": {
+  "groupModal": {
     "title": "新建分组",
     "editTitle": "编辑分组",
     "name": "分组名称",
@@ -86,7 +88,7 @@
     "updateSuccess": "更新成功",
     "deleteSuccess": "删除成功"
   },
-  "preferencesDialog": {
+  "preferencesModal": {
     "title": "偏好设置",
     "cancel": "取消",
     "confirm": "确定",
@@ -165,7 +167,7 @@
       }
     }
   },
-  "credentialDialog": {
+  "credentialModal": {
     "title": "添加凭据",
     "editTitle": "编辑凭据",
     "label": "名称",

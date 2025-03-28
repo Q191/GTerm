@@ -331,6 +331,7 @@ const toTerminal = (conn: model.Connection) => {
     label: `${conn.label} (${connStore.connections.filter(c => c.host === conn.host).length + 1})`,
     host: conn.host,
     username: conn.credential?.username || '',
+    theme: conn.theme || 'Default',
   };
   connStore.addConnection(connection);
   router.push({ name: 'Terminal' });

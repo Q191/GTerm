@@ -194,7 +194,7 @@ func (s *SSH) Input(quitSignal chan bool) {
 
 func (s *SSH) Output(quitSignal chan bool) {
 	defer s.setQuit(quitSignal)
-	tick := time.NewTicker(time.Millisecond * time.Duration(60))
+	tick := time.NewTicker(time.Millisecond * time.Duration(5))
 	defer tick.Stop()
 	for {
 		select {

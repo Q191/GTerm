@@ -2,22 +2,22 @@
   <n-modal
     v-model:show="visible"
     close-on-esc
-    :negative-text="$t('groupDialog.cancel')"
+    :negative-text="$t('groupModal.cancel')"
     :on-close="resetForm"
-    :positive-text="$t('groupDialog.confirm')"
+    :positive-text="$t('groupModal.confirm')"
     :show-icon="false"
-    :title="isEdit ? $t('groupDialog.editTitle') : $t('groupDialog.title')"
+    :title="isEdit ? $t('groupModal.editTitle') : $t('groupModal.title')"
     preset="dialog"
     style="width: 600px"
     transform-origin="center"
     @positive-click="handleConfirm"
   >
     <n-form ref="formRef" :model="formValue" :rules="rules">
-      <n-form-item path="name" :label="$t('groupDialog.name')">
+      <n-form-item path="name" :label="$t('groupModal.name')">
         <n-input
           v-model:value="formValue.name"
           clearable
-          :placeholder="$t('groupDialog.placeholder.name')"
+          :placeholder="$t('groupModal.placeholder.name')"
           :allow-input="value => !/\s/.test(value)"
         />
       </n-form-item>
@@ -65,12 +65,12 @@ const formValue = ref<model.Group>(createGroupObject());
 const rules: FormRules = {
   name: {
     required: true,
-    message: t('groupDialog.validation.nameRequired'),
+    message: t('groupModal.validation.nameRequired'),
     trigger: 'blur',
   },
 };
 
-const initDialog = () => {
+const initModalData = () => {
   if (props.group) {
     formValue.value = { ...props.group } as model.Group;
   } else {
@@ -80,13 +80,13 @@ const initDialog = () => {
 
 onUpdated(() => {
   if (props.show) {
-    initDialog();
+    initModalData();
   }
 });
 
 onMounted(() => {
   if (props.show) {
-    initDialog();
+    initModalData();
   }
 });
 

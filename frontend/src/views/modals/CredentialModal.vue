@@ -2,11 +2,11 @@
   <n-modal
     v-model:show="visible"
     close-on-esc
-    :negative-text="$t('credentialDialog.cancel')"
+    :negative-text="$t('credentialModal.cancel')"
     :on-close="resetForm"
-    :positive-text="$t('credentialDialog.confirm')"
+    :positive-text="$t('credentialModal.confirm')"
     :show-icon="false"
-    :title="isEdit ? $t('credentialDialog.editTitle') : $t('credentialDialog.title')"
+    :title="isEdit ? $t('credentialModal.editTitle') : $t('credentialModal.title')"
     preset="dialog"
     transform-origin="center"
     style="width: 600px"
@@ -14,16 +14,16 @@
   >
     <n-scrollbar style="max-height: 70vh; padding-right: 12px">
       <n-form ref="formRef" :model="formValue" :rules="rules">
-        <n-form-item path="label" :label="$t('credentialDialog.label')">
+        <n-form-item path="label" :label="$t('credentialModal.label')">
           <n-input
             v-model:value="formValue.label"
             clearable
-            :placeholder="$t('credentialDialog.placeholder.label')"
+            :placeholder="$t('credentialModal.placeholder.label')"
             :allow-input="value => !/\s/.test(value)"
           />
         </n-form-item>
 
-        <n-form-item :label="$t('credentialDialog.authType')" path="authMethod">
+        <n-form-item :label="$t('credentialModal.authType')" path="authMethod">
           <div class="auth-type-container">
             <n-button-group>
               <n-button
@@ -33,7 +33,7 @@
                 <template #icon>
                   <Icon icon="ph:password" />
                 </template>
-                {{ $t('credentialDialog.password') }}
+                {{ $t('credentialModal.password') }}
               </n-button>
               <n-button
                 :type="formValue.authMethod === AuthMethod.PRIVATEKEY ? 'primary' : 'default'"
@@ -42,51 +42,51 @@
                 <template #icon>
                   <Icon icon="ph:key" />
                 </template>
-                {{ $t('credentialDialog.privateKey') }}
+                {{ $t('credentialModal.privateKey') }}
               </n-button>
             </n-button-group>
           </div>
         </n-form-item>
 
-        <n-form-item path="username" :label="$t('credentialDialog.username')">
+        <n-form-item path="username" :label="$t('credentialModal.username')">
           <n-input
             v-model:value="formValue.username"
             clearable
-            :placeholder="$t('credentialDialog.placeholder.username')"
+            :placeholder="$t('credentialModal.placeholder.username')"
             :allow-input="value => !/\s/.test(value)"
           />
         </n-form-item>
 
         <template v-if="formValue.authMethod === AuthMethod.PASSWORD">
-          <n-form-item path="password" :label="$t('credentialDialog.password')">
+          <n-form-item path="password" :label="$t('credentialModal.password')">
             <n-input
               v-model:value="formValue.password"
               type="password"
               show-password-on="click"
               clearable
-              :placeholder="$t('credentialDialog.placeholder.password')"
+              :placeholder="$t('credentialModal.placeholder.password')"
               :allow-input="value => !/\s/.test(value)"
             />
           </n-form-item>
         </template>
 
         <template v-if="formValue.authMethod === AuthMethod.PRIVATEKEY">
-          <n-form-item path="privateKey" :label="$t('credentialDialog.privateKey')">
+          <n-form-item path="privateKey" :label="$t('credentialModal.privateKey')">
             <n-input
               v-model:value="formValue.privateKey"
               type="textarea"
               :autosize="{ minRows: 3, maxRows: 3 }"
               clearable
-              :placeholder="$t('credentialDialog.placeholder.privateKey')"
+              :placeholder="$t('credentialModal.placeholder.privateKey')"
             />
           </n-form-item>
-          <n-form-item path="passphrase" :label="$t('credentialDialog.passphrase')">
+          <n-form-item path="passphrase" :label="$t('credentialModal.passphrase')">
             <n-input
               v-model:value="formValue.passphrase"
               type="password"
               show-password-on="click"
               clearable
-              :placeholder="$t('credentialDialog.placeholder.passphrase')"
+              :placeholder="$t('credentialModal.placeholder.passphrase')"
               :allow-input="value => !/\s/.test(value)"
             />
           </n-form-item>
@@ -166,27 +166,27 @@ const handleAuthTypeChange = (authMethod: enums.AuthMethod) => {
 const rules = computed<FormRules>(() => ({
   label: {
     required: true,
-    message: t('credentialDialog.validation.labelRequired'),
+    message: t('credentialModal.validation.labelRequired'),
     trigger: 'blur',
   },
   username: {
     required: true,
-    message: t('credentialDialog.validation.usernameRequired'),
+    message: t('credentialModal.validation.usernameRequired'),
     trigger: 'blur',
   },
   password: {
     required: formValue.value.authMethod === AuthMethod.PASSWORD,
-    message: t('credentialDialog.validation.passwordRequired'),
+    message: t('credentialModal.validation.passwordRequired'),
     trigger: 'blur',
   },
   privateKey: {
     required: formValue.value.authMethod === AuthMethod.PRIVATEKEY,
-    message: t('credentialDialog.validation.privateKeyRequired'),
+    message: t('credentialModal.validation.privateKeyRequired'),
     trigger: 'blur',
   },
 }));
 
-const initDialog = () => {
+const initModalData = () => {
   if (props.credential) {
     formValue.value = { ...props.credential } as model.Credential;
   } else {
@@ -196,13 +196,13 @@ const initDialog = () => {
 
 onUpdated(() => {
   if (props.show) {
-    initDialog();
+    initModalData();
   }
 });
 
 onMounted(() => {
   if (props.show) {
-    initDialog();
+    initModalData();
   }
 });
 
