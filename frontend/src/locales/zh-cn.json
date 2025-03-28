@@ -17,8 +17,6 @@
     "password": "密码",
     "privateKey": "私钥",
     "commonCredentialLib": "凭据",
-    "commonCredential": "共享",
-    "privateCredential": "私有",
     "label": "连接名称",
     "group": "所属分组",
     "connProtocol": "连接协议",
@@ -35,7 +33,6 @@
     "theme": "终端主题",
     "placeholder": {
       "label": "请输入连接名称",
-      "credentialLabel": "请输入凭据名称",
       "group": "请选择所属分组",
       "host": "请输入主机地址",
       "port": "请输入端口号",
@@ -50,7 +47,7 @@
       "dataBits": "数据位",
       "stopBits": "停止位",
       "parity": "校验位",
-      "theme": "请选择终端主题"
+      "selectTheme": "请选择终端主题"
     },
     "validation": {
       "labelRequired": "请输入连接名称",
@@ -60,7 +57,6 @@
       "passwordRequired": "请输入密码",
       "privateKeyRequired": "请输入私钥内容",
       "credentialRequired": "请选择凭据信息",
-      "credentialLabelRequired": "请输入凭据名称",
       "portInvalid": "端口号必须在 1-65535 之间",
       "serialPortRequired": "请选择串口",
       "baudRateRequired": "请选择波特率",
@@ -153,7 +149,6 @@
       "edit_conn": "编辑连接",
       "delete_conn": "删除连接"
     },
-    "back": "返回列表",
     "connection": {
       "active": "活跃会话",
       "disconnected": "已断开"
