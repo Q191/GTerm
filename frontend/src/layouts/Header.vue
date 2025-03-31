@@ -17,7 +17,7 @@
       <ConnectionTabs v-if="hasConnections" ref="connectionTabsRef" class="connection-tabs-container" />
     </div>
 
-    <div v-if="isDarwin" class="window-controls">
+    <div v-if="!isDarwin" class="window-controls">
       <div class="window-control-btn" @click="WindowMinimise">
         <n-icon size="16"><icon icon="ph:minus-bold" /></n-icon>
       </div>
