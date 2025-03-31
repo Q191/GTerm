@@ -1,5 +1,5 @@
 <template>
-  <div ref="widthRef" class="header">
+  <div ref="widthRef" class="header" @dblclick="toggleFullscreen">
     <div
       class="logo-container"
       :class="{
@@ -41,6 +41,8 @@ import {
   WindowMaximise,
   WindowUnmaximise,
   WindowIsFullscreen,
+  WindowFullscreen,
+  WindowUnfullscreen,
   EventsOn,
   EventsOff,
 } from '@wailsApp/runtime';
@@ -72,6 +74,16 @@ const toggleMaximize = async () => {
   const isMaximised = await WindowIsMaximised();
   windowIsMaximised.value = !isMaximised;
   isMaximised ? WindowUnmaximise() : WindowMaximise();
+};
+
+const toggleFullscreen = async () => {
+  const fullscreen = await WindowIsFullscreen();
+  if (fullscreen) {
+    WindowUnfullscreen();
+  } else {
+    WindowFullscreen();
+  }
+  await checkFullscreenStatus();
 };
 
 const checkFullscreenStatus = async () => {
