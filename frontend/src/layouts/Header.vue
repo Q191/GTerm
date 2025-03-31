@@ -5,8 +5,9 @@
       :class="{
         'padding-left-small': !isDarwin,
         'padding-left-large': isDarwin,
-        'center-position': !hasConnections,
-        'left-position': hasConnections,
+        'center-position': !hasConnections && !isFullscreen,
+        'left-position': hasConnections || isFullscreen,
+        fullscreen: isFullscreen,
       }"
     >
       <div class="logo-wrapper" @click="toConnection">
@@ -16,14 +17,13 @@
       <ConnectionTabs v-if="hasConnections" ref="connectionTabsRef" class="connection-tabs-container" />
     </div>
 
-    <div v-if="!isDarwin" class="window-controls">
+    <div v-if="isDarwin" class="window-controls">
       <div class="window-control-btn" @click="WindowMinimise">
         <n-icon size="16"><icon icon="ph:minus-bold" /></n-icon>
       </div>
-      <div class="window-control-btn" @click="reduction">
+      <div class="window-control-btn" @click="toggleMaximize">
         <n-icon size="16">
-          <span v-if="windowIsMaximised"><icon icon="ph:corners-in-bold" /></span>
-          <span v-else><icon icon="ph:corners-out-bold" /></span>
+          <icon :icon="windowIsMaximised ? 'ph:corners-in-bold' : 'ph:corners-out-bold'" />
         </n-icon>
       </div>
       <div class="window-control-btn close-btn" @click="Quit">
@@ -34,7 +34,16 @@
 </template>
 
 <script lang="ts" setup>
-import { WindowMinimise, Quit, WindowIsMaximised, WindowMaximise, WindowUnmaximise } from '@wailsApp/runtime';
+import {
+  WindowMinimise,
+  Quit,
+  WindowIsMaximised,
+  WindowMaximise,
+  WindowUnmaximise,
+  WindowIsFullscreen,
+  EventsOn,
+  EventsOff,
+} from '@wailsApp/runtime';
 import { NIcon } from 'naive-ui';
 import { Icon } from '@iconify/vue';
 import { IsDarwin } from '@wailsApp/go/services/PreferencesSrv';
@@ -52,27 +61,38 @@ const hasConnections = computed(() => connectionStore.hasConnections);
 const router = useRouter();
 
 const isDarwin = ref(false);
+const isFullscreen = ref(false);
+const windowIsMaximised = ref(false);
 
 const toConnection = () => {
   router.push({ name: 'Connection' });
 };
 
-const windowIsMaximised = ref(false);
+const toggleMaximize = async () => {
+  const isMaximised = await WindowIsMaximised();
+  windowIsMaximised.value = !isMaximised;
+  isMaximised ? WindowUnmaximise() : WindowMaximise();
+};
 
-const reduction = () => {
-  WindowIsMaximised().then(isMaximised => {
-    if (isMaximised) {
-      windowIsMaximised.value = false;
-      WindowUnmaximise();
-    } else {
-      windowIsMaximised.value = true;
-      WindowMaximise();
-    }
-  });
+const checkFullscreenStatus = async () => {
+  isFullscreen.value = await WindowIsFullscreen();
+};
+
+const updateWindowState = async () => {
+  await checkFullscreenStatus();
+  windowIsMaximised.value = await WindowIsMaximised();
 };
 
 onMounted(async () => {
   isDarwin.value = await IsDarwin();
+  await updateWindowState();
+  EventsOn('window:state-changed', updateWindowState);
+  window.addEventListener('resize', updateWindowState);
+});
+
+onUnmounted(() => {
+  EventsOff('window:state-changed');
+  window.removeEventListener('resize', updateWindowState);
 });
 </script>
 
@@ -100,6 +120,10 @@ onMounted(async () => {
 
   &.padding-left-large {
     padding-left: 80px;
+
+    &.fullscreen {
+      padding-left: 8px;
+    }
   }
 
   &.center-position {
@@ -116,6 +140,7 @@ onMounted(async () => {
 .logo-wrapper {
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .logo-image {
