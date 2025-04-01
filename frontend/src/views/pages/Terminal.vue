@@ -5,7 +5,7 @@
         v-if="conn.connectionError"
         status="error"
         :title="conn.errorMessage"
-        v-show="conn.id === activeConn?.id"
+        :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
       >
         <template #footer>
           <n-button @click="() => reconnect(conn.id)" type="primary">{{ $t('terminal.reconnect') }}</n-button>
@@ -25,16 +25,15 @@
         status="info"
         :title="$t('terminal.connecting')"
         :description="$t('terminal.connecting_desc')"
-        v-show="conn.id === activeConn?.id"
+        :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
       >
         <template #icon>
           <n-spin size="large" />
         </template>
       </n-result>
       <div
-        v-show="
-          conn.id === activeConn?.id && !conn.connectionError && !conn.isConnecting && connectedTerminals[conn.id]
-        "
+        v-show="isTerminalVisible(conn)"
+        :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
         :ref="el => el && (terminalRefs[conn.id] = el as HTMLElement)"
         class="xterm-wrapper"
       />
@@ -43,14 +42,13 @@
 </template>
 
 <script setup lang="ts">
-import { defaultTheme, loadTheme } from '@/themes/xtermjs';
+import { loadTheme } from '@/themes/xtermjs';
 import { WebsocketPort } from '@wailsApp/go/services/TerminalSrv';
 import { CanvasAddon } from '@xterm/addon-canvas';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { WebglAddon } from '@xterm/addon-webgl';
 import { Terminal } from '@xterm/xterm';
-import { throttle } from 'lodash';
 import '@xterm/xterm/css/xterm.css';
 import { useConnectionStore } from '@/stores/connection';
 import { NCode, NCollapse, NCollapseItem, NResult, NSpin, NButton } from 'naive-ui';
@@ -62,6 +60,14 @@ const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const connectionTabs = inject<any>('connectionTabs');
 const activeConn = computed(() => connectionStore.activeConnection);
+
+const isTerminalHidden = (connId: number) => {
+  return connId !== activeConn.value?.id;
+};
+
+const isTerminalVisible = (conn: any) => {
+  return !conn.connectionError && !conn.isConnecting && connectedTerminals.value[conn.id];
+};
 
 const terminalRefs = ref<Record<number, HTMLElement | null>>({});
 const terminals = ref<Record<number, Terminal | undefined>>({});
@@ -93,13 +99,24 @@ const updateStatus = (
   }
 };
 
-const fitXterm = throttle((id: number) => {
+const fitXterm = (id: number) => {
   const dims = fitAddons.value[id]?.proposeDimensions();
   if (!dims || !terminals.value[id] || !dims.cols || !dims.rows) return;
   if (terminals.value[id].rows !== dims.rows || terminals.value[id].cols !== dims.cols) {
     terminals.value[id].resize(dims.cols, dims.rows);
   }
-}, 50);
+};
+
+const fitAllTerminals = () => {
+  requestAnimationFrame(() => {
+    Object.keys(terminals.value).forEach(id => {
+      const numId = Number(id);
+      if (terminals.value[numId]) {
+        fitXterm(numId);
+      }
+    });
+  });
+};
 
 const initializeTerminal = async (id: number) => {
   if (terminals.value[id]) return;
@@ -157,7 +174,8 @@ const initializeXterm = async (id: number) => {
     }
   });
 
-  nextTick(() => fitXterm(id));
+  await nextTick();
+  fitXterm(id);
 };
 
 const initializeWebsocket = async (id: number, hostId: number) => {
@@ -265,6 +283,8 @@ const reconnect = async (id: number) => {
     errorMessage: '',
   });
   await initializeWebsocket(id, conn.connId);
+  await nextTick();
+  fitXterm(id);
 };
 
 const closeTerminal = (id: number) => {
@@ -330,27 +350,22 @@ watchEffect(async () => {
 });
 
 onMounted(async () => {
-  window.addEventListener('resize', () => activeConn.value && fitXterm(activeConn.value.id));
+  window.addEventListener('resize', fitAllTerminals);
   await registerToTabs();
 });
 
 onUnmounted(() => {
   Object.keys(terminals.value).forEach(id => closeTerminal(Number(id)));
-  window.removeEventListener('resize', () => activeConn.value && fitXterm(activeConn.value.id));
+  window.removeEventListener('resize', fitAllTerminals);
 });
 
 onActivated(() => {
-  Object.keys(terminals.value).forEach(id => {
-    const numId = Number(id);
-    if (terminals.value[numId]) {
-      nextTick(() => {
-        fitXterm(numId);
-        if (activeConn.value?.id === numId) {
-          terminals.value[numId]?.focus();
-        }
-      });
-    }
-  });
+  const activeId = activeConn.value?.id;
+  if (activeId && terminals.value[activeId]) {
+    nextTick(() => {
+      terminals.value[activeId]?.focus();
+    });
+  }
 });
 
 defineExpose({ closeTerminal });
@@ -360,6 +375,22 @@ defineOptions({ name: 'Terminal' });
 <style lang="less" scoped>
 .xterm-container {
   height: calc(100vh - 38px);
+  position: relative;
+
+  .terminal-hidden {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .xterm-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 
   :deep(.xterm) {
     height: calc(100vh - 54px);
