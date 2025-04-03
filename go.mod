@@ -9,6 +9,7 @@ require (
 	github.com/google/wire v0.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
+	github.com/skeema/knownhosts v1.3.1
 	github.com/vrischmann/userdir v0.0.0-20151206171402-20f291cebd68
 	github.com/wailsapp/wails/v2 v2.10.1
 	go.bug.st/serial v1.6.2

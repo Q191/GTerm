@@ -11,6 +11,9 @@ interface Connection {
   errorMessage?: string;
   errorDetails?: string;
   theme?: string;
+  isFingerprintConfirm?: boolean;
+  hostAddress?: string;
+  hostFingerprint?: string;
 }
 
 export const useConnectionStore = defineStore('connection', () => {

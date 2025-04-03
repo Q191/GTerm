@@ -44,5 +44,6 @@ func (a *App) Bind() (services []any) {
 func (a *App) Enums() (es []any) {
 	es = append(es, enums.AuthMethodEnums)
 	es = append(es, enums.ConnProtocolEnums)
+	es = append(es, enums.TerminalTypeEnums)
 	return
 }

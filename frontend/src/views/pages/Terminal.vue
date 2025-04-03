@@ -21,6 +21,40 @@
         </template>
       </n-result>
       <n-result
+        v-else-if="conn.isFingerprintConfirm"
+        status="warning"
+        :title="$t('terminal.fingerprint.confirm')"
+        :description="$t('terminal.fingerprint.description')"
+        :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
+      >
+        <template #icon>
+          <n-icon size="48">
+            <icon icon="ph:fingerprint" />
+          </n-icon>
+        </template>
+        <template #footer>
+          <n-space>
+            <n-button @click="() => rejectFingerprint(conn.id)" type="error">
+              {{ $t('terminal.fingerprint.reject') }}
+            </n-button>
+            <n-button @click="() => acceptFingerprint(conn.id)" type="primary">
+              {{ $t('terminal.fingerprint.accept') }}
+            </n-button>
+          </n-space>
+        </template>
+        <template #default>
+          <div class="fingerprint-details">
+            <p>
+              <strong>{{ $t('terminal.fingerprint.host') }}:</strong> {{ conn.hostAddress }}
+            </p>
+            <p>
+              <strong>{{ $t('terminal.fingerprint.fingerprint') }}:</strong>
+            </p>
+            <n-code :code="conn.hostFingerprint || ''" language="bash" :word-wrap="true" />
+          </div>
+        </template>
+      </n-result>
+      <n-result
         v-else-if="conn.isConnecting || !connectedTerminals[conn.id]"
         status="info"
         :title="$t('terminal.connecting')"
@@ -42,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import { Icon } from '@iconify/vue';
 import { loadTheme } from '@/themes/xtermjs';
 import { WebsocketPort } from '@wailsApp/go/services/TerminalSrv';
 import { CanvasAddon } from '@xterm/addon-canvas';
@@ -51,9 +86,10 @@ import { WebglAddon } from '@xterm/addon-webgl';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { useConnectionStore } from '@/stores/connection';
-import { NCode, NCollapse, NCollapseItem, NResult, NSpin, NButton } from 'naive-ui';
+import { NCode, NCollapse, NCollapseItem, NResult, NSpin, NButton, NSpace, NIcon } from 'naive-ui';
 import { onActivated } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { enums } from '@wailsApp/go/models';
 
 const { t } = useI18n();
 
@@ -66,7 +102,7 @@ const isTerminalHidden = (connId: number) => {
 };
 
 const isTerminalVisible = (conn: any) => {
-  return !conn.connectionError && !conn.isConnecting && connectedTerminals.value[conn.id];
+  return !conn.connectionError && !conn.isConnecting && !conn.isFingerprintConfirm && connectedTerminals.value[conn.id];
 };
 
 const terminalRefs = ref<Record<number, HTMLElement | null>>({});
@@ -83,8 +119,11 @@ const updateStatus = (
   status: Partial<{
     isConnecting: boolean;
     connectionError: boolean;
+    isFingerprintConfirm: boolean;
     errorMessage: string;
     errorDetails: string;
+    hostAddress: string;
+    hostFingerprint: string;
   }>,
 ) => {
   connectionStore.updateConnectionStatus(id, status);
@@ -92,11 +131,51 @@ const updateStatus = (
     let tabStatus = 'connecting';
     if (status.connectionError) {
       tabStatus = 'error';
+    } else if (status.isFingerprintConfirm) {
+      tabStatus = 'warning';
     } else if (!status.isConnecting && connectedTerminals.value[id]) {
       tabStatus = 'connected';
     }
     connectionTabs.value.updateTabStatus(id, tabStatus);
   }
+};
+
+const acceptFingerprint = (id: number) => {
+  const conn = connectionStore.connections.find(c => c.id === id);
+  if (!conn || !sockets.value[id]) return;
+
+  sockets.value[id]?.send(
+    JSON.stringify({
+      type: enums.TerminalType.FINGERPRINTCONFIRM,
+      accept: true,
+    }),
+  );
+
+  updateStatus(id, {
+    isFingerprintConfirm: false,
+    isConnecting: true,
+  });
+};
+
+const rejectFingerprint = (id: number) => {
+  const conn = connectionStore.connections.find(c => c.id === id);
+  if (!conn || !sockets.value[id]) return;
+
+  sockets.value[id]?.send(
+    JSON.stringify({
+      type: enums.TerminalType.FINGERPRINTCONFIRM,
+      accept: false,
+    }),
+  );
+
+  updateStatus(id, {
+    isFingerprintConfirm: false,
+    connectionError: true,
+    errorMessage: t('terminal.fingerprint.rejected'),
+  });
+
+  sockets.value[id]?.close();
+  sockets.value[id] = undefined;
 };
 
 const fitXterm = (id: number) => {
@@ -167,10 +246,10 @@ const initializeXterm = async (id: number) => {
   });
 
   terminal.open(terminalEl);
-  terminal.onData(data => sockets.value[id]?.send(JSON.stringify({ type: 'cmd', cmd: data })));
+  terminal.onData(data => sockets.value[id]?.send(JSON.stringify({ type: enums.TerminalType.CMD, cmd: data })));
   terminal.onResize(({ cols, rows }) => {
     if (sockets.value[id]?.readyState === WebSocket.OPEN) {
-      sockets.value[id]?.send(JSON.stringify({ type: 'resize', cols, rows }));
+      sockets.value[id]?.send(JSON.stringify({ type: enums.TerminalType.RESIZE, cols, rows }));
     }
   });
 
@@ -193,8 +272,11 @@ const initializeWebsocket = async (id: number, hostId: number) => {
     updateStatus(id, {
       isConnecting: true,
       connectionError: false,
+      isFingerprintConfirm: false,
       errorMessage: '',
       errorDetails: '',
+      hostAddress: '',
+      hostFingerprint: '',
     });
 
     const port = await WebsocketPort();
@@ -213,7 +295,7 @@ const initializeWebsocket = async (id: number, hostId: number) => {
     socket.onmessage = async (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       switch (data.type) {
-        case 'error':
+        case enums.TerminalType.ERROR:
           updateStatus(id, {
             isConnecting: false,
             connectionError: true,
@@ -223,18 +305,26 @@ const initializeWebsocket = async (id: number, hostId: number) => {
           connectedTerminals.value[id] = false;
           socket?.close();
           break;
-        case 'connected':
+        case enums.TerminalType.FINGERPRINTCONFIRM:
+          updateStatus(id, {
+            isConnecting: false,
+            isFingerprintConfirm: true,
+            hostAddress: data.host,
+            hostFingerprint: data.fingerprint,
+          });
+          break;
+        case enums.TerminalType.CONNECTED:
           updateStatus(id, { isConnecting: false });
           connectedTerminals.value[id] = true;
           if (connectionTabs?.value) {
-            connectionTabs.value.updateTabStatus(id, 'connected');
+            connectionTabs.value.updateTabStatus(id, enums.TerminalType.CONNECTED);
           }
           nextTick(() => {
             terminals.value[id]?.focus();
             fitXterm(id);
           });
           break;
-        case 'data':
+        case enums.TerminalType.DATA:
           terminals.value[id]?.write(data.content);
           break;
       }
@@ -330,7 +420,7 @@ const registerToTabs = async () => {
       connectedTerminals.value[id];
     connectionTabs.value.registerTerminal(id, {
       closeTerminal: () => closeTerminal(id),
-      status: isConnected ? 'connected' : 'error',
+      status: isConnected ? enums.TerminalType.CONNECTED : enums.TerminalType.ERROR,
     });
   }
 };
@@ -350,13 +440,13 @@ watchEffect(async () => {
 });
 
 onMounted(async () => {
-  window.addEventListener('resize', fitAllTerminals);
+  window.addEventListener(enums.TerminalType.RESIZE, fitAllTerminals);
   await registerToTabs();
 });
 
 onUnmounted(() => {
   Object.keys(terminals.value).forEach(id => closeTerminal(Number(id)));
-  window.removeEventListener('resize', fitAllTerminals);
+  window.removeEventListener(enums.TerminalType.RESIZE, fitAllTerminals);
 });
 
 onActivated(() => {
@@ -433,6 +523,10 @@ defineOptions({ name: 'Terminal' });
   .n-button {
     min-width: 120px;
     margin-top: 16px;
+  }
+
+  .fingerprint-details {
+    text-align: left;
   }
 }
 </style>

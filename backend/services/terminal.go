@@ -3,6 +3,8 @@ package services
 import (
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/MisakaTAT/GTerm/backend/consts"
 	"github.com/MisakaTAT/GTerm/backend/enums"
 	"github.com/MisakaTAT/GTerm/backend/initialize"
@@ -14,7 +16,6 @@ import (
 	"github.com/gorilla/websocket"
 	"go.bug.st/serial"
 	"go.uber.org/zap"
-	"time"
 )
 
 var TerminalSrvSet = wire.NewSet(wire.Struct(new(TerminalSrv), "*"))
@@ -57,7 +58,7 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 	}
 
 	// 发送连接成功消息
-	if err = ws.WriteJSON(&types.Message{Type: types.MessageTypeConnected}); err != nil {
+	if err = ws.WriteJSON(&types.Message{Type: enums.TerminalTypeConnected}); err != nil {
 		s.Logger.Error("Failed to send connected message",
 			zap.Error(err),
 		)
@@ -66,6 +67,39 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 
 	term := terminal.NewTerminal(ws, ssh, s.SessionEnded)
 	term.Start()
+
+	return nil
+}
+
+// AddFingerprint 添加主机指纹到known_hosts文件
+func (s *TerminalSrv) AddFingerprint(hostID uint, hostAddress string, fingerprint string) error {
+	conn, err := s.ConnectionSrv.FindByID(hostID)
+	if err != nil {
+		return fmt.Errorf("failed to find host: %v", err)
+	}
+
+	sshConf := &adapter.SSHConfig{
+		Host:       conn.Host,
+		Port:       conn.Port,
+		User:       conn.Credential.Username,
+		AuthMethod: conn.Credential.AuthMethod,
+	}
+
+	switch conn.Credential.AuthMethod {
+	case enums.Password:
+		sshConf.Password = conn.Credential.Password
+	case enums.PrivateKey:
+		sshConf.PrivateKey = conn.Credential.PrivateKey
+		sshConf.KeyPassword = conn.Credential.Passphrase
+	}
+
+	// 创建SSH配置
+	ssh := adapter.NewSSH(sshConf, nil, s.Logger)
+
+	// 添加主机指纹
+	if err = ssh.AddFingerprint(hostAddress, fingerprint); err != nil {
+		return fmt.Errorf("failed to add host fingerprint: %v", err)
+	}
 
 	return nil
 }

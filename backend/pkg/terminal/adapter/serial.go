@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"encoding/json"
+	"github.com/MisakaTAT/GTerm/backend/enums"
 	"github.com/MisakaTAT/GTerm/backend/pkg/terminal"
 	"github.com/MisakaTAT/GTerm/backend/types"
 	"github.com/gorilla/websocket"
@@ -88,7 +89,7 @@ func (s *Serial) Output(quitSignal chan bool) {
 					continue
 				}
 				if err = s.ws.WriteJSON(&types.Message{
-					Type:    types.MessageTypeData,
+					Type:    enums.TerminalTypeData,
 					Content: string(buff[:n]),
 				}); err != nil {
 					s.logger.Error("write message failed", zap.Error(err))

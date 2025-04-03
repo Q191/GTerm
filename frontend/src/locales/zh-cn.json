@@ -115,6 +115,15 @@
       "connection": "连接失败，请检查应用是否正常运行",
       "disconnected": "连接已断开",
       "failed": "无法建立连接"
+    },
+    "fingerprint": {
+      "confirm": "验证主机指纹",
+      "description": "首次连接到该主机，请确认指纹信息",
+      "host": "主机地址",
+      "fingerprint": "主机指纹",
+      "accept": "接受并继续",
+      "reject": "拒绝连接",
+      "rejected": "已拒绝主机指纹"
     }
   },
   "sider": {
