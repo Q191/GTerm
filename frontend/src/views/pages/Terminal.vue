@@ -113,6 +113,7 @@ const webLinksAddons = ref<Record<number, WebLinksAddon | undefined>>({});
 const webglAddons = ref<Record<number, WebglAddon | undefined>>({});
 const canvasAddons = ref<Record<number, CanvasAddon | undefined>>({});
 const connectedTerminals = ref<Record<number, boolean>>({});
+const resizeObservers = ref<Record<number, ResizeObserver | undefined>>({});
 
 const updateStatus = (
   id: number,
@@ -179,22 +180,8 @@ const rejectFingerprint = (id: number) => {
 };
 
 const fitXterm = (id: number) => {
-  const dims = fitAddons.value[id]?.proposeDimensions();
-  if (!dims || !terminals.value[id] || !dims.cols || !dims.rows) return;
-  if (terminals.value[id].rows !== dims.rows || terminals.value[id].cols !== dims.cols) {
-    terminals.value[id].resize(dims.cols, dims.rows);
-  }
-};
-
-const fitAllTerminals = () => {
-  requestAnimationFrame(() => {
-    Object.keys(terminals.value).forEach(id => {
-      const numId = Number(id);
-      if (terminals.value[numId]) {
-        fitXterm(numId);
-      }
-    });
-  });
+  if (!fitAddons.value[id] || !terminals.value[id]) return;
+  fitAddons.value[id].fit();
 };
 
 const initializeTerminal = async (id: number) => {
@@ -252,6 +239,14 @@ const initializeXterm = async (id: number) => {
       sockets.value[id]?.send(JSON.stringify({ type: enums.TerminalType.RESIZE, cols, rows }));
     }
   });
+
+  const resizeObserver = new ResizeObserver(() => {
+    if (fitAddons.value[id]) {
+      fitAddons.value[id].fit();
+    }
+  });
+  resizeObserver.observe(terminalEl);
+  resizeObservers.value[id] = resizeObserver;
 
   await nextTick();
   fitXterm(id);
@@ -383,6 +378,11 @@ const closeTerminal = (id: number) => {
     sockets.value[id] = undefined;
     connectedTerminals.value[id] = false;
 
+    if (resizeObservers.value[id]) {
+      resizeObservers.value[id].disconnect();
+      resizeObservers.value[id] = undefined;
+    }
+
     if (terminals.value[id]) {
       terminals.value[id].onData(() => {});
       terminals.value[id].onResize(() => {});
@@ -440,13 +440,11 @@ watchEffect(async () => {
 });
 
 onMounted(async () => {
-  window.addEventListener('resize', fitAllTerminals);
   await registerToTabs();
 });
 
 onUnmounted(() => {
   Object.keys(terminals.value).forEach(id => closeTerminal(Number(id)));
-  window.removeEventListener('resize', fitAllTerminals);
 });
 
 onActivated(() => {
