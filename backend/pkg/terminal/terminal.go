@@ -1,13 +1,10 @@
 package terminal
 
 import (
-	"github.com/gorilla/websocket"
 	"sync"
-)
 
-const (
-	Resize  = "resize"
-	Command = "cmd"
+	"github.com/MisakaTAT/GTerm/backend/enums"
+	"github.com/gorilla/websocket"
 )
 
 type Handler interface {
@@ -17,10 +14,10 @@ type Handler interface {
 }
 
 type Payload struct {
-	Type string `json:"type"`
-	Cmd  string `json:"cmd"`
-	Cols int    `json:"cols"`
-	Rows int    `json:"rows"`
+	Type enums.TerminalType `json:"type"`
+	Cmd  string             `json:"cmd"`
+	Cols int                `json:"cols"`
+	Rows int                `json:"rows"`
 }
 
 type Terminal struct {

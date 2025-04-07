@@ -42,7 +42,7 @@ const terminalRefs = ref<Map<number, any>>(new Map());
 
 const tabStatus = ref<Record<number, string>>({});
 
-const updateTabStatus = (id: number, status: 'connected' | 'error' | 'connecting') => {
+const updateTabStatus = (id: number, status: 'connected' | 'error' | 'connecting' | 'warning') => {
   tabStatus.value[id] = status;
 };
 

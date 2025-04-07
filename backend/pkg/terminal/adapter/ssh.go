@@ -334,13 +334,13 @@ func (s *SSH) Input(quitSignal chan bool) {
 			_ = json.Unmarshal(data, &msg)
 
 			switch msg.Type {
-			case terminal.Resize:
+			case enums.TerminalTypeResize:
 				if msg.Cols > 0 && msg.Rows > 0 {
 					if err = s.session.WindowChange(msg.Rows, msg.Cols); err != nil {
 						s.logger.Error("failed change ssh pty window size", zap.Error(err))
 					}
 				}
-			case terminal.Command:
+			case enums.TerminalTypeCMD:
 				if _, err = s.stdinPipe.Write([]byte(msg.Cmd)); err != nil {
 					s.logger.Error("failed write command to stdin pipe", zap.Error(err))
 				}

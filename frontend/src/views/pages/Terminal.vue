@@ -317,7 +317,7 @@ const initializeWebsocket = async (id: number, hostId: number) => {
           updateStatus(id, { isConnecting: false });
           connectedTerminals.value[id] = true;
           if (connectionTabs?.value) {
-            connectionTabs.value.updateTabStatus(id, enums.TerminalType.CONNECTED);
+            connectionTabs.value.updateTabStatus(id, 'connected');
           }
           nextTick(() => {
             terminals.value[id]?.focus();
@@ -406,7 +406,7 @@ const closeTerminal = (id: number) => {
       errorDetails: '',
     });
   } catch (e) {
-    console.error('Error in closeTerminal:', e);
+    console.error('Error in close terminal:', e);
   }
 };
 
@@ -440,13 +440,13 @@ watchEffect(async () => {
 });
 
 onMounted(async () => {
-  window.addEventListener(enums.TerminalType.RESIZE, fitAllTerminals);
+  window.addEventListener('resize', fitAllTerminals);
   await registerToTabs();
 });
 
 onUnmounted(() => {
   Object.keys(terminals.value).forEach(id => closeTerminal(Number(id)));
-  window.removeEventListener(enums.TerminalType.RESIZE, fitAllTerminals);
+  window.removeEventListener('resize', fitAllTerminals);
 });
 
 onActivated(() => {

@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"encoding/json"
+
 	"github.com/MisakaTAT/GTerm/backend/enums"
 	"github.com/MisakaTAT/GTerm/backend/pkg/terminal"
 	"github.com/MisakaTAT/GTerm/backend/types"
@@ -58,7 +59,7 @@ func (s *Serial) Input(quitSignal chan bool) {
 			}
 			msg := &terminal.Payload{}
 			_ = json.Unmarshal(data, &msg)
-			if msg.Type == terminal.Command {
+			if msg.Type == enums.TerminalTypeCMD {
 				if _, err = s.port.Write([]byte(msg.Cmd)); err != nil {
 					s.logger.Error("write to serial port failed", zap.Error(err))
 				}
