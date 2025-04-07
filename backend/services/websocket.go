@@ -27,7 +27,19 @@ var ug = websocket.Upgrader{
 	WriteBufferSize:   1024 * 1024 * 10,
 	EnableCompression: true,
 	CheckOrigin: func(r *http.Request) bool {
-		return true
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			return false
+		}
+		allowedOrigins := []string{
+			"wails://wails.localhost",
+		}
+		for _, allowed := range allowedOrigins {
+			if strings.HasPrefix(origin, allowed) {
+				return true
+			}
+		}
+		return false
 	},
 }
 
