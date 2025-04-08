@@ -4,6 +4,7 @@ import (
 	"github.com/MisakaTAT/GTerm/backend/dal/model"
 	"github.com/MisakaTAT/GTerm/backend/dal/query"
 	"github.com/MisakaTAT/GTerm/backend/enums"
+	"github.com/MisakaTAT/GTerm/backend/initialize"
 	"github.com/MisakaTAT/GTerm/backend/pkg/exec"
 	"github.com/MisakaTAT/GTerm/backend/pkg/metadata"
 	"github.com/google/wire"
@@ -13,7 +14,7 @@ import (
 var MetadataSrvSet = wire.NewSet(wire.Struct(new(MetadataSrv), "*"))
 
 type MetadataSrv struct {
-	Logger *zap.Logger
+	Logger initialize.Logger
 	Query  *query.Query
 }
 

@@ -13,7 +13,7 @@ func NewApp() *App {
 		AppSet,
 		initialize.InitDatabase,
 		initialize.InitHTTPServer,
-		initialize.InitZap,
+		initialize.InitLogger,
 		services.SetProvider,
 	)
 	return new(App)

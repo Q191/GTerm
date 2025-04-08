@@ -599,7 +599,6 @@ const handleConfirm = async () => {
     emit('update:show', false);
     emit('success');
   } catch (errors) {
-    console.error('表单验证错误:', errors);
     return false;
   }
 };

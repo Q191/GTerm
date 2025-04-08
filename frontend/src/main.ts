@@ -4,6 +4,7 @@ import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './App.vue';
 import '@/styles/basic.less';
+import { LogInfo } from '@wailsApp/runtime/runtime';
 
 async function setupApp() {
   const app = createApp(App);
@@ -13,4 +14,4 @@ async function setupApp() {
   app.mount('#app');
 }
 
-setupApp().then(() => console.log('App is ready'));
+setupApp().then(() => LogInfo('App is ready'));

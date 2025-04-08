@@ -79,6 +79,7 @@
 import { Icon } from '@iconify/vue';
 import { loadTheme } from '@/themes/xtermjs';
 import { WebsocketPort } from '@wailsApp/go/services/TerminalSrv';
+import { LogWarning, LogError, LogInfo } from '@wailsApp/runtime/runtime';
 import { CanvasAddon } from '@xterm/addon-canvas';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
@@ -215,7 +216,7 @@ const initializeXterm = async (id: number) => {
     webLinksAddons.value[id].activate(terminal);
     webglAddons.value[id].activate(terminal);
   } catch (e) {
-    console.warn('Failed to activate WebGL addon, falling back to Canvas:', e);
+    LogWarning(`Failed to activate WebGL addon, falling back to Canvas: ${e}`);
     webglAddons.value[id] = undefined;
     canvasAddons.value[id] = new CanvasAddon();
     canvasAddons.value[id].activate(terminal);
@@ -362,6 +363,7 @@ const reconnect = async (id: number) => {
   const conn = connectionStore.connections.find(c => c.id === id);
   if (!conn) return;
 
+  LogInfo(`Reconnecting to terminal ID: ${id}, connId: ${conn.connId}`);
   updateStatus(id, {
     connectionError: false,
     isConnecting: true,
@@ -389,7 +391,7 @@ const closeTerminal = (id: number) => {
       try {
         terminals.value[id].dispose();
       } catch (e) {
-        console.warn('Error disposing terminal:', e);
+        LogWarning(`Error disposing terminal: ${e}`);
       }
       terminals.value[id] = undefined;
     }
@@ -406,7 +408,7 @@ const closeTerminal = (id: number) => {
       errorDetails: '',
     });
   } catch (e) {
-    console.error('Error in close terminal:', e);
+    LogError(`Error in close terminal: ${e}`);
   }
 };
 

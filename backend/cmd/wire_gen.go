@@ -15,7 +15,7 @@ import (
 
 func NewApp() *App {
 	httpListenerPort := initialize.InitHTTPServer()
-	logger := initialize.InitZap()
+	logger := initialize.ProvideLogger()
 	query := initialize.InitDatabase()
 	connectionSrv := &services.ConnectionSrv{
 		Logger: logger,

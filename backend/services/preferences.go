@@ -2,17 +2,18 @@ package services
 
 import (
 	"fmt"
-	"github.com/MisakaTAT/GTerm/backend/pkg/base"
-	"github.com/google/wire"
-	"go.uber.org/zap"
 	"runtime"
 	"time"
+
+	"github.com/MisakaTAT/GTerm/backend/initialize"
+	"github.com/MisakaTAT/GTerm/backend/pkg/base"
+	"github.com/google/wire"
 )
 
 var PreferencesSrvSet = wire.NewSet(wire.Struct(new(PreferencesSrv), "*"))
 
 type PreferencesSrv struct {
-	Logger *zap.Logger
+	Logger initialize.Logger
 }
 
 func (s *PreferencesSrv) Version() string {
