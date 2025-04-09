@@ -2,22 +2,22 @@
   <n-modal
     v-model:show="visible"
     close-on-esc
-    :negative-text="$t('groupModal.cancel')"
+    :negative-text="$t('frontend.groupModal.cancel')"
     :on-close="resetForm"
-    :positive-text="$t('groupModal.confirm')"
+    :positive-text="$t('frontend.groupModal.confirm')"
     :show-icon="false"
-    :title="isEdit ? $t('groupModal.editTitle') : $t('groupModal.title')"
+    :title="isEdit ? $t('frontend.groupModal.editTitle') : $t('frontend.groupModal.title')"
     preset="dialog"
     style="width: 600px"
     transform-origin="center"
     @positive-click="handleConfirm"
   >
     <n-form ref="formRef" :model="formValue" :rules="rules">
-      <n-form-item path="name" :label="$t('groupModal.name')">
+      <n-form-item path="name" :label="$t('frontend.groupModal.name')">
         <n-input
           v-model:value="formValue.name"
           clearable
-          :placeholder="$t('groupModal.placeholder.name')"
+          :placeholder="$t('frontend.groupModal.placeholder.name')"
           :allow-input="value => !/\s/.test(value)"
         />
       </n-form-item>
@@ -28,13 +28,14 @@
 <script lang="ts" setup>
 import { model } from '@wailsApp/go/models';
 import { CreateGroup, UpdateGroup } from '@wailsApp/go/services/GroupSrv';
-import { FormInst, FormRules, NForm, NFormItem, NInput, NModal, useMessage } from 'naive-ui';
+import { FormInst, FormRules, NForm, NFormItem, NInput, NModal } from 'naive-ui';
 import { ref, computed, onMounted, onUpdated } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useCall } from '@/utils/call';
 
 const { t } = useI18n();
 const formRef = ref<FormInst | null>(null);
-const message = useMessage();
+const { call } = useCall();
 
 const props = defineProps<{
   show: boolean;
@@ -65,7 +66,7 @@ const formValue = ref<model.Group>(createGroupObject());
 const rules: FormRules = {
   name: {
     required: true,
-    message: t('groupModal.validation.nameRequired'),
+    message: t('frontend.groupModal.validation.nameRequired'),
     trigger: 'blur',
   },
 };
@@ -93,16 +94,18 @@ onMounted(() => {
 const handleConfirm = async () => {
   try {
     await formRef.value?.validate();
-    const resp = props.isEdit ? await UpdateGroup(formValue.value) : await CreateGroup(formValue.value);
 
-    if (!resp.ok) {
-      message.error(resp.msg);
-      return false;
+    const backendFunc = props.isEdit ? UpdateGroup : CreateGroup;
+    const result = await call(backendFunc, {
+      args: [formValue.value],
+    });
+
+    if (result.ok) {
+      emit('update:show', false);
+      emit('success');
     }
 
-    message.success(props.isEdit ? t('message.updateSuccess') : t('message.createSuccess'));
-    emit('update:show', false);
-    emit('success');
+    return result.ok;
   } catch (errors) {
     return false;
   }

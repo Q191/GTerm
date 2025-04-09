@@ -2,11 +2,11 @@
   <div class="credential-container">
     <div class="header">
       <div class="title">
-        <span>凭据</span>
+        <span>{{ $t('frontend.credential.title') }}</span>
       </div>
       <div class="actions">
         <n-input-group>
-          <n-input placeholder="搜索凭据..." :allow-input="value => !/\s/.test(value)">
+          <n-input :placeholder="$t('frontend.credential.search')" :allow-input="value => !/\s/.test(value)">
             <template #prefix>
               <icon icon="ph:magnifying-glass" />
             </template>
@@ -15,7 +15,7 @@
             <template #icon>
               <icon icon="ph:plus-bold" />
             </template>
-            添加凭据
+            {{ $t('frontend.credential.add') }}
           </n-button>
         </n-input-group>
       </div>
@@ -62,7 +62,11 @@
                       </template>
                     </n-button>
                   </template>
-                  {{ v.authMethod === enums.AuthMethod.PASSWORD ? '复制密码' : '查看密钥' }}
+                  {{
+                    v.authMethod === enums.AuthMethod.PASSWORD
+                      ? $t('frontend.credential.actions.copyPassword')
+                      : $t('frontend.credential.actions.viewKey')
+                  }}
                 </n-tooltip>
                 <n-tooltip trigger="hover">
                   <template #trigger>
@@ -72,7 +76,7 @@
                       </template>
                     </n-button>
                   </template>
-                  编辑
+                  {{ $t('frontend.credential.actions.edit') }}
                 </n-tooltip>
                 <n-tooltip trigger="hover">
                   <template #trigger>
@@ -82,13 +86,13 @@
                       </template>
                     </n-button>
                   </template>
-                  删除
+                  {{ $t('frontend.credential.actions.delete') }}
                 </n-tooltip>
               </div>
             </div>
           </n-list-item>
         </n-list>
-        <n-empty v-else class="credential-empty" description="暂无可用凭据" />
+        <n-empty v-else class="credential-empty" :description="$t('frontend.credential.empty')" />
       </div>
     </n-scrollbar>
 
@@ -120,8 +124,12 @@ import { ListCredential, DeleteCredential } from '@wailsApp/go/services/Credenti
 import { enums, model } from '@wailsApp/go/models';
 import dayjs from 'dayjs';
 import CredentialModal from '@/views/modals/CredentialModal.vue';
+import { useCall } from '@/utils/call';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const message = useMessage();
+const { call } = useCall();
 const showModal = ref(false);
 const isEdit = ref(false);
 const credentialId = ref<number>(0);
@@ -130,9 +138,9 @@ const handleCopy = async (credential: model.Credential) => {
   if (credential.authMethod === enums.AuthMethod.PASSWORD) {
     try {
       await navigator.clipboard.writeText(credential.password);
-      message.success('密码已复制到剪贴板');
+      message.success(t('frontend.credential.messages.passwordCopied'));
     } catch (err) {
-      message.error('复制失败');
+      message.error(t('frontend.credential.messages.copyFailed'));
     }
   }
 };
@@ -144,13 +152,13 @@ const handleEdit = (credential: model.Credential) => {
 };
 
 const handleDelete = async (credential: model.Credential) => {
-  const resp = await DeleteCredential(credential.id);
-  if (!resp.ok) {
-    message.error(resp.msg);
-    return;
+  const result = await call(DeleteCredential, {
+    args: [credential.id],
+  });
+
+  if (result.ok) {
+    await fetchCredentials();
   }
-  message.success('删除成功');
-  await fetchCredentials();
 };
 
 const handleAdd = () => {
@@ -166,12 +174,11 @@ const formatTime = (time: string) => {
 const creds = ref<model.Credential[]>();
 
 const fetchCredentials = async () => {
-  const resp = await ListCredential();
-  if (!resp.ok) {
-    message.error(resp.msg);
+  const result = await call(ListCredential);
+  if (result.ok) {
+    creds.value = result.data;
   }
-  creds.value = resp.data;
-  return resp.data;
+  return result.data;
 };
 
 const handleSuccess = () => {

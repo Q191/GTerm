@@ -2,15 +2,16 @@ package types
 
 import (
 	"fmt"
+
 	"github.com/MisakaTAT/GTerm/backend/enums"
 )
 
 type Message struct {
 	Type        enums.TerminalType `json:"type"`
 	Content     any                `json:"content,omitempty"`
-	Error       string             `json:"error,omitempty"`
+	Message     string             `json:"message,omitempty"`
 	Details     string             `json:"details,omitempty"`
-	ErrorCode   string             `json:"error_code,omitempty"`
+	Code        string             `json:"code,omitempty"`
 	Host        string             `json:"host,omitempty"`
 	Fingerprint string             `json:"fingerprint,omitempty"`
 }

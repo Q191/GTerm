@@ -7,7 +7,7 @@
             v-model:value="searchText"
             size="small"
             clearable
-            :placeholder="$t('connection.search')"
+            :placeholder="$t('frontend.connection.search')"
             :allow-input="value => !/\s/.test(value)"
           >
             <template #prefix>
@@ -24,7 +24,7 @@
                   </template>
                 </n-button>
               </template>
-              {{ $t('connection.add.group') }}
+              {{ $t('frontend.connection.add.group') }}
             </n-tooltip>
             <n-tooltip trigger="hover">
               <template #trigger>
@@ -34,14 +34,14 @@
                   </template>
                 </n-button>
               </template>
-              {{ $t('connection.add.conn') }}
+              {{ $t('frontend.connection.add.conn') }}
             </n-tooltip>
           </div>
         </div>
         <div class="list-content">
           <!-- 资产列表部分 -->
           <div class="section-header">
-            <div class="section-title">资产列表</div>
+            <div class="section-title">{{ $t('frontend.connection.sections.assetList') }}</div>
             <n-button text size="tiny" @click="assetListCollapsed = !assetListCollapsed">
               <template #icon>
                 <icon :icon="assetListCollapsed ? 'ph:caret-right' : 'ph:caret-down'" />
@@ -67,7 +67,7 @@
 
           <!-- 分组列表部分 -->
           <div class="section-header">
-            <div class="section-title">资产分组</div>
+            <div class="section-title">{{ $t('frontend.connection.sections.groupList') }}</div>
             <n-button text size="tiny" @click="groupListCollapsed = !groupListCollapsed">
               <template #icon>
                 <icon :icon="groupListCollapsed ? 'ph:caret-right' : 'ph:caret-down'" />
@@ -112,7 +112,7 @@
     <div class="main-content">
       <div class="content-header">
         <div class="header-left">
-          <h2>{{ selectedGroup ? selectedGroup.name : $t('sider.assets') }}</h2>
+          <h2>{{ selectedGroup ? selectedGroup.name : $t('frontend.sider.assets') }}</h2>
           <n-badge :value="filteredConns.length" show-zero type="success" />
         </div>
       </div>
@@ -155,7 +155,7 @@
                     </n-tag>
                   </div>
                 </template>
-                {{ $t('connection.connection.active') }}
+                {{ $t('frontend.connection.connection.active') }}
               </n-tooltip>
               <n-tooltip trigger="hover" v-if="getErrorConnCount(conn) > 0">
                 <template #trigger>
@@ -165,7 +165,7 @@
                     </n-tag>
                   </div>
                 </template>
-                {{ $t('connection.connection.disconnected') }}
+                {{ $t('frontend.connection.connection.disconnected') }}
               </n-tooltip>
             </div>
           </div>
@@ -174,11 +174,11 @@
       <div class="empty-state" v-else>
         <n-result
           status="404"
-          :title="$t('connection.empty.title')"
+          :title="$t('frontend.connection.empty.title')"
           :description="
             selectedGroup
-              ? $t('connection.empty.group_desc', { name: selectedGroup.name })
-              : $t('connection.empty.all_desc')
+              ? $t('frontend.connection.empty.group_desc', { name: selectedGroup.name })
+              : $t('frontend.connection.empty.all_desc')
           "
         />
       </div>
@@ -201,18 +201,7 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import {
-  NButton,
-  NTag,
-  NTooltip,
-  NDropdown,
-  NResult,
-  NBadge,
-  NInput,
-  useMessage,
-  useThemeVars,
-  useDialog,
-} from 'naive-ui';
+import { NButton, NTag, NTooltip, NDropdown, NResult, NBadge, NInput, useThemeVars, useDialog } from 'naive-ui';
 import type { DropdownOption } from 'naive-ui';
 import { ListGroup, DeleteGroup } from '@wailsApp/go/services/GroupSrv';
 import { ListConnection, DeleteConnection } from '@wailsApp/go/services/ConnectionSrv';
@@ -223,11 +212,12 @@ import { h, ref, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ConnectionModal from '@/views/modals/ConnectionModal.vue';
 import GroupModal from '@/views/modals/GroupModal.vue';
+import { useCall } from '@/utils/call';
 
 const router = useRouter();
-const message = useMessage();
 const connStore = useConnectionStore();
 const { t } = useI18n();
+const { call } = useCall();
 
 const groups = ref<model.Group[]>();
 const conns = ref<model.Connection[]>();
@@ -258,12 +248,12 @@ const updateDropdownOptions = (type: 'group' | 'conn') => {
   if (type === 'group') {
     dropdownOptions.value = [
       {
-        label: t('connection.menu.edit_group'),
+        label: t('frontend.connection.menu.edit_group'),
         key: 'edit-group',
         icon: () => h(Icon, { icon: 'ph:pencil-simple' }),
       },
       {
-        label: t('connection.menu.delete_group'),
+        label: t('frontend.connection.menu.delete_group'),
         key: 'delete-group',
         icon: () => h(Icon, { icon: 'ph:trash' }),
       },
@@ -271,12 +261,12 @@ const updateDropdownOptions = (type: 'group' | 'conn') => {
   } else {
     dropdownOptions.value = [
       {
-        label: t('connection.menu.edit_conn'),
+        label: t('frontend.connection.menu.edit_conn'),
         key: 'edit-conn',
         icon: () => h(Icon, { icon: 'ph:pencil-simple' }),
       },
       {
-        label: t('connection.menu.delete_conn'),
+        label: t('frontend.connection.menu.delete_conn'),
         key: 'delete-conn',
         icon: () => h(Icon, { icon: 'ph:trash' }),
       },
@@ -302,13 +292,13 @@ const handleDropdownSelect = async (key: string) => {
       if (conn) handleEditConn(conn);
       break;
     case 'delete-conn':
-      const resp = await DeleteConnection(connId);
-      if (!resp.ok) {
-        message.error(resp.msg);
-        return;
+      const result = await call(DeleteConnection, {
+        args: [connId],
+      });
+
+      if (result.ok) {
+        await fetchData();
       }
-      message.success(t('message.deleteSuccess'));
-      await fetchData();
       break;
   }
   currentContextNode.value = null;
@@ -374,19 +364,13 @@ const handleGroupSuccess = () => {
 };
 
 const fetchGroups = async () => {
-  const resp = await ListGroup();
-  if (!resp.ok) {
-    message.error(resp.msg);
-  }
-  return resp.data;
+  const result = await call(ListGroup);
+  return result.data || [];
 };
 
 const fetchConns = async () => {
-  const resp = await ListConnection();
-  if (!resp.ok) {
-    message.error(resp.msg);
-  }
-  return resp.data;
+  const result = await call(ListConnection);
+  return result.data || [];
 };
 
 const fetchData = async () => {
@@ -458,11 +442,11 @@ const getSessionIcon = (conn: model.Connection) => {
 };
 
 const getConnCount = (conn: model.Connection) => {
-  return connStore.connections.filter(c => c.host === conn.host && !c.connectionError).length;
+  return connStore.connections.filter(c => c.host === conn.host && !c.errorCausedClosed).length;
 };
 
 const getErrorConnCount = (conn: model.Connection) => {
-  return connStore.connections.filter(c => c.host === conn.host && c.connectionError).length;
+  return connStore.connections.filter(c => c.host === conn.host && c.errorCausedClosed).length;
 };
 
 const getProtocolIcon = (conn: model.Connection) => {
@@ -592,18 +576,18 @@ const handleDeleteGroup = async () => {
   if (!group) return;
 
   dialog.warning({
-    title: t('connection.delete.group.title'),
-    content: t('connection.delete.group.content', { name: group.name }),
-    positiveText: t('connection.delete.group.confirm'),
-    negativeText: t('connection.delete.group.cancel'),
+    title: t('frontend.connection.delete.group.title'),
+    content: t('frontend.connection.delete.group.content', { name: group.name }),
+    positiveText: t('frontend.connection.delete.group.confirm'),
+    negativeText: t('frontend.connection.delete.group.cancel'),
     onPositiveClick: async () => {
-      const resp = await DeleteGroup(groupId);
-      if (!resp.ok) {
-        message.error(resp.msg);
-        return;
+      const result = await call(DeleteGroup, {
+        args: [groupId],
+      });
+
+      if (result.ok) {
+        await fetchData();
       }
-      message.success(t('message.deleteSuccess'));
-      await fetchData();
     },
   });
 };

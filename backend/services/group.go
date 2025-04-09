@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/MisakaTAT/GTerm/backend/consts/messages"
 	"github.com/MisakaTAT/GTerm/backend/dal/model"
 	"github.com/MisakaTAT/GTerm/backend/dal/query"
 	"github.com/MisakaTAT/GTerm/backend/initialize"
@@ -20,7 +21,7 @@ func (s *GroupSrv) CreateGroup(group *model.Group) *resp.Resp {
 	if err := t.Create(group); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.Ok()
+	return resp.OkWithCode(messages.CreateSuccess)
 }
 
 func (s *GroupSrv) UpdateGroup(group *model.Group) *resp.Resp {
@@ -28,7 +29,7 @@ func (s *GroupSrv) UpdateGroup(group *model.Group) *resp.Resp {
 	if _, err := t.Where(t.ID.Eq(group.ID)).Updates(group); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.Ok()
+	return resp.OkWithCode(messages.UpdateSuccess)
 }
 
 func (s *GroupSrv) DeleteGroup(id uint) *resp.Resp {
@@ -45,7 +46,7 @@ func (s *GroupSrv) DeleteGroup(id uint) *resp.Resp {
 	}); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.Ok()
+	return resp.OkWithCode(messages.DeleteSuccess)
 }
 
 func (s *GroupSrv) ListGroup() *resp.Resp {

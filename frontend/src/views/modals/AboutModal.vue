@@ -3,7 +3,7 @@
     v-model:show="dialogStore.aboutDialogVisible"
     preset="dialog"
     :close-on-esc="true"
-    :title="$t('about.name')"
+    :title="$t('frontend.about.name')"
     transform-origin="center"
     :show-icon="false"
     style="width: 460px"
@@ -15,9 +15,9 @@
       <div class="about-app-title">GTerm</div>
       <n-button text @click="onOpenVersionURL">{{ version }}</n-button>
       <n-space :size="1" :wrap="false" :wrap-item="false" align="center">
-        <n-button text @click="onOpenSource">{{ $t('about.github') }}</n-button>
+        <n-button text @click="onOpenSource">{{ $t('frontend.about.github') }}</n-button>
         <n-divider vertical />
-        <n-button text @click="onOpenWebsite">{{ $t('about.website') }}</n-button>
+        <n-button text @click="onOpenWebsite">{{ $t('frontend.about.website') }}</n-button>
       </n-space>
       <div :style="{ color: themeVars.textColor3 }" class="about-copyright">
         <span>{{ copyright }}</span>
@@ -31,7 +31,7 @@ import iconUrl from '@/assets/images/icon.png';
 import { useDialogStore } from '@/stores/dialog';
 import { BrowserOpenURL } from '@wailsApp/runtime';
 import { Copyright, Version, VersionURL } from '@wailsApp/go/services/PreferencesSrv';
-import { NAvatar, NDivider, NModal, NSpace, NText, useThemeVars } from 'naive-ui';
+import { NAvatar, NDivider, NModal, NSpace, useThemeVars } from 'naive-ui';
 
 const version = ref('');
 const copyright = ref('');

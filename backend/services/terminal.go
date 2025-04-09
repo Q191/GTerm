@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/MisakaTAT/GTerm/backend/consts"
+	"github.com/MisakaTAT/GTerm/backend/consts/messages"
 	"github.com/MisakaTAT/GTerm/backend/enums"
 	"github.com/MisakaTAT/GTerm/backend/initialize"
 	"github.com/MisakaTAT/GTerm/backend/pkg/terminal"
@@ -160,7 +161,7 @@ func (s *TerminalSrv) CloseSession(ws *websocket.Conn, reason string) {
 }
 
 func (s *TerminalSrv) SessionEnded(ws *websocket.Conn) {
-	s.CloseSession(ws, "Session ended")
+	s.CloseSession(ws, messages.SessionEnded)
 }
 
 func (s *TerminalSrv) WebsocketPort() int {

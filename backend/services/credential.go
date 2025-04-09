@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/MisakaTAT/GTerm/backend/consts/messages"
 	"github.com/MisakaTAT/GTerm/backend/dal/model"
 	"github.com/MisakaTAT/GTerm/backend/dal/query"
 	"github.com/MisakaTAT/GTerm/backend/initialize"
@@ -21,7 +22,7 @@ func (s *CredentialSrv) CreateCredential(cred *model.Credential) *resp.Resp {
 	if err := t.Create(cred); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.Ok()
+	return resp.OkWithCode(messages.CreateSuccess)
 }
 
 func (s *CredentialSrv) UpdateCredential(cred *model.Credential) *resp.Resp {
@@ -29,7 +30,7 @@ func (s *CredentialSrv) UpdateCredential(cred *model.Credential) *resp.Resp {
 	if _, err := t.Where(t.ID.Eq(cred.ID)).Updates(cred); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.Ok()
+	return resp.OkWithCode(messages.UpdateSuccess)
 }
 
 func (s *CredentialSrv) ListCredential() *resp.Resp {
@@ -47,7 +48,7 @@ func (s *CredentialSrv) DeleteCredential(id uint) *resp.Resp {
 	if err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.Ok()
+	return resp.OkWithCode(messages.DeleteSuccess)
 }
 
 func (s *CredentialSrv) FindCredentialByID(id uint) *resp.Resp {

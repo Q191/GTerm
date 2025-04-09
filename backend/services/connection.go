@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/MisakaTAT/GTerm/backend/consts/messages"
 	"github.com/MisakaTAT/GTerm/backend/dal/model"
 	"github.com/MisakaTAT/GTerm/backend/dal/query"
 	"github.com/MisakaTAT/GTerm/backend/initialize"
@@ -33,7 +34,7 @@ func (s *ConnectionSrv) CreateConnection(conn *model.Connection) *resp.Resp {
 	}); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.Ok()
+	return resp.OkWithCode(messages.CreateSuccess)
 }
 
 func (s *ConnectionSrv) UpdateConnection(conn *model.Connection) *resp.Resp {
@@ -73,7 +74,7 @@ func (s *ConnectionSrv) UpdateConnection(conn *model.Connection) *resp.Resp {
 	}); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.Ok()
+	return resp.OkWithCode(messages.UpdateSuccess)
 }
 
 func (s *ConnectionSrv) FindConnectionByID(id uint) *resp.Resp {
@@ -116,7 +117,7 @@ func (s *ConnectionSrv) DeleteConnection(id uint) *resp.Resp {
 	}); err != nil {
 		return resp.FailWithMsg(err.Error())
 	}
-	return resp.Ok()
+	return resp.OkWithCode(messages.DeleteSuccess)
 }
 
 func (s *ConnectionSrv) ListConnection() *resp.Resp {

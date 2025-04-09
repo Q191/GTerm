@@ -7,9 +7,9 @@ interface Connection {
   host: string;
   username: string;
   isConnecting?: boolean;
-  connectionError?: boolean;
-  errorMessage?: string;
-  errorDetails?: string;
+  errorCausedClosed?: boolean;
+  message?: string;
+  details?: string;
   theme?: string;
   isFingerprintConfirm?: boolean;
   hostAddress?: string;
@@ -45,8 +45,8 @@ export const useConnectionStore = defineStore('connection', () => {
     connections.value.push({
       ...connection,
       isConnecting: true,
-      connectionError: false,
-      errorMessage: '',
+      errorCausedClosed: false,
+      message: '',
     });
     activeConnectionId.value = connection.id;
   };

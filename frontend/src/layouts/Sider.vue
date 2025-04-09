@@ -13,7 +13,7 @@
             </n-icon>
           </div>
         </template>
-        {{ $t('sider.assets') }}
+        {{ $t('frontend.sider.assets') }}
       </n-tooltip>
 
       <n-tooltip placement="right" trigger="hover">
@@ -28,7 +28,7 @@
             </n-icon>
           </div>
         </template>
-        {{ $t('sider.credentials') }}
+        {{ $t('frontend.sider.credentials') }}
       </n-tooltip>
     </div>
 
@@ -36,17 +36,17 @@
       <n-dropdown
         :options="[
           {
-            label: $t('sider.menu.preferences'),
+            label: $t('frontend.sider.menu.preferences'),
             key: 'preferences',
             icon: () => h(NIcon, { size: 'large' }, { default: () => h(Icon, { icon: 'ph:sliders-horizontal' }) }),
           },
           {
-            label: $t('sider.menu.check_update'),
+            label: $t('frontend.sider.menu.check_update'),
             key: 'check-update',
             icon: () => h(NIcon, { size: 'large' }, { default: () => h(Icon, { icon: 'ph:arrow-circle-up' }) }),
           },
           {
-            label: $t('sider.menu.about'),
+            label: $t('frontend.sider.menu.about'),
             key: 'about',
             icon: () => h(NIcon, { size: 'large' }, { default: () => h(Icon, { icon: 'ph:info' }) }),
           },
@@ -64,7 +64,7 @@
               </n-icon>
             </div>
           </template>
-          {{ $t('sider.settings') }}
+          {{ $t('frontend.sider.settings') }}
         </n-tooltip>
       </n-dropdown>
 
@@ -76,7 +76,7 @@
             </n-icon>
           </div>
         </template>
-        {{ prefStore.isDark ? $t('sider.theme.toggle_light') : $t('sider.theme.toggle_dark') }}
+        {{ prefStore.isDark ? $t('frontend.sider.theme.toggle_light') : $t('frontend.sider.theme.toggle_dark') }}
       </n-tooltip>
 
       <n-tooltip placement="right" trigger="hover">
@@ -87,7 +87,7 @@
             </n-icon>
           </div>
         </template>
-        {{ $t('sider.github') }}
+        {{ $t('frontend.sider.github') }}
       </n-tooltip>
     </div>
   </div>

@@ -2,19 +2,19 @@
   <div class="xterm-container">
     <template v-for="conn in connectionStore.connections" :key="conn.id">
       <n-result
-        v-if="conn.connectionError"
-        status="error"
-        :title="conn.errorMessage"
+        v-if="conn.errorCausedClosed"
+        :status="conn.errorCausedClosed ? 'error' : 'warning'"
+        :title="conn.message"
         :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
       >
         <template #footer>
-          <n-button @click="() => reconnect(conn.id)" type="primary">{{ $t('terminal.reconnect') }}</n-button>
+          <n-button @click="() => reconnect(conn.id)" type="primary">{{ $t('frontend.terminal.reconnect') }}</n-button>
         </template>
         <template #default>
-          <div class="error-details" v-if="conn.errorDetails">
-            <n-collapse class="error-collapse">
-              <n-collapse-item :title="$t('terminal.error.details')" name="details">
-                <n-code :code="conn.errorDetails" language="bash" :word-wrap="true" />
+          <div v-if="conn.details">
+            <n-collapse>
+              <n-collapse-item :title="$t('frontend.terminal.error.details')" name="details">
+                <n-code :code="conn.details" language="bash" :word-wrap="true" />
               </n-collapse-item>
             </n-collapse>
           </div>
@@ -23,8 +23,8 @@
       <n-result
         v-else-if="conn.isFingerprintConfirm"
         status="warning"
-        :title="$t('terminal.fingerprint.confirm')"
-        :description="$t('terminal.fingerprint.description')"
+        :title="$t('frontend.terminal.fingerprint.confirm')"
+        :description="$t('frontend.terminal.fingerprint.description')"
         :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
       >
         <template #icon>
@@ -35,20 +35,20 @@
         <template #footer>
           <n-space>
             <n-button @click="() => rejectFingerprint(conn.id)" type="error">
-              {{ $t('terminal.fingerprint.reject') }}
+              {{ $t('frontend.terminal.fingerprint.reject') }}
             </n-button>
             <n-button @click="() => acceptFingerprint(conn.id)" type="primary">
-              {{ $t('terminal.fingerprint.accept') }}
+              {{ $t('frontend.terminal.fingerprint.accept') }}
             </n-button>
           </n-space>
         </template>
         <template #default>
           <div class="fingerprint-details">
             <p>
-              <strong>{{ $t('terminal.fingerprint.host') }}:</strong> {{ conn.hostAddress }}
+              <strong>{{ $t('frontend.terminal.fingerprint.host') }}:</strong> {{ conn.hostAddress }}
             </p>
             <p>
-              <strong>{{ $t('terminal.fingerprint.fingerprint') }}:</strong>
+              <strong>{{ $t('frontend.terminal.fingerprint.fingerprint') }}:</strong>
             </p>
             <n-code :code="conn.hostFingerprint || ''" language="bash" :word-wrap="true" />
           </div>
@@ -57,8 +57,8 @@
       <n-result
         v-else-if="conn.isConnecting || !connectedTerminals[conn.id]"
         status="info"
-        :title="$t('terminal.connecting')"
-        :description="$t('terminal.connecting_desc')"
+        :title="$t('frontend.terminal.connecting')"
+        :description="$t('frontend.terminal.connecting_desc')"
         :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
       >
         <template #icon>
@@ -91,6 +91,7 @@ import { NCode, NCollapse, NCollapseItem, NResult, NSpin, NButton, NSpace, NIcon
 import { onActivated } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { enums } from '@wailsApp/go/models';
+import { getTranslated } from '@/utils/call';
 
 const { t } = useI18n();
 
@@ -120,10 +121,10 @@ const updateStatus = (
   id: number,
   status: Partial<{
     isConnecting: boolean;
-    connectionError: boolean;
+    errorCausedClosed: boolean;
     isFingerprintConfirm: boolean;
-    errorMessage: string;
-    errorDetails: string;
+    message: string;
+    details: string;
     hostAddress: string;
     hostFingerprint: string;
   }>,
@@ -131,7 +132,7 @@ const updateStatus = (
   connectionStore.updateConnectionStatus(id, status);
   if (connectionTabs?.value) {
     let tabStatus = 'connecting';
-    if (status.connectionError) {
+    if (status.errorCausedClosed) {
       tabStatus = 'error';
     } else if (status.isFingerprintConfirm) {
       tabStatus = 'warning';
@@ -172,12 +173,8 @@ const rejectFingerprint = (id: number) => {
 
   updateStatus(id, {
     isFingerprintConfirm: false,
-    connectionError: true,
-    errorMessage: t('terminal.fingerprint.rejected'),
+    isConnecting: true,
   });
-
-  sockets.value[id]?.close();
-  sockets.value[id] = undefined;
 };
 
 const fitXterm = (id: number) => {
@@ -267,10 +264,10 @@ const initializeWebsocket = async (id: number, hostId: number) => {
 
     updateStatus(id, {
       isConnecting: true,
-      connectionError: false,
+      errorCausedClosed: false,
       isFingerprintConfirm: false,
-      errorMessage: '',
-      errorDetails: '',
+      message: '',
+      details: '',
       hostAddress: '',
       hostFingerprint: '',
     });
@@ -294,9 +291,9 @@ const initializeWebsocket = async (id: number, hostId: number) => {
         case enums.TerminalType.ERROR:
           updateStatus(id, {
             isConnecting: false,
-            connectionError: true,
-            errorMessage: data.error,
-            errorDetails: data.details,
+            errorCausedClosed: true,
+            message: getTranslated(data.code, data.message),
+            details: data.details,
           });
           connectedTerminals.value[id] = false;
           socket?.close();
@@ -329,30 +326,31 @@ const initializeWebsocket = async (id: number, hostId: number) => {
     socket.onerror = () => {
       updateStatus(id, {
         isConnecting: false,
-        connectionError: true,
-        errorMessage: t('terminal.error.connection'),
+        errorCausedClosed: true,
+        message: t('frontend.terminal.error.connection'),
       });
       connectedTerminals.value[id] = false;
       socket?.close();
     };
 
     socket.onclose = event => {
-      if (!connectionStore.connections.find(c => c.id === id)?.connectionError) {
+      if (!connectionStore.connections.find(c => c.id === id)?.errorCausedClosed) {
         updateStatus(id, {
           isConnecting: false,
-          connectionError: true,
-          errorMessage: event.reason || t('terminal.error.disconnected'),
+          errorCausedClosed: true,
+          // TODO: reason 需要返回 message 原文。用于在 code 不存在的时候 fallback
+          message: getTranslated(event.reason, t('frontend.terminal.error.disconnected')),
         });
       }
       connectedTerminals.value[id] = false;
       sockets.value[id] = undefined;
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : t('terminal.error.failed');
+    const errorMessage = error instanceof Error ? error.message : t('frontend.terminal.error.failed');
     updateStatus(id, {
       isConnecting: false,
-      connectionError: true,
-      errorMessage,
+      errorCausedClosed: true,
+      message: errorMessage,
     });
     sockets.value[id]?.close();
     sockets.value[id] = undefined;
@@ -365,9 +363,9 @@ const reconnect = async (id: number) => {
 
   LogInfo(`Reconnecting to terminal ID: ${id}, connId: ${conn.connId}`);
   updateStatus(id, {
-    connectionError: false,
+    errorCausedClosed: false,
     isConnecting: true,
-    errorMessage: '',
+    message: '',
   });
   await initializeWebsocket(id, conn.connId);
   await nextTick();
@@ -403,9 +401,9 @@ const closeTerminal = (id: number) => {
 
     updateStatus(id, {
       isConnecting: false,
-      connectionError: false,
-      errorMessage: '',
-      errorDetails: '',
+      errorCausedClosed: false,
+      message: '',
+      details: '',
     });
   } catch (e) {
     LogError(`Error in close terminal: ${e}`);
@@ -417,7 +415,7 @@ const registerToTabs = async () => {
   if (connectionTabs?.value && activeConn.value?.id) {
     const id = activeConn.value.id;
     const isConnected =
-      !connectionStore.connections.find(c => c.id === id)?.connectionError &&
+      !connectionStore.connections.find(c => c.id === id)?.errorCausedClosed &&
       !connectionStore.connections.find(c => c.id === id)?.isConnecting &&
       connectedTerminals.value[id];
     connectionTabs.value.registerTerminal(id, {

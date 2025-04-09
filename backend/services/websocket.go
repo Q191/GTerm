@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/MisakaTAT/GTerm/backend/consts/messages"
 	"github.com/MisakaTAT/GTerm/backend/enums"
 	"github.com/MisakaTAT/GTerm/backend/initialize"
 	"github.com/MisakaTAT/GTerm/backend/types"
@@ -42,74 +43,79 @@ var ug = websocket.Upgrader{
 	},
 }
 
+var errorMappings = map[string]string{
+	"i/o timeout":          messages.ConnectionTimeout,
+	"connection refused":   messages.ConnectionRefused,
+	"no route":             messages.NoRoute,
+	"auth":                 messages.AuthFailed,
+	"invalid credentials":  messages.InvalidCredentials,
+	"incorrect password":   messages.InvalidCredentials,
+	"wrong username":       messages.InvalidCredentials,
+	"permission denied":    messages.PermissionDenied,
+	"access denied":        messages.PermissionDenied,
+	"host unreachable":     messages.HostUnreachable,
+	"no such host":         messages.HostUnreachable,
+	"ssh service":          messages.SSHServiceDown,
+	"port 22":              messages.SSHServiceDown,
+	"network":              messages.NetworkError,
+	"connection reset":     messages.NetworkError,
+	"broken pipe":          messages.NetworkError,
+	"protocol":             messages.ProtocolError,
+	"incompatible":         messages.ProtocolError,
+	"version":              messages.ProtocolError,
+	"resource":             messages.ResourceExhausted,
+	"too many connections": messages.ResourceExhausted,
+	"connection limit":     messages.ResourceExhausted,
+}
+
 func (s *WebsocketSrv) formatError(err error) *types.Message {
 	switch {
 	case errors.Is(err, websocket.ErrCloseSent):
 		return &types.Message{
-			Type:      enums.TerminalTypeError,
-			Error:     "Connection closed",
-			ErrorCode: "CONNECTION_CLOSED",
-			Details:   err.Error(),
+			Type:    enums.TerminalTypeError,
+			Message: messages.CodeMapping[messages.ConnectionClosed],
+			Code:    messages.ConnectionClosed,
+			Details: err.Error(),
 		}
 	case errors.Is(err, websocket.ErrReadLimit):
 		return &types.Message{
-			Type:      enums.TerminalTypeError,
-			Error:     "Connection data exceeded limit",
-			ErrorCode: "READ_LIMIT_EXCEEDED",
-			Details:   err.Error(),
+			Type:    enums.TerminalTypeError,
+			Message: messages.CodeMapping[messages.ReadLimitExceeded],
+			Code:    messages.ReadLimitExceeded,
+			Details: err.Error(),
 		}
 	default:
-		// 处理SSH相关错误
 		errStr := err.Error()
-		switch {
-		case strings.Contains(errStr, "i/o timeout"):
-			return &types.Message{
-				Type:      enums.TerminalTypeError,
-				Error:     "Connection timeout, please check network connection and host status",
-				ErrorCode: "CONNECTION_TIMEOUT",
-				Details:   errStr,
+		for pattern, code := range errorMappings {
+			if strings.Contains(errStr, pattern) {
+				return &types.Message{
+					Type:    enums.TerminalTypeError,
+					Message: messages.CodeMapping[code],
+					Code:    code,
+					Details: errStr,
+				}
 			}
-		case strings.Contains(errStr, "connection refused"):
-			return &types.Message{
-				Type:      enums.TerminalTypeError,
-				Error:     "Connection refused, please check if the host is running SSH service",
-				ErrorCode: "CONNECTION_REFUSED",
-				Details:   errStr,
-			}
-		case strings.Contains(errStr, "no route"):
-			return &types.Message{
-				Type:      enums.TerminalTypeError,
-				Error:     "Cannot connect to host, please check network connection and host address",
-				ErrorCode: "NO_ROUTE",
-				Details:   errStr,
-			}
-		case strings.Contains(errStr, "auth"):
-			return &types.Message{
-				Type:      enums.TerminalTypeError,
-				Error:     "Authentication failed, please check username and password",
-				ErrorCode: "AUTH_FAILED",
-				Details:   errStr,
-			}
-		default:
-			return &types.Message{
-				Type:      enums.TerminalTypeError,
-				Error:     "Connection failed, please try again later",
-				ErrorCode: "UNKNOWN_ERROR",
-				Details:   errStr,
-			}
+		}
+
+		s.Logger.Error("Unhandled error type: %s", errStr)
+		return &types.Message{
+			Type:    enums.TerminalTypeError,
+			Message: messages.CodeMapping[messages.UnknownError],
+			Code:    messages.UnknownError,
+			Details: errStr,
 		}
 	}
 }
 
 func (s *WebsocketSrv) handleError(ws *websocket.Conn, err error) {
 	if err != nil && ws != nil {
-		msg := s.formatError(err)
+		e := s.formatError(err)
 		s.Logger.Error("Terminal connection error: %s, code: %s, details: %s",
-			msg.Error,
-			msg.ErrorCode,
-			msg.Details,
+			e.Message,
+			e.Code,
+			e.Details,
 		)
-		if err = ws.WriteJSON(msg); err != nil {
+		if err = ws.WriteJSON(e); err != nil {
 			s.Logger.Error("Failed to write error message: %v", err)
 		}
 	}
@@ -158,7 +164,7 @@ func (s *WebsocketSrv) TerminalHandle(w http.ResponseWriter, r *http.Request) {
 			Fingerprint: fingerprintErr.Fingerprint,
 		}); err != nil {
 			s.Logger.Error("Failed to send host fingerprint confirmation message: %v", err)
-			s.TerminalSrv.CloseSession(ws, "Failed to send fingerprint message")
+			s.TerminalSrv.CloseSession(ws, messages.FailedToSendFingerprintMsg)
 			return
 		}
 		s.Logger.Info("Host fingerprint confirmation message sent, waiting for client confirmation")
@@ -167,7 +173,7 @@ func (s *WebsocketSrv) TerminalHandle(w http.ResponseWriter, r *http.Request) {
 		_, data, err := ws.ReadMessage()
 		if err != nil {
 			s.Logger.Error("Failed to read host fingerprint confirmation response: %v", err)
-			s.TerminalSrv.CloseSession(ws, "Failed to read fingerprint confirmation")
+			s.TerminalSrv.CloseSession(ws, messages.FailedToReadFingerprint)
 			return
 		}
 		s.Logger.Info("Received client fingerprint confirmation response")
@@ -175,7 +181,7 @@ func (s *WebsocketSrv) TerminalHandle(w http.ResponseWriter, r *http.Request) {
 		var fg types.Fingerprint
 		if err = json.Unmarshal(data, &fg); err != nil {
 			s.Logger.Error("Failed to parse host fingerprint confirmation response: %v, data: %s", err, string(data))
-			s.TerminalSrv.CloseSession(ws, "Failed to parse fingerprint confirmation")
+			s.TerminalSrv.CloseSession(ws, messages.FailedToParseFingerprint)
 			return
 		}
 
@@ -185,7 +191,7 @@ func (s *WebsocketSrv) TerminalHandle(w http.ResponseWriter, r *http.Request) {
 			if err = s.TerminalSrv.AddFingerprint(uint(hostID), fingerprintErr.Host, fingerprintErr.Fingerprint); err != nil {
 				s.Logger.Error("Failed to add host fingerprint: %v", err)
 				s.handleError(ws, err)
-				s.TerminalSrv.CloseSession(ws, "Failed to add host fingerprint")
+				s.TerminalSrv.CloseSession(ws, messages.FailedToAddFingerprint)
 				return
 			}
 			s.Logger.Info("Host fingerprint added, retrying connection")
@@ -194,24 +200,23 @@ func (s *WebsocketSrv) TerminalHandle(w http.ResponseWriter, r *http.Request) {
 			if err = s.TerminalSrv.SSH(ws, uint(hostID)); err != nil {
 				s.Logger.Error("Failed to reconnect SSH: %v", err)
 				s.handleError(ws, err)
-				s.TerminalSrv.CloseSession(ws, s.formatError(err).Error)
+				s.TerminalSrv.CloseSession(ws, s.formatError(err).Message)
 				return
 			}
 			s.Logger.Info("SSH reconnection successful")
 		} else {
 			// 用户拒绝添加主机指纹
 			s.Logger.Info("Client rejected host fingerprint, closing connection")
-			s.TerminalSrv.CloseSession(ws, "User rejected host fingerprint")
+			s.TerminalSrv.CloseSession(ws, messages.UserRejectedFingerprint)
 			return
 		}
 	} else if err != nil {
-		// 处理其他错误
 		s.Logger.Error("SSH connection failed: %v", err)
 		s.handleError(ws, err)
-		s.TerminalSrv.CloseSession(ws, s.formatError(err).Error)
+		s.TerminalSrv.CloseSession(ws, s.formatError(err).Message)
 		return
 	}
 
 	s.Logger.Info("Terminal session ended, closing WebSocket connection")
-	s.TerminalSrv.CloseSession(ws, "Session ended")
+	s.TerminalSrv.CloseSession(ws, messages.SessionEnded)
 }

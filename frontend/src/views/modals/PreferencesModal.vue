@@ -4,32 +4,32 @@
     :close-on-esc="true"
     :on-close="dialogStore.closePreferencesDialog"
     :show-icon="false"
-    :negative-text="$t('preferencesModal.cancel')"
-    :positive-text="$t('preferencesModal.confirm')"
+    :negative-text="$t('frontend.preferencesModal.cancel')"
+    :positive-text="$t('frontend.preferencesModal.confirm')"
     preset="dialog"
     style="width: 600px"
-    :title="$t('preferencesModal.title')"
+    :title="$t('frontend.preferencesModal.title')"
     transform-origin="center"
     @positive-click="handleSubmit"
   >
     <n-tabs key="settings" animated placement="left" type="line">
-      <n-tab-pane name="appearance" :tab="$t('preferencesModal.tabs.general')">
+      <n-tab-pane name="appearance" :tab="$t('frontend.preferencesModal.tabs.general')">
         <n-form ref="formRef" label-placement="top" size="small">
-          <n-form-item :label="$t('preferencesModal.theme.title')">
+          <n-form-item :label="$t('frontend.preferencesModal.theme.title')">
             <div style="display: flex; gap: 12px">
               <div
                 :class="['theme-option', prefStore.themeMode === 'light' && 'theme-option--active']"
                 @click="prefStore.updateThemeMode('light')"
               >
                 <div class="theme-preview light" v-html="PreviewSvg" />
-                <div class="theme-label">{{ $t('preferencesModal.theme.light') }}</div>
+                <div class="theme-label">{{ $t('frontend.preferencesModal.theme.light') }}</div>
               </div>
               <div
                 :class="['theme-option', prefStore.themeMode === 'dark' && 'theme-option--active']"
                 @click="prefStore.updateThemeMode('dark')"
               >
                 <div class="theme-preview dark" v-html="PreviewSvg" />
-                <div class="theme-label">{{ $t('preferencesModal.theme.dark') }}</div>
+                <div class="theme-label">{{ $t('frontend.preferencesModal.theme.dark') }}</div>
               </div>
               <div
                 :class="['theme-option', prefStore.themeMode === 'auto' && 'theme-option--active']"
@@ -41,12 +41,12 @@
                     <div class="split-half dark" v-html="PreviewSvg" />
                   </div>
                 </div>
-                <div class="theme-label">{{ $t('preferencesModal.theme.auto') }}</div>
+                <div class="theme-label">{{ $t('frontend.preferencesModal.theme.auto') }}</div>
               </div>
             </div>
           </n-form-item>
 
-          <n-form-item :label="$t('preferencesModal.language.title')">
+          <n-form-item :label="$t('frontend.preferencesModal.language.title')">
             <n-select
               v-model:value="prefStore.language"
               :options="languageOptions"
@@ -56,7 +56,7 @@
             />
           </n-form-item>
 
-          <n-form-item :label="$t('preferencesModal.sidebar.title')">
+          <n-form-item :label="$t('frontend.preferencesModal.sidebar.title')">
             <div style="display: flex; gap: 12px; width: 100%">
               <n-input-number
                 v-model:value="prefStore.sidebarWidth"
@@ -67,10 +67,10 @@
                 style="flex: 1; width: 0"
                 @update:value="value => value && prefStore.updateSidebarWidth(value)"
               >
-                <template #suffix>{{ $t('preferencesModal.sidebar.width') }}</template>
+                <template #suffix>{{ $t('frontend.preferencesModal.sidebar.width') }}</template>
               </n-input-number>
               <n-button size="medium" @click="prefStore.resetSidebarWidth">{{
-                $t('preferencesModal.sidebar.reset')
+                $t('frontend.preferencesModal.sidebar.reset')
               }}</n-button>
             </div>
           </n-form-item>

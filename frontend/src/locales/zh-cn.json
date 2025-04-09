@@ -1,199 +1,254 @@
 {
-  "about": {
-    "name": "关于",
-    "github": "源码",
-    "website": "官网"
-  },
-  "connModal": {
-    "title": "新建连接",
-    "editTitle": "编辑连接",
-    "cancel": "取消",
-    "confirm": "确定",
-    "basicConfig": "基础配置",
-    "personalConfig": "个性配置",
-    "advancedConfig": "高级配置",
-    "developing": "功能开发中...",
-    "authType": "认证方式",
-    "password": "密码",
-    "privateKey": "私钥",
-    "commonCredentialLib": "凭据",
-    "label": "连接名称",
-    "group": "所属分组",
-    "connProtocol": "连接协议",
-    "serialPort": "串口设备",
-    "baudRate": "波特率",
-    "dataBits": "数据位",
-    "stopBits": "停止位",
-    "parity": "校验位",
-    "host": "主机地址",
-    "port": "端口号",
-    "username": "用户名",
-    "credential": "凭据信息",
-    "passphrase": "密钥口令",
-    "theme": "终端主题",
-    "placeholder": {
-      "label": "请输入连接名称",
-      "group": "请选择所属分组",
-      "host": "请输入主机地址",
-      "port": "请输入端口号",
-      "username": "请输入用户名",
-      "password": "请输入密码",
-      "privateKey": "请输入私钥内容",
-      "passphrase": "请输入密钥口令",
-      "selectCredential": "请选择凭据信息",
-      "serialPort": "请选择串口设备",
-      "connProtocol": "请选择连接协议",
+  "frontend": {
+    "about": {
+      "name": "关于",
+      "github": "源码",
+      "website": "官网"
+    },
+    "connModal": {
+      "title": "新建连接",
+      "editTitle": "编辑连接",
+      "cancel": "取消",
+      "confirm": "确定",
+      "basicConfig": "基础配置",
+      "personalConfig": "个性配置",
+      "advancedConfig": "高级配置",
+      "developing": "功能开发中...",
+      "authType": "认证方式",
+      "password": "密码",
+      "privateKey": "私钥",
+      "commonCredentialLib": "凭据",
+      "label": "连接名称",
+      "group": "所属分组",
+      "connProtocol": "连接协议",
+      "serialPort": "串口设备",
       "baudRate": "波特率",
       "dataBits": "数据位",
       "stopBits": "停止位",
       "parity": "校验位",
-      "selectTheme": "请选择终端主题"
-    },
-    "validation": {
-      "labelRequired": "请输入连接名称",
-      "hostRequired": "请输入主机地址",
-      "portRequired": "请输入端口号",
-      "usernameRequired": "请输入用户名",
-      "passwordRequired": "请输入密码",
-      "privateKeyRequired": "请输入私钥内容",
-      "credentialRequired": "请选择凭据信息",
-      "portInvalid": "端口号必须在 1-65535 之间",
-      "serialPortRequired": "请选择串口",
-      "baudRateRequired": "请选择波特率",
-      "dataBitsRequired": "请选择数据位",
-      "stopBitsRequired": "请选择停止位",
-      "parityRequired": "请选择校验位",
-      "connProtocolRequired": "请选择连接协议"
-    }
-  },
-  "groupModal": {
-    "title": "新建分组",
-    "editTitle": "编辑分组",
-    "name": "分组名称",
-    "cancel": "取消",
-    "confirm": "确定",
-    "placeholder": {
-      "name": "请输入分组名称"
-    },
-    "validation": {
-      "nameRequired": "请输入分组名称"
-    }
-  },
-  "message": {
-    "createSuccess": "创建成功",
-    "updateSuccess": "更新成功",
-    "deleteSuccess": "删除成功"
-  },
-  "preferencesModal": {
-    "title": "偏好设置",
-    "cancel": "取消",
-    "confirm": "确定",
-    "tabs": {
-      "general": "通用设置"
-    },
-    "theme": {
-      "title": "主题外观",
-      "light": "浅色模式",
-      "dark": "深色模式",
-      "auto": "跟随系统"
-    },
-    "language": {
-      "title": "显示语言"
-    },
-    "sidebar": {
-      "title": "侧边栏宽度",
-      "reset": "重置",
-      "width": "px"
-    }
-  },
-  "terminal": {
-    "connecting": "正在连接",
-    "connecting_desc": "正在建立连接...",
-    "reconnect": "重新连接",
-    "error": {
-      "details": "错误详情",
-      "connection": "连接失败，请检查应用是否正常运行",
-      "disconnected": "连接已断开",
-      "failed": "无法建立连接"
-    },
-    "fingerprint": {
-      "confirm": "验证主机指纹",
-      "description": "首次连接到该主机，请确认指纹信息",
       "host": "主机地址",
-      "fingerprint": "主机指纹",
-      "accept": "接受并继续",
-      "reject": "拒绝连接",
-      "rejected": "已拒绝主机指纹"
-    }
-  },
-  "sider": {
-    "assets": "资产管理",
-    "credentials": "凭据管理",
-    "settings": "系统设置",
-    "theme": {
-      "toggle_light": "切换到浅色模式",
-      "toggle_dark": "切换到深色模式"
+      "port": "端口号",
+      "username": "用户名",
+      "credential": "凭据信息",
+      "passphrase": "密钥口令",
+      "theme": "终端主题",
+      "placeholder": {
+        "label": "请输入连接名称",
+        "group": "请选择所属分组",
+        "host": "请输入主机地址",
+        "port": "请输入端口号",
+        "username": "请输入用户名",
+        "password": "请输入密码",
+        "privateKey": "请输入私钥内容",
+        "passphrase": "请输入密钥口令",
+        "selectCredential": "请选择凭据信息",
+        "serialPort": "请选择串口设备",
+        "connProtocol": "请选择连接协议",
+        "baudRate": "波特率",
+        "dataBits": "数据位",
+        "stopBits": "停止位",
+        "parity": "校验位",
+        "selectTheme": "请选择终端主题"
+      },
+      "validation": {
+        "labelRequired": "请输入连接名称",
+        "hostRequired": "请输入主机地址",
+        "portRequired": "请输入端口号",
+        "usernameRequired": "请输入用户名",
+        "passwordRequired": "请输入密码",
+        "privateKeyRequired": "请输入私钥内容",
+        "credentialRequired": "请选择凭据信息",
+        "portInvalid": "端口号必须在 1-65535 之间",
+        "serialPortRequired": "请选择串口",
+        "baudRateRequired": "请选择波特率",
+        "dataBitsRequired": "请选择数据位",
+        "stopBitsRequired": "请选择停止位",
+        "parityRequired": "请选择校验位",
+        "connProtocolRequired": "请选择连接协议"
+      }
     },
-    "github": "访问项目仓库",
-    "menu": {
-      "preferences": "偏好设置",
-      "check_update": "检查更新",
-      "about": "关于"
-    }
-  },
-  "connection": {
-    "search": "搜索资产",
-    "add": {
-      "group": "新建分组",
-      "conn": "新建连接"
+    "groupModal": {
+      "title": "新建分组",
+      "editTitle": "编辑分组",
+      "name": "分组名称",
+      "cancel": "取消",
+      "confirm": "确定",
+      "placeholder": {
+        "name": "请输入分组名称"
+      },
+      "validation": {
+        "nameRequired": "请输入分组名称"
+      }
     },
-    "empty": {
-      "title": "空空如也",
-      "group_desc": "分组「{name}」中还没有添加任何连接",
-      "all_desc": "您还没有任何可用连接，点击创建即刻开始！"
+    "preferencesModal": {
+      "title": "偏好设置",
+      "cancel": "取消",
+      "confirm": "确定",
+      "tabs": {
+        "general": "通用设置"
+      },
+      "theme": {
+        "title": "主题外观",
+        "light": "浅色模式",
+        "dark": "深色模式",
+        "auto": "跟随系统"
+      },
+      "language": {
+        "title": "显示语言"
+      },
+      "sidebar": {
+        "title": "侧边栏宽度",
+        "reset": "重置",
+        "width": "px"
+      }
     },
-    "menu": {
-      "edit_group": "编辑分组",
-      "delete_group": "删除分组",
-      "edit_conn": "编辑连接",
-      "delete_conn": "删除连接"
+    "terminal": {
+      "connecting": "正在连接",
+      "connecting_desc": "正在建立连接...",
+      "reconnect": "重新连接",
+      "error": {
+        "details": "错误详情",
+        "connection": "连接失败，请检查应用是否正常运行",
+        "disconnected": "连接已断开",
+        "failed": "无法建立连接"
+      },
+      "fingerprint": {
+        "confirm": "验证主机指纹",
+        "description": "首次连接到该主机，请确认指纹信息",
+        "host": "主机地址",
+        "fingerprint": "主机指纹",
+        "accept": "接受并继续",
+        "reject": "拒绝连接"
+      }
+    },
+    "sider": {
+      "assets": "资产管理",
+      "credentials": "凭据管理",
+      "settings": "系统设置",
+      "theme": {
+        "toggle_light": "切换到浅色模式",
+        "toggle_dark": "切换到深色模式"
+      },
+      "github": "访问项目仓库",
+      "menu": {
+        "preferences": "偏好设置",
+        "check_update": "检查更新",
+        "about": "关于"
+      }
     },
     "connection": {
-      "active": "活跃会话",
-      "disconnected": "已断开"
+      "search": "搜索资产",
+      "add": {
+        "group": "新建分组",
+        "conn": "新建连接"
+      },
+      "empty": {
+        "title": "空空如也",
+        "group_desc": "分组「{name}」中还没有添加任何连接",
+        "all_desc": "您还没有任何可用连接，点击创建即刻开始！"
+      },
+      "menu": {
+        "edit_group": "编辑分组",
+        "delete_group": "删除分组",
+        "edit_conn": "编辑连接",
+        "delete_conn": "删除连接"
+      },
+      "connection": {
+        "active": "活跃会话",
+        "disconnected": "已断开"
+      },
+      "delete": {
+        "group": {
+          "title": "删除分组",
+          "content": "删除分组「{name}」后，该分组下的所有连接将被移出此分组。是否继续？",
+          "confirm": "删除",
+          "cancel": "取消"
+        }
+      },
+      "sections": {
+        "assetList": "资产列表",
+        "groupList": "资产分组"
+      }
     },
-    "delete": {
-      "group": {
-        "title": "删除分组",
-        "content": "删除分组「{name}」后，该分组下的所有连接将被移出此分组。是否继续？",
-        "confirm": "删除",
-        "cancel": "取消"
+    "credentialModal": {
+      "title": "添加凭据",
+      "editTitle": "编辑凭据",
+      "label": "名称",
+      "authType": "认证类型",
+      "username": "用户名",
+      "password": "密码",
+      "privateKey": "私钥",
+      "passphrase": "私钥密码",
+      "confirm": "确定",
+      "cancel": "取消",
+      "placeholder": {
+        "label": "请输入凭据名称",
+        "username": "请输入用户名",
+        "password": "请输入密码",
+        "privateKey": "请输入私钥",
+        "passphrase": "请输入私钥密码"
+      },
+      "validation": {
+        "labelRequired": "请输入凭据名称",
+        "usernameRequired": "请输入用户名",
+        "passwordRequired": "请输入密码",
+        "privateKeyRequired": "请输入私钥"
+      }
+    },
+    "credential": {
+      "title": "凭据",
+      "search": "搜索凭据...",
+      "add": "添加凭据",
+      "empty": "暂无可用凭据",
+      "actions": {
+        "copyPassword": "复制密码",
+        "viewKey": "查看密钥",
+        "edit": "编辑",
+        "delete": "删除"
+      },
+      "messages": {
+        "passwordCopied": "密码已复制到剪贴板",
+        "copyFailed": "复制失败"
       }
     }
   },
-  "credentialModal": {
-    "title": "添加凭据",
-    "editTitle": "编辑凭据",
-    "label": "名称",
-    "authType": "认证类型",
-    "username": "用户名",
-    "password": "密码",
-    "privateKey": "私钥",
-    "passphrase": "私钥密码",
-    "confirm": "确定",
-    "cancel": "取消",
-    "placeholder": {
-      "label": "请输入凭据名称",
-      "username": "请输入用户名",
-      "password": "请输入密码",
-      "privateKey": "请输入私钥",
-      "passphrase": "请输入私钥密码"
+  "backend": {
+    "common": {
+      "create": {
+        "success": "创建成功"
+      },
+      "update": {
+        "success": "更新成功"
+      },
+      "delete": {
+        "success": "删除成功"
+      }
     },
-    "validation": {
-      "labelRequired": "请输入凭据名称",
-      "usernameRequired": "请输入用户名",
-      "passwordRequired": "请输入密码",
-      "privateKeyRequired": "请输入私钥"
+    "websocket": {
+      "error": {
+        "connection_closed": "连接已关闭",
+        "read_limit_exceeded": "连接数据超出限制",
+        "connection_timeout": "连接超时，请检查网络连接和主机状态",
+        "connection_refused": "连接被拒绝，请检查主机是否运行SSH服务",
+        "no_route": "无法连接到主机，请检查网络连接和主机地址",
+        "auth_failed": "认证失败，请检查用户名和密码",
+        "unknown_error": "连接失败，请稍后重试",
+        "invalid_credentials": "凭据无效，请检查用户名和密码",
+        "permission_denied": "权限被拒绝，请检查访问权限",
+        "host_unreachable": "主机不可达，请检查网络连接",
+        "ssh_service_down": "SSH服务未运行",
+        "network_error": "网络错误，请检查连接",
+        "protocol_error": "协议错误，SSH版本或配置不兼容",
+        "resource_exhausted": "服务器资源耗尽，请稍后重试",
+        "failed_to_send_fingerprint_msg": "发送指纹消息失败",
+        "failed_to_read_fingerprint": "读取指纹确认失败",
+        "failed_to_parse_fingerprint": "解析指纹确认失败",
+        "failed_to_add_fingerprint": "添加主机指纹失败"
+      },
+      "info": {
+        "session_ended": "会话已结束",
+        "user_rejected_fingerprint": "用户拒绝主机指纹"
+      }
     }
   }
 }
