@@ -9,29 +9,5 @@
   "i18n-ally.enabledFrameworks": ["vue"],
   "i18n-ally.displayLanguage": "zh-cn",
   "i18n-ally.keystyle": "nested",
-  "i18n-ally.keysInUse": [
-    "backend.common.create.success",
-    "backend.common.update.success",
-    "backend.common.delete.success",
-    "backend.websocket.error.connection_closed",
-    "backend.websocket.error.read_limit_exceeded",
-    "backend.websocket.error.connection_timeout",
-    "backend.websocket.error.connection_refused",
-    "backend.websocket.error.no_route",
-    "backend.websocket.error.auth_failed",
-    "backend.websocket.error.unknown_error",
-    "backend.websocket.error.invalid_credentials",
-    "backend.websocket.error.permission_denied",
-    "backend.websocket.error.host_unreachable",
-    "backend.websocket.error.ssh_service_down",
-    "backend.websocket.error.protocol_error",
-    "backend.websocket.error.network_error",
-    "backend.websocket.error.resource_exhausted",
-    "backend.websocket.error.failed_to_send_fingerprint_msg",
-    "backend.websocket.error.failed_to_read_fingerprint",
-    "backend.websocket.error.failed_to_parse_fingerprint",
-    "backend.websocket.error.failed_to_add_fingerprint",
-    "backend.websocket.info.session_ended",
-    "backend.websocket.info.user_rejected_fingerprint"
-  ]
+  "i18n-ally.keysInUse": ["backend.*"]
 }
