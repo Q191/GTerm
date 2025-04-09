@@ -95,7 +95,7 @@
     <credential-modal
       v-model:show="showModal"
       :is-edit="isEdit"
-      :credential="editCredential"
+      :credential-id="credentialId"
       @success="handleSuccess"
     />
   </div>
@@ -124,7 +124,7 @@ import CredentialModal from '@/views/modals/CredentialModal.vue';
 const message = useMessage();
 const showModal = ref(false);
 const isEdit = ref(false);
-const editCredential = ref<model.Credential | undefined>(undefined);
+const credentialId = ref<number>(0);
 
 const handleCopy = async (credential: model.Credential) => {
   if (credential.authMethod === enums.AuthMethod.PASSWORD) {
@@ -139,7 +139,7 @@ const handleCopy = async (credential: model.Credential) => {
 
 const handleEdit = (credential: model.Credential) => {
   isEdit.value = true;
-  editCredential.value = credential;
+  credentialId.value = credential.id;
   showModal.value = true;
 };
 
@@ -155,7 +155,7 @@ const handleDelete = async (credential: model.Credential) => {
 
 const handleAdd = () => {
   isEdit.value = false;
-  editCredential.value = undefined;
+  credentialId.value = 0;
   showModal.value = true;
 };
 

@@ -12,8 +12,9 @@ import (
 var ConnectionSrvSet = wire.NewSet(wire.Struct(new(ConnectionSrv), "*"))
 
 type ConnectionSrv struct {
-	Logger initialize.Logger
-	Query  *query.Query
+	Logger        initialize.Logger
+	Query         *query.Query
+	CredentialSrv *CredentialSrv
 }
 
 func (s *ConnectionSrv) CreateConnection(conn *model.Connection) *resp.Resp {
@@ -76,9 +77,26 @@ func (s *ConnectionSrv) UpdateConnection(conn *model.Connection) *resp.Resp {
 	return resp.Ok()
 }
 
+func (s *ConnectionSrv) FindConnectionByID(id uint) *resp.Resp {
+	conn, err := s.FindByID(id)
+	if err != nil {
+		return resp.FailWithMsg(err.Error())
+	}
+	return resp.OkWithData(conn)
+}
+
 func (s *ConnectionSrv) FindByID(id uint) (*model.Connection, error) {
 	t := s.Query.Connection
-	return t.Where(t.ID.Eq(id)).Preload(t.Credential, t.Metadata).First()
+	conn, err := t.Where(t.ID.Eq(id)).Preload(t.Credential, t.Metadata).First()
+	if err != nil {
+		return nil, err
+	}
+	if conn.Credential != nil {
+		if err = conn.Credential.Decrypt(); err != nil {
+			return nil, err
+		}
+	}
+	return conn, nil
 }
 
 func (s *ConnectionSrv) DeleteConnection(id uint) *resp.Resp {

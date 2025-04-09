@@ -51,7 +51,7 @@ func (c *Credential) BeforeSave(tx *gorm.DB) error {
 	return nil
 }
 
-func (c *Credential) AfterFind(tx *gorm.DB) error {
+func (c *Credential) Decrypt() error {
 	cred, err := encrypt.NewCredential()
 	if err != nil {
 		return err

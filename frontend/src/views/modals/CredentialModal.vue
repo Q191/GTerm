@@ -98,7 +98,7 @@
 
 <script lang="ts" setup>
 import { enums, model } from '@wailsApp/go/models';
-import { CreateCredential, UpdateCredential } from '@wailsApp/go/services/CredentialSrv';
+import { CreateCredential, FindCredentialByID, UpdateCredential } from '@wailsApp/go/services/CredentialSrv';
 import { Icon } from '@iconify/vue';
 
 import {
@@ -121,7 +121,7 @@ const { AuthMethod } = enums;
 const props = defineProps<{
   show: boolean;
   isEdit: boolean;
-  credential?: model.Credential;
+  credentialId?: number;
 }>();
 
 const emit = defineEmits<{
@@ -186,9 +186,15 @@ const rules = computed<FormRules>(() => ({
   },
 }));
 
-const initModalData = () => {
-  if (props.credential) {
-    formValue.value = { ...props.credential } as model.Credential;
+const initModalData = async () => {
+  if (props.credentialId && props.credentialId > 0 && props.isEdit) {
+    const resp = await FindCredentialByID(props.credentialId);
+    if (resp.ok) {
+      formValue.value = { ...resp.data } as model.Credential;
+      return;
+    }
+    message.error(resp.msg);
+    emit('update:show', false);
   } else {
     formValue.value = createCredentialObject();
   }

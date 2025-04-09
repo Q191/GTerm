@@ -244,7 +244,7 @@
 <script lang="ts" setup>
 import { enums, model } from '@wailsApp/go/models';
 import { ListGroup } from '@wailsApp/go/services/GroupSrv';
-import { CreateConnection, UpdateConnection } from '@wailsApp/go/services/ConnectionSrv';
+import { CreateConnection, UpdateConnection, FindConnectionByID } from '@wailsApp/go/services/ConnectionSrv';
 import { Icon } from '@iconify/vue';
 import ThemePreview from '../components/ThemePreview.vue';
 import { themeOptions as xtermThemeOptions, loadTheme, defaultTheme } from '@/themes/xtermjs';
@@ -282,7 +282,7 @@ const message = useMessage();
 const props = defineProps<{
   show: boolean;
   isEdit: boolean;
-  connection?: model.Connection;
+  connectionId?: number;
 }>();
 
 const emit = defineEmits<{
@@ -566,8 +566,14 @@ const initOptions = async () => {
 const initModalData = async () => {
   await initOptions();
 
-  if (props.connection) {
-    formValue.value = prepareConnectionForEdit(props.connection);
+  if (props.connectionId && props.connectionId > 0 && props.isEdit) {
+    const resp = await FindConnectionByID(props.connectionId);
+    if (resp.ok) {
+      formValue.value = prepareConnectionForEdit(resp.data);
+      return;
+    }
+    message.error(resp.msg);
+    emit('update:show', false);
   } else {
     formValue.value = createConnectionObject();
   }

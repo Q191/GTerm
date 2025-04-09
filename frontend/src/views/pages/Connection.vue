@@ -187,7 +187,7 @@
     <connection-modal
       v-model:show="showConnModal"
       :is-edit="isEditConn"
-      :connection="editConnection"
+      :connection-id="connectionId"
       @success="handleConnSuccess"
     />
     <group-modal
@@ -243,12 +243,11 @@ const searchText = ref('');
 const assetListCollapsed = ref(false);
 const groupListCollapsed = ref(false);
 
-// 对话框状态
 const showConnModal = ref(false);
 const showGroupModal = ref(false);
 const isEditConn = ref(false);
 const isEditGroup = ref(false);
-const editConnection = ref<model.Connection | undefined>(undefined);
+const connectionId = ref<number>(0);
 const editGroup = ref<model.Group | undefined>(undefined);
 
 const currentContextNode = ref<any>(null);
@@ -339,7 +338,7 @@ const toTerminal = (conn: model.Connection) => {
 
 const handleEditConn = (conn: model.Connection) => {
   isEditConn.value = true;
-  editConnection.value = conn;
+  connectionId.value = conn.id;
   showConnModal.value = true;
 };
 
@@ -349,7 +348,7 @@ const handleConnSuccess = () => {
 
 const handleAddConn = () => {
   isEditConn.value = false;
-  editConnection.value = undefined;
+  connectionId.value = 0;
   showConnModal.value = true;
 };
 

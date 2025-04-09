@@ -49,3 +49,23 @@ func (s *CredentialSrv) DeleteCredential(id uint) *resp.Resp {
 	}
 	return resp.Ok()
 }
+
+func (s *CredentialSrv) FindCredentialByID(id uint) *resp.Resp {
+	conn, err := s.FindByID(id)
+	if err != nil {
+		return resp.FailWithMsg(err.Error())
+	}
+	return resp.OkWithData(conn)
+}
+
+func (s *CredentialSrv) FindByID(id uint) (*model.Credential, error) {
+	t := s.Query.Credential
+	cred, err := t.Where(t.ID.Eq(id)).First()
+	if err != nil {
+		return nil, err
+	}
+	if err = cred.Decrypt(); err != nil {
+		return nil, err
+	}
+	return cred, nil
+}
