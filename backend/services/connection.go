@@ -12,9 +12,8 @@ import (
 var ConnectionSrvSet = wire.NewSet(wire.Struct(new(ConnectionSrv), "*"))
 
 type ConnectionSrv struct {
-	Logger        initialize.Logger
-	Query         *query.Query
-	CredentialSrv *CredentialSrv
+	Logger initialize.Logger
+	Query  *query.Query
 }
 
 func (s *ConnectionSrv) CreateConnection(conn *model.Connection) *resp.Resp {
