@@ -44,6 +44,12 @@ func newConnection(db *gorm.DB, opts ...gen.DOOption) connection {
 	_connection.StopBits = field.NewInt(tableName, "stop_bits")
 	_connection.Parity = field.NewInt(tableName, "parity")
 	_connection.Theme = field.NewString(tableName, "theme")
+	_connection.SSHKeyExchanges = field.NewField(tableName, "ssh_key_exchanges")
+	_connection.SSHCiphers = field.NewField(tableName, "ssh_ciphers")
+	_connection.SSHMACs = field.NewField(tableName, "ssh_ma_cs")
+	_connection.SSHPublicKeyAlgorithms = field.NewField(tableName, "ssh_public_key_algorithms")
+	_connection.SSHHostKeyAlgorithms = field.NewField(tableName, "ssh_host_key_algorithms")
+	_connection.SSHCharset = field.NewString(tableName, "ssh_charset")
 	_connection.Metadata = connectionHasOneMetadata{
 		db: db.Session(&gorm.Session{}),
 
@@ -64,25 +70,31 @@ func newConnection(db *gorm.DB, opts ...gen.DOOption) connection {
 type connection struct {
 	connectionDo
 
-	ALL                 field.Asterisk
-	ID                  field.Uint
-	CreatedAt           field.Time
-	UpdatedAt           field.Time
-	DeletedAt           field.Field
-	Label               field.String
-	Host                field.String
-	Port                field.Uint
-	SerialPort          field.String
-	ConnProtocol        field.String
-	CredentialID        field.Uint
-	UseCommonCredential field.Bool
-	GroupID             field.Uint
-	BaudRate            field.Int
-	DataBits            field.Int
-	StopBits            field.Int
-	Parity              field.Int
-	Theme               field.String
-	Metadata            connectionHasOneMetadata
+	ALL                    field.Asterisk
+	ID                     field.Uint
+	CreatedAt              field.Time
+	UpdatedAt              field.Time
+	DeletedAt              field.Field
+	Label                  field.String
+	Host                   field.String
+	Port                   field.Uint
+	SerialPort             field.String
+	ConnProtocol           field.String
+	CredentialID           field.Uint
+	UseCommonCredential    field.Bool
+	GroupID                field.Uint
+	BaudRate               field.Int
+	DataBits               field.Int
+	StopBits               field.Int
+	Parity                 field.Int
+	Theme                  field.String
+	SSHKeyExchanges        field.Field
+	SSHCiphers             field.Field
+	SSHMACs                field.Field
+	SSHPublicKeyAlgorithms field.Field
+	SSHHostKeyAlgorithms   field.Field
+	SSHCharset             field.String
+	Metadata               connectionHasOneMetadata
 
 	Credential connectionBelongsToCredential
 
@@ -118,6 +130,12 @@ func (c *connection) updateTableName(table string) *connection {
 	c.StopBits = field.NewInt(table, "stop_bits")
 	c.Parity = field.NewInt(table, "parity")
 	c.Theme = field.NewString(table, "theme")
+	c.SSHKeyExchanges = field.NewField(table, "ssh_key_exchanges")
+	c.SSHCiphers = field.NewField(table, "ssh_ciphers")
+	c.SSHMACs = field.NewField(table, "ssh_ma_cs")
+	c.SSHPublicKeyAlgorithms = field.NewField(table, "ssh_public_key_algorithms")
+	c.SSHHostKeyAlgorithms = field.NewField(table, "ssh_host_key_algorithms")
+	c.SSHCharset = field.NewString(table, "ssh_charset")
 
 	c.fillFieldMap()
 
@@ -134,7 +152,7 @@ func (c *connection) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *connection) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 19)
+	c.fieldMap = make(map[string]field.Expr, 25)
 	c.fieldMap["id"] = c.ID
 	c.fieldMap["created_at"] = c.CreatedAt
 	c.fieldMap["updated_at"] = c.UpdatedAt
@@ -152,6 +170,12 @@ func (c *connection) fillFieldMap() {
 	c.fieldMap["stop_bits"] = c.StopBits
 	c.fieldMap["parity"] = c.Parity
 	c.fieldMap["theme"] = c.Theme
+	c.fieldMap["ssh_key_exchanges"] = c.SSHKeyExchanges
+	c.fieldMap["ssh_ciphers"] = c.SSHCiphers
+	c.fieldMap["ssh_ma_cs"] = c.SSHMACs
+	c.fieldMap["ssh_public_key_algorithms"] = c.SSHPublicKeyAlgorithms
+	c.fieldMap["ssh_host_key_algorithms"] = c.SSHHostKeyAlgorithms
+	c.fieldMap["ssh_charset"] = c.SSHCharset
 
 }
 

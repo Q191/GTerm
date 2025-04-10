@@ -24,6 +24,9 @@ export const themeOverrides: GlobalThemeOverrides = {
     feedbackFontSizeLarge: '12px',
     labelFontWeight: '450',
   },
+  Collapse: {
+    titleFontSize: '12px',
+  },
 };
 
 const _darkThemeOverrides: GlobalThemeOverrides = {

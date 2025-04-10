@@ -14,6 +14,13 @@
       "personalConfig": "个性配置",
       "advancedConfig": "高级配置",
       "developing": "功能开发中...",
+      "charset": "终端字符集",
+      "ciphers": "加密算法",
+      "keyExchanges": "密钥交换算法",
+      "macs": "MAC哈希算法",
+      "publicKeyAlgorithms": "公钥认证算法",
+      "hostKeyAlgorithms": "主机密钥算法",
+      "resetToDefault": "恢复默认",
       "authType": "认证方式",
       "password": "密码",
       "privateKey": "私钥",
@@ -48,7 +55,8 @@
         "dataBits": "数据位",
         "stopBits": "停止位",
         "parity": "校验位",
-        "selectTheme": "请选择终端主题"
+        "selectTheme": "请选择终端主题",
+        "charset": "请选择终端字符集"
       },
       "validation": {
         "labelRequired": "请输入连接名称",
@@ -65,7 +73,9 @@
         "stopBitsRequired": "请选择停止位",
         "parityRequired": "请选择校验位",
         "connProtocolRequired": "请选择连接协议"
-      }
+      },
+      "serialAdvanced": "串口高级设置",
+      "selectProtocolFirst": "请先选择连接协议"
     },
     "groupModal": {
       "title": "新建分组",

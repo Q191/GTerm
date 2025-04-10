@@ -231,11 +231,264 @@
       </n-tab-pane>
 
       <n-tab-pane name="advanced" :tab="$t('frontend.connModal.advancedConfig')">
-        <n-empty size="small" :description="$t('frontend.connModal.developing')">
-          <template #icon>
-            <Icon icon="ph:code" />
+        <n-scrollbar style="max-height: 70vh; padding-right: 12px">
+          <template v-if="formValue.connProtocol === ConnProtocol.SSH">
+            <n-form ref="formRef" :model="formValue" :rules="rules">
+              <n-form-item path="sshCharset" :label="$t('frontend.connModal.charset')">
+                <n-select
+                  v-model:value="formValue.sshCharset"
+                  :options="charsetOptions"
+                  filterable
+                  :placeholder="$t('frontend.connModal.placeholder.charset')"
+                />
+              </n-form-item>
+
+              <n-collapse accordion>
+                <n-collapse-item name="ciphers">
+                  <template #header>
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
+                      <span>{{ $t('frontend.connModal.ciphers') }}</span>
+                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('ciphers')">
+                        {{ $t('frontend.connModal.resetToDefault') }}
+                      </n-button>
+                    </div>
+                  </template>
+                  <div class="algorithm-container">
+                    <n-list bordered size="small" class="algorithm-list">
+                      <n-list-item v-for="(cipher, index) in formValue.sshCiphers" :key="index" class="compact-item">
+                        <div class="algorithm-item">
+                          <n-text class="algorithm-name">{{ cipher }}</n-text>
+                          <div class="algorithm-actions">
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('ciphers', index, -1)"
+                              :disabled="index === 0"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-up" />
+                              </template>
+                            </n-button>
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('ciphers', index, 1)"
+                              :disabled="index === formValue.sshCiphers.length - 1"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-down" />
+                              </template>
+                            </n-button>
+                          </div>
+                        </div>
+                      </n-list-item>
+                    </n-list>
+                  </div>
+                </n-collapse-item>
+
+                <n-collapse-item name="keyExchanges">
+                  <template #header>
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
+                      <span>{{ $t('frontend.connModal.keyExchanges') }}</span>
+                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('keyExchanges')">
+                        {{ $t('frontend.connModal.resetToDefault') }}
+                      </n-button>
+                    </div>
+                  </template>
+                  <div class="algorithm-container">
+                    <n-list bordered size="small" class="algorithm-list">
+                      <n-list-item v-for="(kex, index) in formValue.sshKeyExchanges" :key="index" class="compact-item">
+                        <div class="algorithm-item">
+                          <n-text class="algorithm-name">{{ kex }}</n-text>
+                          <div class="algorithm-actions">
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('keyExchanges', index, -1)"
+                              :disabled="index === 0"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-up" />
+                              </template>
+                            </n-button>
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('keyExchanges', index, 1)"
+                              :disabled="index === formValue.sshKeyExchanges.length - 1"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-down" />
+                              </template>
+                            </n-button>
+                          </div>
+                        </div>
+                      </n-list-item>
+                    </n-list>
+                  </div>
+                </n-collapse-item>
+
+                <n-collapse-item name="macs">
+                  <template #header>
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
+                      <span>{{ $t('frontend.connModal.macs') }}</span>
+                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('macs')">
+                        {{ $t('frontend.connModal.resetToDefault') }}
+                      </n-button>
+                    </div>
+                  </template>
+                  <div class="algorithm-container">
+                    <n-list bordered size="small" class="algorithm-list">
+                      <n-list-item v-for="(mac, index) in formValue.sshMACs" :key="index" class="compact-item">
+                        <div class="algorithm-item">
+                          <n-text class="algorithm-name">{{ mac }}</n-text>
+                          <div class="algorithm-actions">
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('macs', index, -1)"
+                              :disabled="index === 0"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-up" />
+                              </template>
+                            </n-button>
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('macs', index, 1)"
+                              :disabled="index === formValue.sshMACs.length - 1"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-down" />
+                              </template>
+                            </n-button>
+                          </div>
+                        </div>
+                      </n-list-item>
+                    </n-list>
+                  </div>
+                </n-collapse-item>
+
+                <n-collapse-item name="publicKeyAlgorithms">
+                  <template #header>
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
+                      <span>{{ $t('frontend.connModal.publicKeyAlgorithms') }}</span>
+                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('publicKeyAlgorithms')">
+                        {{ $t('frontend.connModal.resetToDefault') }}
+                      </n-button>
+                    </div>
+                  </template>
+                  <div class="algorithm-container">
+                    <n-list bordered size="small" class="algorithm-list">
+                      <n-list-item
+                        v-for="(algo, index) in formValue.sshPublicKeyAlgorithms"
+                        :key="index"
+                        class="compact-item"
+                      >
+                        <div class="algorithm-item">
+                          <n-text class="algorithm-name">{{ algo }}</n-text>
+                          <div class="algorithm-actions">
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('publicKeyAlgorithms', index, -1)"
+                              :disabled="index === 0"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-up" />
+                              </template>
+                            </n-button>
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('publicKeyAlgorithms', index, 1)"
+                              :disabled="index === formValue.sshPublicKeyAlgorithms.length - 1"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-down" />
+                              </template>
+                            </n-button>
+                          </div>
+                        </div>
+                      </n-list-item>
+                    </n-list>
+                  </div>
+                </n-collapse-item>
+
+                <n-collapse-item name="hostKeyAlgorithms">
+                  <template #header>
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
+                      <span>{{ $t('frontend.connModal.hostKeyAlgorithms') }}</span>
+                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('hostKeyAlgorithms')">
+                        {{ $t('frontend.connModal.resetToDefault') }}
+                      </n-button>
+                    </div>
+                  </template>
+                  <div class="algorithm-container">
+                    <n-list bordered size="small" class="algorithm-list">
+                      <n-list-item
+                        v-for="(algo, index) in formValue.sshHostKeyAlgorithms"
+                        :key="index"
+                        class="compact-item"
+                      >
+                        <div class="algorithm-item">
+                          <n-text class="algorithm-name">{{ algo }}</n-text>
+                          <div class="algorithm-actions">
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('hostKeyAlgorithms', index, -1)"
+                              :disabled="index === 0"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-up" />
+                              </template>
+                            </n-button>
+                            <n-button
+                              quaternary
+                              circle
+                              size="tiny"
+                              @click="handleMoveAlgorithm('hostKeyAlgorithms', index, 1)"
+                              :disabled="index === formValue.sshHostKeyAlgorithms.length - 1"
+                            >
+                              <template #icon>
+                                <Icon icon="ph:arrow-down" />
+                              </template>
+                            </n-button>
+                          </div>
+                        </div>
+                      </n-list-item>
+                    </n-list>
+                  </div>
+                </n-collapse-item>
+              </n-collapse>
+            </n-form>
           </template>
-        </n-empty>
+
+          <template v-else-if="formValue.connProtocol === ConnProtocol.SERIAL">
+            <n-empty size="small" :description="$t('frontend.connModal.developing')">
+              <template #icon>
+                <Icon icon="ph:code" />
+              </template>
+            </n-empty>
+          </template>
+
+          <template v-else>
+            <n-space justify="center" align="center" style="height: 200px">
+              <n-text>{{ $t('frontend.connModal.selectProtocolFirst') }}</n-text>
+            </n-space>
+          </template>
+        </n-scrollbar>
       </n-tab-pane>
     </n-tabs>
   </n-modal>
@@ -262,9 +515,14 @@ import {
   NSelect,
   NTabPane,
   NTabs,
-  useMessage,
   NEmpty,
   NScrollbar,
+  NSpace,
+  NList,
+  NListItem,
+  NText,
+  NCollapse,
+  NCollapseItem,
 } from 'naive-ui';
 import { SelectMixedOption } from 'naive-ui/es/select/src/interface';
 import { ref, computed, onMounted, onUpdated } from 'vue';
@@ -333,6 +591,84 @@ const defaultConnection: Partial<model.Connection> = {
   stopBits: 0, // OneStopBit
   parity: 0, // NoParity
   theme: 'Default',
+  sshCharset: 'UTF-8',
+  sshCiphers: [
+    'aes256-gcm@openssh.com',
+    'aes128-gcm@openssh.com',
+    'chacha20-poly1305@openssh.com',
+    'aes256-ctr',
+    'aes192-ctr',
+    'aes128-ctr',
+    'aes256-cbc',
+    'aes192-cbc',
+    'aes128-cbc',
+    'blowfish-cbc',
+    '3des-cbc',
+  ],
+  sshKeyExchanges: [
+    'curve25519-sha256',
+    'curve25519-sha256@libssh.org',
+    'ecdh-sha2-nistp256',
+    'ecdh-sha2-nistp384',
+    'ecdh-sha2-nistp521',
+    'diffie-hellman-group18-sha512',
+    'diffie-hellman-group16-sha512',
+    'diffie-hellman-group-exchange-sha1',
+    'diffie-hellman-group-exchange-sha256',
+    'diffie-hellman-group1-sha1',
+    'diffie-hellman-group14-sha1',
+    'diffie-hellman-group14-sha256',
+  ],
+  sshMACs: [
+    'hmac-sha2-256-etm@openssh.com',
+    'hmac-sha2-512-etm@openssh.com',
+    'hmac-sha1-etm@openssh.com',
+    'hmac-sha1-96-etm@openssh.com',
+    'hmac-md5-etm@openssh.com',
+    'hmac-md5-96-etm@openssh.com',
+    'hmac-sha2-256',
+    'hmac-sha2-512',
+    'hmac-sha1',
+    'hmac-sha1-96',
+    'hmac-md5',
+    'hmac-md5-96',
+    'aead-poly1305',
+    'aead-gcm',
+  ],
+  sshPublicKeyAlgorithms: [
+    'ssh-ed25519-cert-v01@openssh.com',
+    'ecdsa-sha2-nistp512-cert-v01@openssh.com',
+    'ecdsa-sha2-nistp384-cert-v01@openssh.com',
+    'ecdsa-sha2-nistp256-cert-v01@openssh.com',
+    'rsa-sha2-512-cert-v01@openssh.com',
+    'rsa-sha2-256-cert-v01@openssh.com',
+    'ssh-rsa-cert-v01@openssh.com',
+    'ssh-ed25519',
+    'ecdsa-sha2-nistp256',
+    'rsa-sha2-512',
+    'rsa-sha2-256',
+    'ssh-rsa-cert-v01@openssh.com',
+    'ssh-dss-cert-v01@openssh.com',
+    'ssh-ed25519',
+    'ecdsa-sha2-nistp512',
+    'ecdsa-sha2-nistp384',
+    'ecdsa-sha2-nistp256',
+    'rsa-sha2-512',
+    'rsa-sha2-256',
+    'ssh-rsa',
+    'ssh-dss',
+  ],
+  sshHostKeyAlgorithms: [
+    'ssh-ed25519',
+    'ecdsa-sha2-nistp256',
+    'ecdsa-sha2-nistp384',
+    'ecdsa-sha2-nistp521',
+    'rsa-sha2-512',
+    'rsa-sha2-256',
+    'ssh-rsa',
+    'ssh-dss',
+    'ssh-dss-cert-v01@openssh.com',
+  ],
 };
 
 const tempCachedCredentials = ref<{
@@ -622,6 +958,69 @@ onMounted(async () => {
 const handleThemeChange = async (newTheme: string) => {
   selectedTheme.value = await loadTheme(newTheme);
 };
+
+// 默认算法列表
+const defaultCiphers = [...(defaultConnection.sshCiphers || [])];
+const defaultKeyExchanges = [...(defaultConnection.sshKeyExchanges || [])];
+const defaultMACs = [...(defaultConnection.sshMACs || [])];
+const defaultPublicKeyAlgorithms = [...(defaultConnection.sshPublicKeyAlgorithms || [])];
+const defaultHostKeyAlgorithms = [...(defaultConnection.sshHostKeyAlgorithms || [])];
+
+const charsetOptions = [
+  { label: 'UTF-8', value: 'UTF-8' },
+  { label: 'GBK', value: 'GBK' },
+  { label: 'GB18030', value: 'GB18030' },
+  { label: 'ISO-8859-1', value: 'ISO-8859-1' },
+  { label: 'ISO-8859-15', value: 'ISO-8859-15' },
+  { label: 'Windows-1252', value: 'Windows-1252' },
+];
+
+type AlgorithmType = 'ciphers' | 'keyExchanges' | 'macs' | 'publicKeyAlgorithms' | 'hostKeyAlgorithms';
+
+const handleMoveAlgorithm = (type: AlgorithmType, index: number, direction: -1 | 1) => {
+  const newIndex = index + direction;
+
+  if (type === 'ciphers' && formValue.value.sshCiphers) {
+    if (newIndex < 0 || newIndex >= formValue.value.sshCiphers.length) return;
+    const temp = formValue.value.sshCiphers[index];
+    formValue.value.sshCiphers[index] = formValue.value.sshCiphers[newIndex];
+    formValue.value.sshCiphers[newIndex] = temp;
+  } else if (type === 'keyExchanges' && formValue.value.sshKeyExchanges) {
+    if (newIndex < 0 || newIndex >= formValue.value.sshKeyExchanges.length) return;
+    const temp = formValue.value.sshKeyExchanges[index];
+    formValue.value.sshKeyExchanges[index] = formValue.value.sshKeyExchanges[newIndex];
+    formValue.value.sshKeyExchanges[newIndex] = temp;
+  } else if (type === 'macs' && formValue.value.sshMACs) {
+    if (newIndex < 0 || newIndex >= formValue.value.sshMACs.length) return;
+    const temp = formValue.value.sshMACs[index];
+    formValue.value.sshMACs[index] = formValue.value.sshMACs[newIndex];
+    formValue.value.sshMACs[newIndex] = temp;
+  } else if (type === 'publicKeyAlgorithms' && formValue.value.sshPublicKeyAlgorithms) {
+    if (newIndex < 0 || newIndex >= formValue.value.sshPublicKeyAlgorithms.length) return;
+    const temp = formValue.value.sshPublicKeyAlgorithms[index];
+    formValue.value.sshPublicKeyAlgorithms[index] = formValue.value.sshPublicKeyAlgorithms[newIndex];
+    formValue.value.sshPublicKeyAlgorithms[newIndex] = temp;
+  } else if (type === 'hostKeyAlgorithms' && formValue.value.sshHostKeyAlgorithms) {
+    if (newIndex < 0 || newIndex >= formValue.value.sshHostKeyAlgorithms.length) return;
+    const temp = formValue.value.sshHostKeyAlgorithms[index];
+    formValue.value.sshHostKeyAlgorithms[index] = formValue.value.sshHostKeyAlgorithms[newIndex];
+    formValue.value.sshHostKeyAlgorithms[newIndex] = temp;
+  }
+};
+
+const handleResetAlgorithms = (type: AlgorithmType) => {
+  if (type === 'ciphers') {
+    formValue.value.sshCiphers = [...defaultCiphers];
+  } else if (type === 'keyExchanges') {
+    formValue.value.sshKeyExchanges = [...defaultKeyExchanges];
+  } else if (type === 'macs') {
+    formValue.value.sshMACs = [...defaultMACs];
+  } else if (type === 'publicKeyAlgorithms') {
+    formValue.value.sshPublicKeyAlgorithms = [...defaultPublicKeyAlgorithms];
+  } else if (type === 'hostKeyAlgorithms') {
+    formValue.value.sshHostKeyAlgorithms = [...defaultHostKeyAlgorithms];
+  }
+};
 </script>
 
 <style lang="less" scoped>
@@ -666,5 +1065,68 @@ const handleThemeChange = async (newTheme: string) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.algorithm-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .reset-text {
+    text-align: right;
+    font-size: 12px;
+    color: var(--primary-color);
+    cursor: pointer;
+    margin-bottom: 4px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .algorithm-list {
+    max-height: 160px;
+    overflow-y: auto;
+
+    :deep(.n-list-item) {
+      padding: 2px 10px;
+    }
+
+    .compact-item {
+      padding: 0;
+    }
+  }
+
+  .algorithm-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .algorithm-name {
+      flex: 1;
+      font-size: 12px;
+      padding-left: 8px;
+    }
+
+    .algorithm-actions {
+      display: flex;
+      gap: 2px;
+    }
+  }
+}
+
+:deep(.n-collapse) {
+  .n-collapse-item {
+    margin: 0px;
+
+    .n-collapse-item__header {
+      padding: 0px;
+      height: 24px;
+    }
+
+    .n-collapse-item__content-inner {
+      padding: 0px;
+    }
+  }
 }
 </style>

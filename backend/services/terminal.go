@@ -48,6 +48,36 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 		AuthMethod: conn.Credential.AuthMethod,
 	}
 
+	// if len(conn.SSHCiphers) > 0 {
+	// 	sshConf.Ciphers = conn.SSHCiphers
+	// 	s.Logger.Debug("Using custom ciphers: %v", conn.SSHCiphers)
+	// }
+	//
+	// if len(conn.SSHKeyExchanges) > 0 {
+	// 	sshConf.KeyExchanges = conn.SSHKeyExchanges
+	// 	s.Logger.Debug("Using custom key exchanges: %v", conn.SSHKeyExchanges)
+	// }
+	//
+	// if len(conn.SSHMACs) > 0 {
+	// 	sshConf.MACs = conn.SSHMACs
+	// 	s.Logger.Debug("Using custom MACs: %v", conn.SSHMACs)
+	// }
+	//
+	// if len(conn.SSHPublicKeyAlgorithms) > 0 {
+	// 	sshConf.PublicKeyAlgorithms = conn.SSHPublicKeyAlgorithms
+	// 	s.Logger.Debug("Using custom public key algorithms: %v", conn.SSHPublicKeyAlgorithms)
+	// }
+	//
+	// if len(conn.SSHHostKeyAlgorithms) > 0 {
+	// 	sshConf.HostKeyAlgorithms = conn.SSHHostKeyAlgorithms
+	// 	s.Logger.Debug("Using custom host key algorithms: %v", conn.SSHHostKeyAlgorithms)
+	// }
+	//
+	// if conn.SSHCharset != "" {
+	// 	sshConf.Charset = conn.SSHCharset
+	// 	s.Logger.Debug("Using charset: %s", conn.SSHCharset)
+	// }
+
 	s.Logger.Info("SSH configuration ready, host: %s, user: %s, auth method: %s",
 		conn.Host,
 		conn.Credential.Username,

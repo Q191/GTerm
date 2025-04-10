@@ -5,10 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/MisakaTAT/GTerm/backend/enums"
-	"golang.org/x/crypto/ssh"
 	"strings"
 	"time"
+
+	"github.com/MisakaTAT/GTerm/backend/enums"
+	"golang.org/x/crypto/ssh"
 )
 
 type Config struct {
@@ -19,6 +20,9 @@ type Config struct {
 	Password    string
 	PrivateKey  string
 	KeyPassword string
+	// Ciphers      []string
+	// KeyExchanges []string
+	// MACs         []string
 }
 
 type Result struct {
@@ -192,6 +196,18 @@ func NewExec(conf *Config) (*ssh.Client, error) {
 			ssh.KeyAlgoED25519,
 		},
 	}
+
+	// if len(conf.Ciphers) > 0 {
+	// 	c.Ciphers = conf.Ciphers
+	// }
+	//
+	// if len(conf.KeyExchanges) > 0 {
+	// 	c.KeyExchanges = conf.KeyExchanges
+	// }
+	//
+	// if len(conf.MACs) > 0 {
+	// 	c.MACs = conf.MACs
+	// }
 
 	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port), c)
 	if err != nil {

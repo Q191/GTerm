@@ -31,6 +31,12 @@ type SSHConfig struct {
 	PrivateKey       string
 	KeyPassword      string
 	TrustUnknownHost bool
+	// Ciphers             []string
+	// KeyExchanges        []string
+	// MACs                []string
+	// PublicKeyAlgorithms []string
+	// HostKeyAlgorithms   []string
+	// Charset             string
 }
 
 type SSH struct {
@@ -144,14 +150,42 @@ func (s *SSH) Connect() (*SSH, error) {
 	} else {
 		// 默认算法列表
 		config.HostKeyAlgorithms = []string{
-			ssh.KeyAlgoRSASHA512,
-			ssh.KeyAlgoRSASHA256,
-			ssh.KeyAlgoRSA,
-			ssh.KeyAlgoECDSA256,
 			ssh.KeyAlgoED25519,
+			ssh.KeyAlgoECDSA256,
+			ssh.KeyAlgoECDSA384,
+			ssh.KeyAlgoECDSA521,
+			ssh.KeyAlgoRSASHA512,
+			ssh.KeyAlgoECDSA256,
+			ssh.KeyAlgoRSA,
+			ssh.KeyAlgoDSA,
+			ssh.CertAlgoDSAv01,
 		}
 		s.logger.Info("Using default host key algorithm list")
 	}
+
+	// else if len(s.conf.HostKeyAlgorithms) > 0 {
+	// 	config.HostKeyAlgorithms = s.conf.HostKeyAlgorithms
+	// 	s.logger.Info("Using custom host key algorithm list: %v", s.conf.HostKeyAlgorithms)
+	// }
+
+	// if len(s.conf.Ciphers) > 0 {
+	// 	config.Ciphers = s.conf.Ciphers
+	// 	s.logger.Info("Using custom cipher list: %v", s.conf.Ciphers)
+	// }
+	//
+	// if len(s.conf.KeyExchanges) > 0 {
+	// 	config.KeyExchanges = s.conf.KeyExchanges
+	// 	s.logger.Info("Using custom key exchange list: %v", s.conf.KeyExchanges)
+	// }
+	//
+	// if len(s.conf.MACs) > 0 {
+	// 	config.MACs = s.conf.MACs
+	// 	s.logger.Info("Using custom MAC list: %v", s.conf.MACs)
+	// }
+
+	// if len(s.conf.PublicKeyAlgorithms) > 0 {
+	//     s.logger.Info("Public key algorithms setting is currently not supported by the SSH library")
+	// }
 
 	s.logger.Info("Starting SSH connection to server, %s@%s", s.conf.User, hostPort)
 	client, err := ssh.Dial("tcp", hostPort, config)
@@ -204,6 +238,7 @@ func (s *SSH) Connect() (*SSH, error) {
 		ssh.TTY_OP_OSPEED: 14400,
 	}
 
+	// TODO: 支持自定义终端类型
 	s.logger.Debug("Requesting PTY terminal, type: xterm")
 	if err = s.session.RequestPty("xterm", 0, 0, modes); err != nil {
 		s.logger.Error("Failed to request PTY terminal: %v", err)
