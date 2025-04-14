@@ -5,25 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/MisakaTAT/GTerm/backend/initialize"
 	"strings"
 	"time"
 
-	"github.com/MisakaTAT/GTerm/backend/enums"
+	commonssh "github.com/MisakaTAT/GTerm/backend/pkg/ssh"
 	"golang.org/x/crypto/ssh"
 )
-
-type Config struct {
-	AuthMethod  enums.AuthMethod
-	Port        uint
-	Host        string
-	User        string
-	Password    string
-	PrivateKey  string
-	KeyPassword string
-	// Ciphers      []string
-	// KeyExchanges []string
-	// MACs         []string
-}
 
 type Result struct {
 	stdout   string
@@ -154,65 +142,6 @@ func (r *Result) String() string {
 	return fmt.Sprintf("error: %v", r.err)
 }
 
-func NewExec(conf *Config) (*ssh.Client, error) {
-	var auth []ssh.AuthMethod
-
-	switch conf.AuthMethod {
-	case enums.Password:
-		auth = append(auth, ssh.Password(conf.Password))
-		auth = append(auth, ssh.KeyboardInteractive(func(user, instruction string, questions []string, echos []bool) ([]string, error) {
-			answers := make([]string, len(questions))
-			if len(questions) == 1 {
-				answers[0] = conf.Password
-			}
-			return answers, nil
-		}))
-	case enums.PrivateKey:
-		var signer ssh.Signer
-		var err error
-		if conf.KeyPassword == "" {
-			signer, err = ssh.ParsePrivateKey([]byte(conf.PrivateKey))
-		} else {
-			signer, err = ssh.ParsePrivateKeyWithPassphrase([]byte(conf.PrivateKey), []byte(conf.KeyPassword))
-		}
-		if err != nil {
-			return nil, err
-		}
-		auth = append(auth, ssh.PublicKeys(signer))
-	default:
-		return nil, errors.New("invalid authentication type provided")
-	}
-
-	c := &ssh.ClientConfig{
-		User:            conf.User,
-		Auth:            auth,
-		Timeout:         10 * time.Second,
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		HostKeyAlgorithms: []string{
-			ssh.KeyAlgoRSASHA512,
-			ssh.KeyAlgoRSASHA256,
-			ssh.KeyAlgoRSA,
-			ssh.KeyAlgoECDSA256,
-			ssh.KeyAlgoED25519,
-		},
-	}
-
-	// if len(conf.Ciphers) > 0 {
-	// 	c.Ciphers = conf.Ciphers
-	// }
-	//
-	// if len(conf.KeyExchanges) > 0 {
-	// 	c.KeyExchanges = conf.KeyExchanges
-	// }
-	//
-	// if len(conf.MACs) > 0 {
-	// 	c.MACs = conf.MACs
-	// }
-
-	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port), c)
-	if err != nil {
-		return nil, fmt.Errorf("failed to dial: %v", err)
-	}
-
-	return client, nil
+func NewExec(conf *commonssh.Config, logger initialize.Logger) (*ssh.Client, error) {
+	return commonssh.NewSSHClient(conf, logger)
 }

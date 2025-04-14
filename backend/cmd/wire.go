@@ -14,7 +14,7 @@ func NewApp() *App {
 		initialize.InitDatabase,
 		initialize.InitHTTPServer,
 		initialize.InitLogger,
-		services.SetProvider,
+		services.ProviderSet,
 	)
 	return new(App)
 }

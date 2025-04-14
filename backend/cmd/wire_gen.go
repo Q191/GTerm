@@ -46,6 +46,10 @@ func NewApp() *App {
 		TerminalSrv: terminalSrv,
 		Logger:      logger,
 	}
+	fileTransferSrv := &services.FileTransferSrv{
+		Logger:        logger,
+		ConnectionSrv: connectionSrv,
+	}
 	app := &App{
 		HTTPListenerPort: httpListenerPort,
 		Logger:           logger,
@@ -56,6 +60,7 @@ func NewApp() *App {
 		MetadataSrv:      metadataSrv,
 		CredentialSrv:    credentialSrv,
 		WebsocketSrv:     websocketSrv,
+		FileTransferSrv:  fileTransferSrv,
 	}
 	return app
 }

@@ -4,6 +4,8 @@ var CodeMapping = map[string]string{
 	CreateSuccess: "Creation successful",
 	UpdateSuccess: "Update successful",
 	DeleteSuccess: "Deletion successful",
+	Connected:     "Connected",
+	Disconnected:  "Disconnected",
 
 	ConnectionClosed:           "Connection closed",
 	ReadLimitExceeded:          "Connection data exceeded limit",
@@ -25,4 +27,8 @@ var CodeMapping = map[string]string{
 	FailedToParseFingerprint:   "Failed to parse fingerprint confirmation",
 	FailedToAddFingerprint:     "Failed to add host fingerprint",
 	UserRejectedFingerprint:    "User rejected host fingerprint",
+
+	UploadSuccess:       "Upload successful",
+	DownloadSuccess:     "Download successful",
+	CreateFolderSuccess: "Folder creation successful",
 }

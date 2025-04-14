@@ -20,6 +20,21 @@
         <template #trigger>
           <div
             class="menu-item top-menu-item"
+            :class="{ active: selectedKey === 'FileTransfer' }"
+            @click="handleSelect('FileTransfer')"
+          >
+            <n-icon size="x-large">
+              <icon icon="ph:folders" />
+            </n-icon>
+          </div>
+        </template>
+        {{ $t('frontend.sider.file_transfer') }}
+      </n-tooltip>
+
+      <n-tooltip placement="right" trigger="hover">
+        <template #trigger>
+          <div
+            class="menu-item top-menu-item"
             :class="{ active: selectedKey === 'Credential' }"
             @click="handleSelect('Credential')"
           >

@@ -3,10 +3,10 @@ package services
 import (
 	"github.com/MisakaTAT/GTerm/backend/dal/model"
 	"github.com/MisakaTAT/GTerm/backend/dal/query"
-	"github.com/MisakaTAT/GTerm/backend/enums"
 	"github.com/MisakaTAT/GTerm/backend/initialize"
 	"github.com/MisakaTAT/GTerm/backend/pkg/exec"
 	"github.com/MisakaTAT/GTerm/backend/pkg/metadata"
+	commonssh "github.com/MisakaTAT/GTerm/backend/pkg/ssh"
 	"github.com/google/wire"
 	"go.uber.org/zap"
 )
@@ -21,20 +21,17 @@ type MetadataSrv struct {
 func (s *MetadataSrv) UpdateByConnection(conn *model.Connection) {
 	t := s.Query.Metadata
 
-	config := &exec.Config{
-		Host:       conn.Host,
-		Port:       conn.Port,
-		User:       conn.Credential.Username,
-		AuthMethod: conn.Credential.AuthMethod,
+	config := &commonssh.Config{
+		Host:             conn.Host,
+		Port:             conn.Port,
+		User:             conn.Credential.Username,
+		AuthMethod:       conn.Credential.AuthMethod,
+		Password:         conn.Credential.Password,
+		PrivateKey:       conn.Credential.PrivateKey,
+		Passphrase:       conn.Credential.Passphrase,
+		TrustUnknownHost: true,
 	}
-	switch conn.Credential.AuthMethod {
-	case enums.Password:
-		config.Password = conn.Credential.Password
-	case enums.PrivateKey:
-		config.PrivateKey = conn.Credential.PrivateKey
-		config.KeyPassword = conn.Credential.Passphrase
-	}
-	client, err := exec.NewExec(config)
+	client, err := exec.NewExec(config, s.Logger)
 	if err != nil {
 		s.Logger.Error("failed to create ssh client", zap.Error(err))
 		return

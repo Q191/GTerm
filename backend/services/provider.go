@@ -2,12 +2,13 @@ package services
 
 import "github.com/google/wire"
 
-var SetProvider = wire.NewSet(
-	TerminalSrvSet,
-	PreferencesSrvSet,
-	GroupSrvSet,
+var ProviderSet = wire.NewSet(
 	ConnectionSrvSet,
-	MetadataSrvSet,
 	CredentialSrvSet,
+	GroupSrvSet,
+	MetadataSrvSet,
+	PreferencesSrvSet,
+	TerminalSrvSet,
 	WebsocketSrvSet,
+	FileTransferSrvSet,
 )

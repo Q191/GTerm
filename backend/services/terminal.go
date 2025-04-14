@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	commonssh "github.com/MisakaTAT/GTerm/backend/pkg/ssh"
 	"time"
 
 	"github.com/MisakaTAT/GTerm/backend/consts"
@@ -41,11 +42,14 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 		go s.MetadataSrv.UpdateByConnection(conn)
 	}
 
-	sshConf := &adapter.SSHConfig{
+	sshConf := &commonssh.Config{
 		Host:       conn.Host,
 		Port:       conn.Port,
 		User:       conn.Credential.Username,
 		AuthMethod: conn.Credential.AuthMethod,
+		Password:   conn.Credential.Password,
+		PrivateKey: conn.Credential.PrivateKey,
+		Passphrase: conn.Credential.Passphrase,
 	}
 
 	// if len(conn.SSHCiphers) > 0 {
@@ -83,16 +87,6 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 		conn.Credential.Username,
 		conn.Credential.AuthMethod)
 
-	switch conn.Credential.AuthMethod {
-	case enums.Password:
-		sshConf.Password = conn.Credential.Password
-		s.Logger.Debug("Using password authentication")
-	case enums.PrivateKey:
-		sshConf.PrivateKey = conn.Credential.PrivateKey
-		sshConf.KeyPassword = conn.Credential.Passphrase
-		s.Logger.Debug("Using private key authentication")
-	}
-
 	s.Logger.Info("Connecting to SSH server, host: %s, port: %d", conn.Host, conn.Port)
 	ssh, err := adapter.NewSSH(sshConf, ws, s.Logger).Connect()
 	if err != nil {
@@ -115,39 +109,23 @@ func (s *TerminalSrv) SSH(ws *websocket.Conn, hostID uint) error {
 	return nil
 }
 
-func (s *TerminalSrv) AddFingerprint(hostID uint, hostAddress string, fingerprint string) error {
-	s.Logger.Info("Adding host fingerprint, hostID: %d, address: %s, fingerprint: %s", hostID, hostAddress, fingerprint)
+func (s *TerminalSrv) AddFingerprint(hostID uint, host string, fingerprint string) error {
+	s.Logger.Info("Adding host fingerprint, hostID: %d, host: %s, fingerprint: %s", hostID, host, fingerprint)
 	conn, err := s.ConnectionSrv.FindByID(hostID)
 	if err != nil {
 		s.Logger.Error("Failed to find host information: %v, hostID: %d", err, hostID)
 		return fmt.Errorf("failed to find host: %v", err)
 	}
-
-	sshConf := &adapter.SSHConfig{
-		Host:       conn.Host,
-		Port:       conn.Port,
-		User:       conn.Credential.Username,
-		AuthMethod: conn.Credential.AuthMethod,
+	sshConf := &commonssh.Config{
+		Host: conn.Host,
+		Port: conn.Port,
+		User: conn.Credential.Username,
 	}
-
-	switch conn.Credential.AuthMethod {
-	case enums.Password:
-		sshConf.Password = conn.Credential.Password
-	case enums.PrivateKey:
-		sshConf.PrivateKey = conn.Credential.PrivateKey
-		sshConf.KeyPassword = conn.Credential.Passphrase
-	}
-
-	// 创建SSH配置
-	ssh := adapter.NewSSH(sshConf, nil, s.Logger)
-
-	// 添加主机指纹
-	if err = ssh.AddFingerprint(hostAddress, fingerprint); err != nil {
-		s.Logger.Error("Failed to add host fingerprint: %v, address: %s", err, hostAddress)
+	if err = commonssh.AddFingerprint(sshConf, host, fingerprint, s.Logger); err != nil {
+		s.Logger.Error("Failed to add host fingerprint: %v, host: %s", err, host)
 		return fmt.Errorf("failed to add host fingerprint: %v", err)
 	}
-	s.Logger.Info("Successfully added host fingerprint, address: %s", hostAddress)
-
+	s.Logger.Info("Successfully added host fingerprint, host: %s", host)
 	return nil
 }
 

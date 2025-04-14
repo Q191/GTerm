@@ -23,6 +23,7 @@ type App struct {
 	MetadataSrv      *services.MetadataSrv
 	CredentialSrv    *services.CredentialSrv
 	WebsocketSrv     *services.WebsocketSrv
+	FileTransferSrv  *services.FileTransferSrv
 }
 
 func (a *App) Startup(ctx context.Context) {
@@ -33,16 +34,19 @@ func (a *App) Startup(ctx context.Context) {
 		// log.SetLogLevel(logger.INFO)
 	}
 
+	a.FileTransferSrv.SetContext(ctx)
+
 	http.Handle("/ws/terminal", http.HandlerFunc(a.WebsocketSrv.TerminalHandle))
 }
 
-func (a *App) Bind() (services []any) {
-	services = append(services, a.TerminalSrv)
-	services = append(services, a.PreferencesSrv)
-	services = append(services, a.GroupSrv)
-	services = append(services, a.ConnectionSrv)
-	services = append(services, a.MetadataSrv)
-	services = append(services, a.CredentialSrv)
+func (a *App) Bind() (bd []any) {
+	bd = append(bd, a.TerminalSrv)
+	bd = append(bd, a.PreferencesSrv)
+	bd = append(bd, a.GroupSrv)
+	bd = append(bd, a.ConnectionSrv)
+	bd = append(bd, a.MetadataSrv)
+	bd = append(bd, a.CredentialSrv)
+	bd = append(bd, a.FileTransferSrv)
 	return
 }
 
@@ -50,5 +54,6 @@ func (a *App) Enums() (es []any) {
 	es = append(es, enums.AuthMethodEnums)
 	es = append(es, enums.ConnProtocolEnums)
 	es = append(es, enums.TerminalTypeEnums)
+	es = append(es, enums.FileTransferTaskStateEnums)
 	return
 }

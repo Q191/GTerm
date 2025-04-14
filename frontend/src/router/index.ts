@@ -23,6 +23,11 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('@/views/pages/Connection.vue'),
           },
           {
+            path: 'file-transfer',
+            name: 'FileTransfer',
+            component: () => import('@/views/pages/FileTransfer.vue'),
+          },
+          {
             path: 'credential',
             name: 'Credential',
             component: () => import('@/views/pages/Credential.vue'),
