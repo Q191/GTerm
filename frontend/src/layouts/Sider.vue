@@ -126,9 +126,7 @@ const themeVars = useThemeVars();
 
 const updateSelectedKey = () => {
   const routeName = route.name as string;
-  if (routeName === 'Connection' || routeName === 'Credential') {
-    selectedKey.value = routeName;
-  }
+  selectedKey.value = routeName;
 };
 
 watch(() => route.name, updateSelectedKey);
