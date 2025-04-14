@@ -199,8 +199,6 @@
       "select_files_title": "选择要上传的文件",
       "select_directory_title": "选择下载位置",
       "unknown_file": "未知文件",
-      "navigate_back": "返回上一路径",
-      "navigate_forward": "前往下一路径",
       "navigate_home": "返回主目录",
       "navigate_up": "返回上级目录",
       "navigate_to_path": "转到指定路径",
