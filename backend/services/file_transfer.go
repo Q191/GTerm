@@ -1,7 +1,6 @@
 package services
 
 import (
-	"context"
 	"sync"
 
 	"github.com/MisakaTAT/GTerm/backend/consts/messages"
@@ -19,13 +18,9 @@ var FileTransferSrvSet = wire.NewSet(wire.Struct(new(FileTransferSrv), "*"))
 type FileTransferSrv struct {
 	Logger           initialize.Logger
 	ConnectionSrv    *ConnectionSrv
-	SFTPHandler      *sftp.Handler   `wire:"-"`
-	SFTPHandlerMutex sync.Mutex      `wire:"-"`
-	Context          context.Context `wire:"-"`
-}
-
-func (s *FileTransferSrv) SetContext(ctx context.Context) {
-	s.Context = ctx
+	AppContext       *initialize.AppContext
+	SFTPHandler      *sftp.Handler `wire:"-"`
+	SFTPHandlerMutex sync.Mutex    `wire:"-"`
 }
 
 func (s *FileTransferSrv) ConnectSFTP(connID uint) *resp.Resp {
@@ -163,21 +158,19 @@ func (s *FileTransferSrv) UploadFiles(localPaths []string, remotePath string) *r
 			progress := float64(transferred) / float64(total) * 100
 			s.Logger.Debug("Upload progress: %.2f%% (%d/%d)", progress, transferred, total)
 
-			if s.Context != nil {
-				totalProgress := (float64(completedFiles*100) + progress) / float64(totalFiles)
+			totalProgress := (float64(completedFiles*100) + progress) / float64(totalFiles)
 
-				runtime.EventsEmit(s.Context, "transfer:progress", map[string]interface{}{
-					"type":          "upload",
-					"fileName":      fileName,
-					"fileSize":      fileSize,
-					"progress":      progress,
-					"totalFiles":    totalFiles,
-					"completed":     completedFiles,
-					"total":         total,
-					"transferred":   transferred,
-					"totalProgress": totalProgress,
-				})
-			}
+			runtime.EventsEmit(s.AppContext.Context(), "transfer:progress", map[string]interface{}{
+				"type":          "upload",
+				"fileName":      fileName,
+				"fileSize":      fileSize,
+				"progress":      progress,
+				"totalFiles":    totalFiles,
+				"completed":     completedFiles,
+				"total":         total,
+				"transferred":   transferred,
+				"totalProgress": totalProgress,
+			})
 		})
 
 		if err != nil {
@@ -231,21 +224,19 @@ func (s *FileTransferSrv) DownloadFiles(remotePaths []string, localPath string) 
 		err = s.SFTPHandler.DownloadFile(remotePath, localFilePath, func(transferred, total int64) {
 			progress := float64(transferred) / float64(total) * 100
 
-			if s.Context != nil {
-				totalProgress := (float64(completedFiles*100) + progress) / float64(totalFiles)
+			totalProgress := (float64(completedFiles*100) + progress) / float64(totalFiles)
 
-				runtime.EventsEmit(s.Context, "transfer:progress", map[string]interface{}{
-					"type":          "download",
-					"fileName":      fileName,
-					"fileSize":      fileSize,
-					"progress":      progress,
-					"totalFiles":    totalFiles,
-					"completed":     completedFiles,
-					"total":         total,
-					"transferred":   transferred,
-					"totalProgress": totalProgress,
-				})
-			}
+			runtime.EventsEmit(s.AppContext.Context(), "transfer:progress", map[string]interface{}{
+				"type":          "download",
+				"fileName":      fileName,
+				"fileSize":      fileSize,
+				"progress":      progress,
+				"totalFiles":    totalFiles,
+				"completed":     completedFiles,
+				"total":         total,
+				"transferred":   transferred,
+				"totalProgress": totalProgress,
+			})
 		})
 
 		if err != nil {
@@ -295,12 +286,7 @@ func (s *FileTransferSrv) CreateRemoteFolder(path string) *resp.Resp {
 func (s *FileTransferSrv) SelectDownloadDirectory(title string) *resp.Resp {
 	s.Logger.Info("Opening directory selection dialog with title: %s", title)
 
-	if s.Context == nil {
-		s.Logger.Error("Context not initialized")
-		return resp.FailWithMsg("Context not initialized")
-	}
-
-	directory, err := runtime.OpenDirectoryDialog(s.Context, runtime.OpenDialogOptions{
+	directory, err := runtime.OpenDirectoryDialog(s.AppContext.Context(), runtime.OpenDialogOptions{
 		Title: title,
 	})
 
@@ -321,12 +307,7 @@ func (s *FileTransferSrv) SelectDownloadDirectory(title string) *resp.Resp {
 func (s *FileTransferSrv) SelectUploadFiles(title string) *resp.Resp {
 	s.Logger.Info("Opening file selection dialog with title: %s", title)
 
-	if s.Context == nil {
-		s.Logger.Error("Context not initialized")
-		return resp.FailWithMsg("Context not initialized")
-	}
-
-	files, err := runtime.OpenMultipleFilesDialog(s.Context, runtime.OpenDialogOptions{
+	files, err := runtime.OpenMultipleFilesDialog(s.AppContext.Context(), runtime.OpenDialogOptions{
 		Title:                title,
 		CanCreateDirectories: true,
 		ResolvesAliases:      true,

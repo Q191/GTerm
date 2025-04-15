@@ -189,6 +189,8 @@
       "size": "大小",
       "modified": "修改时间",
       "permissions": "权限",
+      "owner": "所有者",
+      "group": "用户组",
       "enter_folder_name": "请输入文件夹名称",
       "no_tasks": "暂无传输任务",
       "clear_completed": "清除已完成",

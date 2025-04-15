@@ -11,6 +11,7 @@ import (
 func NewApp() *App {
 	wire.Build(
 		AppSet,
+		initialize.InitDefaultContext,
 		initialize.InitDatabase,
 		initialize.InitHTTPServer,
 		initialize.InitLogger,

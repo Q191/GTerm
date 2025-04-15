@@ -8,27 +8,31 @@ import (
 	"strings"
 	"time"
 
+	"github.com/MisakaTAT/GTerm/backend/initialize"
+	"github.com/MisakaTAT/GTerm/backend/pkg/exec"
+	commonssh "github.com/MisakaTAT/GTerm/backend/pkg/ssh"
 	"github.com/MisakaTAT/GTerm/backend/types"
 
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	commonssh "github.com/MisakaTAT/GTerm/backend/pkg/ssh"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
 
 type Handler struct {
-	Logger        initialize.Logger
-	SSHClient     *ssh.Client
-	SFTPClient    *sftp.Client
-	IsConnected   bool
-	LastErrorTime time.Time
-	HomeDir       string
+	Logger           initialize.Logger
+	SSHClient        *ssh.Client
+	SFTPClient       *sftp.Client
+	IsConnected      bool
+	LastErrorTime    time.Time
+	HomeDir          string
+	PermissionsCache *PermissionsCache
+	execAdapter      *exec.Adapter
 }
 
 func NewSFTPHandler(logger initialize.Logger) *Handler {
 	return &Handler{
-		Logger:      logger,
-		IsConnected: false,
+		Logger:           logger,
+		IsConnected:      false,
+		PermissionsCache: NewPermissionsCache(logger),
 	}
 }
 
@@ -44,6 +48,10 @@ func (h *Handler) Connect(conf *commonssh.Config) error {
 		return err
 	}
 	h.SSHClient = client
+
+	h.execAdapter = exec.New(h.SSHClient)
+	// 预加载权限信息
+	h.PermissionsCache.preloadPermissions(h.SSHClient, h.execAdapter)
 
 	h.Logger.Info("Initializing SFTP client")
 	sftpClient, err := sftp.NewClient(client)
@@ -96,9 +104,9 @@ func (h *Handler) Close() error {
 	return err
 }
 
-func (h *Handler) ListRemoteFiles(path string) ([]types.FileTransferItemInfo, error) {
-	if !h.IsConnected || h.SFTPClient == nil {
-		return nil, errors.New("not connected to SFTP server")
+func (h *Handler) ListRemoteFiles(path string) ([]*types.FileTransferItemInfo, error) {
+	if err := h.checkSFTPConnection(); err != nil {
+		return nil, err
 	}
 
 	h.Logger.Info("Listing remote directory: %s", path)
@@ -108,15 +116,23 @@ func (h *Handler) ListRemoteFiles(path string) ([]types.FileTransferItemInfo, er
 		return nil, err
 	}
 
-	files := make([]types.FileTransferItemInfo, 0, len(entries))
+	files := make([]*types.FileTransferItemInfo, 0, len(entries))
 	for _, entry := range entries {
-		files = append(files, types.FileTransferItemInfo{
+		info := &types.FileTransferItemInfo{
 			Name:        entry.Name(),
 			Size:        entry.Size(),
 			IsDir:       entry.IsDir(),
 			ModTime:     entry.ModTime().Format(time.RFC3339),
 			Permissions: entry.Mode().String(),
-		})
+			Owner:       "unknown",
+			Group:       "unknown",
+		}
+
+		if stat, ok := entry.Sys().(*sftp.FileStat); ok {
+			info.Owner = h.PermissionsCache.GetUsername(stat.UID)
+			info.Group = h.PermissionsCache.GetGroupName(stat.GID)
+		}
+		files = append(files, info)
 	}
 
 	h.Logger.Info("Found %d files/directories in remote directory %s", len(files), path)
@@ -124,8 +140,8 @@ func (h *Handler) ListRemoteFiles(path string) ([]types.FileTransferItemInfo, er
 }
 
 func (h *Handler) UploadFile(localPath, remotePath string, progressCallback func(int64, int64)) error {
-	if !h.IsConnected || h.SFTPClient == nil {
-		return errors.New("not connected to SFTP server")
+	if err := h.checkSFTPConnection(); err != nil {
+		return err
 	}
 
 	localFile, err := os.Open(localPath)
@@ -174,7 +190,7 @@ func (h *Handler) UploadFile(localPath, remotePath string, progressCallback func
 		}
 	}(remoteFile)
 
-	_, err = io.Copy(localFile, &types.ProgressReader{
+	_, err = io.Copy(localFile, &ProgressReader{
 		Reader:           remoteFile,
 		TotalSize:        totalSize,
 		BytesRead:        0,
@@ -191,8 +207,8 @@ func (h *Handler) UploadFile(localPath, remotePath string, progressCallback func
 }
 
 func (h *Handler) DownloadFile(remotePath, localPath string, progressCallback func(int64, int64)) error {
-	if !h.IsConnected || h.SFTPClient == nil {
-		return errors.New("not connected to SFTP server")
+	if err := h.checkSFTPConnection(); err != nil {
+		return err
 	}
 
 	remoteFileInfo, err := h.SFTPClient.Stat(remotePath)
@@ -240,7 +256,7 @@ func (h *Handler) DownloadFile(remotePath, localPath string, progressCallback fu
 		}
 	}(localFile)
 
-	_, err = io.Copy(localFile, &types.ProgressReader{
+	_, err = io.Copy(localFile, &ProgressReader{
 		Reader:           remoteFile,
 		TotalSize:        totalSize,
 		BytesRead:        0,
@@ -257,8 +273,8 @@ func (h *Handler) DownloadFile(remotePath, localPath string, progressCallback fu
 }
 
 func (h *Handler) CreateRemoteFolder(path string) error {
-	if !h.IsConnected || h.SFTPClient == nil {
-		return errors.New("not connected to SFTP server")
+	if err := h.checkSFTPConnection(); err != nil {
+		return err
 	}
 
 	h.Logger.Info("Creating remote folder: %s", path)
@@ -273,8 +289,8 @@ func (h *Handler) CreateRemoteFolder(path string) error {
 }
 
 func (h *Handler) GetRemoteFileSize(path string) (int64, error) {
-	if !h.IsConnected || h.SFTPClient == nil {
-		return 0, errors.New("not connected to SFTP server")
+	if err := h.checkSFTPConnection(); err != nil {
+		return 0, err
 	}
 
 	fileInfo, err := h.SFTPClient.Stat(path)
@@ -285,41 +301,27 @@ func (h *Handler) GetRemoteFileSize(path string) (int64, error) {
 }
 
 func (h *Handler) GetHomeDirectory() (string, error) {
-	if !h.IsConnected || h.SFTPClient == nil {
-		return "", errors.New("not connected to SFTP server")
-	}
-	session, err := h.SSHClient.NewSession()
-	if err != nil {
-		h.Logger.Error("Failed to create SSH session: %v", err)
-		return "", err
-	}
-	defer session.Close()
-
-	output, err := session.Output("pwd")
-	if err != nil {
-		h.Logger.Error("Failed to execute pwd command: %v", err)
+	if err := h.checkSSHConnection(); err != nil {
 		return "", err
 	}
 
-	homeDir := string(output)
-	homeDir = strings.TrimSpace(homeDir)
+	result := h.execAdapter.Run("pwd")
+	if !result.Success() {
+		h.Logger.Error("Failed to execute pwd command: %v", result.Error())
+	}
 
+	homeDir := result.Unwrap()
 	if homeDir == "" {
-		session, err = h.SSHClient.NewSession()
-		if err != nil {
-			return "", err
+		h.Logger.Info("pwd command failed, trying $HOME environment variable")
+		result = h.execAdapter.Run("echo $HOME")
+		if !result.Success() {
+			h.Logger.Error("Failed to get HOME environment variable: %v", result.Error())
 		}
-		defer session.Close()
-
-		output, err = session.Output("echo $HOME")
-		if err != nil {
-			return "", err
-		}
-
-		homeDir = strings.TrimSpace(string(output))
+		homeDir = result.Unwrap()
 	}
 
 	if homeDir == "" {
+		h.Logger.Warn("Failed to determine home directory, using / as default")
 		return "/", nil
 	}
 
@@ -331,13 +333,15 @@ func (h *Handler) GetHomeDirectory() (string, error) {
 		homeDir = homeDir[:len(homeDir)-1]
 	}
 
+	h.Logger.Info("Home directory determined: %s", homeDir)
 	return homeDir, nil
 }
 
 func (h *Handler) ProcessPath(path string) (string, error) {
-	if !h.IsConnected || h.SFTPClient == nil {
-		return "", errors.New("not connected to SFTP server")
+	if err := h.checkSFTPConnection(); err != nil {
+		return "", err
 	}
+
 	if path == "" {
 		if h.HomeDir != "" {
 			return h.HomeDir, nil
@@ -370,4 +374,44 @@ func (h *Handler) JoinRemotePaths(base, relPath string) (string, error) {
 	}
 
 	return basePath + relPath, nil
+}
+
+func (h *Handler) isSFTPReady() bool {
+	return h.IsConnected && h.SFTPClient != nil
+}
+
+func (h *Handler) isSSHReady() bool {
+	return h.IsConnected && h.SSHClient != nil
+}
+
+func (h *Handler) checkSFTPConnection() error {
+	if !h.isSFTPReady() {
+		return errors.New("not connected to SFTP server")
+	}
+	return nil
+}
+
+func (h *Handler) checkSSHConnection() error {
+	if !h.isSSHReady() {
+		return errors.New("not connected to SSH server")
+	}
+	return nil
+}
+
+type ProgressReader struct {
+	Reader           io.Reader
+	TotalSize        int64
+	BytesRead        int64
+	ProgressCallback func(int64, int64)
+}
+
+func (pr *ProgressReader) Read(p []byte) (int, error) {
+	n, err := pr.Reader.Read(p)
+	if n > 0 {
+		pr.BytesRead += int64(n)
+		if pr.ProgressCallback != nil {
+			pr.ProgressCallback(pr.BytesRead, pr.TotalSize)
+		}
+	}
+	return n, err
 }

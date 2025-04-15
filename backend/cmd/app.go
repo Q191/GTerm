@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/wailsapp/wails/v2/pkg/logger"
+
 	"github.com/MisakaTAT/GTerm/backend/enums"
 	"github.com/MisakaTAT/GTerm/backend/initialize"
 	"github.com/MisakaTAT/GTerm/backend/services"
@@ -13,7 +15,7 @@ import (
 var AppSet = wire.NewSet(wire.Struct(new(App), "*"))
 
 type App struct {
-	context          context.Context `wire:"-"`
+	AppContext       *initialize.AppContext
 	HTTPListenerPort *initialize.HTTPListenerPort
 	Logger           initialize.Logger
 	TerminalSrv      *services.TerminalSrv
@@ -27,14 +29,11 @@ type App struct {
 }
 
 func (a *App) Startup(ctx context.Context) {
-	a.context = ctx
+	a.AppContext.SetContext(ctx)
 
 	if log, ok := a.Logger.(*initialize.LoggerWrapper); ok {
-		log.SetContext(a.context)
-		// log.SetLogLevel(logger.INFO)
+		log.SetLogLevel(logger.DEBUG)
 	}
-
-	a.FileTransferSrv.SetContext(ctx)
 
 	http.Handle("/ws/terminal", http.HandlerFunc(a.WebsocketSrv.TerminalHandle))
 }

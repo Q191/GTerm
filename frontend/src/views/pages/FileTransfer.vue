@@ -59,12 +59,7 @@
               {{ t('frontend.file_transfer.navigate_up') }}
             </n-tooltip>
 
-            <n-input
-              class="path-input"
-              v-model:value="remotePathInput"
-              placeholder="/path/to/directory"
-              @keydown.enter="navigateToPath"
-            >
+            <n-input class="path-input" v-model:value="remotePathInput" @keydown.enter="navigateToPath">
               <template #prefix>
                 <n-icon><icon icon="ph:folder-open-bold" /></n-icon>
               </template>
@@ -96,17 +91,6 @@
               </n-button>
             </template>
             {{ t('frontend.file_transfer.refresh') }}
-          </n-tooltip>
-
-          <n-tooltip placement="bottom">
-            <template #trigger>
-              <n-button quaternary @click="createRemoteFolder">
-                <template #icon>
-                  <n-icon><icon icon="ph:folder-simple-plus-bold" /></n-icon>
-                </template>
-              </n-button>
-            </template>
-            {{ t('frontend.file_transfer.create_folder') }}
           </n-tooltip>
 
           <n-tooltip placement="bottom">
@@ -161,7 +145,7 @@
                     v-for="task in transferTasks"
                     :key="task.id"
                     class="task-item"
-                    :class="{ 'is-completed': task.status === enums.FileTransferTaskState.COMPLETED }"
+                    :class="{ 'is-completed': task.status === FileTransferTaskState.COMPLETED }"
                   >
                     <div class="task-info">
                       <div class="task-title">
@@ -180,7 +164,7 @@
                     <n-progress
                       type="line"
                       :percentage="getTaskPercentage(task)"
-                      :processing="task.status === enums.FileTransferTaskState.PROGRESS"
+                      :processing="task.status === FileTransferTaskState.PROGRESS"
                       :status="getTaskProgressStatus(task)"
                       :show-indicator="false"
                       :height="4"
@@ -226,6 +210,8 @@
           <div class="file-grid-cell name-cell">{{ t('frontend.file_transfer.name') }}</div>
           <div class="file-grid-cell size-cell">{{ t('frontend.file_transfer.size') }}</div>
           <div class="file-grid-cell time-cell">{{ t('frontend.file_transfer.modified') }}</div>
+          <div class="file-grid-cell owner-cell">{{ t('frontend.file_transfer.owner') }}</div>
+          <div class="file-grid-cell group-cell">{{ t('frontend.file_transfer.group') }}</div>
           <div class="file-grid-cell perm-cell">{{ t('frontend.file_transfer.permissions') }}</div>
         </div>
 
@@ -258,6 +244,12 @@
                 </div>
                 <div class="file-grid-cell time-cell">
                   {{ formatDate(file.modTime) }}
+                </div>
+                <div class="file-grid-cell owner-cell">
+                  {{ file.owner }}
+                </div>
+                <div class="file-grid-cell group-cell">
+                  {{ file.group }}
                 </div>
                 <div class="file-grid-cell perm-cell">
                   {{ file.permissions }}
@@ -296,7 +288,6 @@ import {
   ListRemoteFiles,
   UploadFiles,
   DownloadFiles,
-  CreateRemoteFolder,
   SelectDownloadDirectory,
   SelectUploadFiles,
 } from '@wailsApp/go/services/FileTransferSrv';
@@ -306,6 +297,7 @@ import { useCall } from '@/utils/call';
 import { v4 as uuidv4 } from 'uuid';
 import { enums, types } from '@wailsApp/go/models';
 
+const { FileTransferTaskState } = enums;
 const { t } = useI18n();
 const { call } = useCall();
 const themeVars = useThemeVars();
@@ -351,13 +343,13 @@ const someRemoteSelected = computed(() => {
 
 const activeTasks = computed(() => {
   return transferTasks.value.filter(
-    task => task.status === enums.FileTransferTaskState.PENDING || task.status === enums.FileTransferTaskState.PROGRESS,
+    task => task.status === FileTransferTaskState.PENDING || task.status === FileTransferTaskState.PROGRESS,
   );
 });
 
 const hasCompletedTasks = computed(() => {
   return transferTasks.value.some(
-    task => task.status === enums.FileTransferTaskState.COMPLETED || enums.FileTransferTaskState.ERROR,
+    task => task.status === FileTransferTaskState.COMPLETED || FileTransferTaskState.ERROR,
   );
 });
 
@@ -377,11 +369,11 @@ const getTaskPercentage = (task: types.FileTransferTask): number => {
 
 const getTaskProgressStatus = (task: types.FileTransferTask): 'success' | 'error' | 'warning' | undefined => {
   switch (task.status) {
-    case enums.FileTransferTaskState.COMPLETED:
+    case FileTransferTaskState.COMPLETED:
       return 'success';
-    case enums.FileTransferTaskState.ERROR:
+    case FileTransferTaskState.ERROR:
       return 'error';
-    case enums.FileTransferTaskState.PENDING:
+    case FileTransferTaskState.PENDING:
       return 'warning';
     default:
       return undefined;
@@ -390,13 +382,13 @@ const getTaskProgressStatus = (task: types.FileTransferTask): 'success' | 'error
 
 const getTaskStatusText = (task: types.FileTransferTask): string => {
   switch (task.status) {
-    case enums.FileTransferTaskState.COMPLETED:
+    case FileTransferTaskState.COMPLETED:
       return t('frontend.file_transfer.completed');
-    case enums.FileTransferTaskState.ERROR:
+    case FileTransferTaskState.ERROR:
       return task.error || t('frontend.file_transfer.failed');
-    case enums.FileTransferTaskState.PENDING:
+    case FileTransferTaskState.PENDING:
       return t('frontend.file_transfer.pending');
-    case enums.FileTransferTaskState.PROGRESS:
+    case FileTransferTaskState.PROGRESS:
       return `${getTaskPercentage(task)}%`;
     default:
       return '';
@@ -405,7 +397,7 @@ const getTaskStatusText = (task: types.FileTransferTask): string => {
 
 const clearCompletedTasks = () => {
   transferTasks.value = transferTasks.value.filter(
-    task => task.status === enums.FileTransferTaskState.PENDING || task.status === enums.FileTransferTaskState.PROGRESS,
+    task => task.status === FileTransferTaskState.PENDING || task.status === FileTransferTaskState.PROGRESS,
   );
 };
 
@@ -549,8 +541,8 @@ const uploadToRemote = async () => {
 
   if (!filesResponse.ok) {
     transferTasks.value = transferTasks.value.map(task => {
-      if (task.isUpload && task.status === enums.FileTransferTaskState.PENDING) {
-        return { ...task, status: enums.FileTransferTaskState.ERROR, error: filesResponse.msg };
+      if (task.isUpload && task.status === FileTransferTaskState.PENDING) {
+        return { ...task, status: FileTransferTaskState.ERROR, error: filesResponse.msg };
       }
       return task;
     });
@@ -574,7 +566,7 @@ const uploadToRemote = async () => {
       size: fileSize,
       transferred: 0,
       isUpload: true,
-      status: enums.FileTransferTaskState.PENDING,
+      status: FileTransferTaskState.PENDING,
     };
 
     transferTasks.value.push(task);
@@ -592,8 +584,8 @@ const uploadToRemote = async () => {
     await refreshRemoteFiles();
   } else {
     transferTasks.value = transferTasks.value.map(task => {
-      if (task.isUpload && task.status === enums.FileTransferTaskState.PENDING) {
-        return { ...task, status: enums.FileTransferTaskState.ERROR, error: response.msg };
+      if (task.isUpload && task.status === FileTransferTaskState.PENDING) {
+        return { ...task, status: FileTransferTaskState.ERROR, error: response.msg };
       }
       return task;
     });
@@ -612,8 +604,8 @@ const downloadFromRemote = async () => {
 
   if (!dirResponse.ok) {
     transferTasks.value = transferTasks.value.map(task => {
-      if (!task.isUpload && task.status === enums.FileTransferTaskState.PENDING) {
-        return { ...task, status: enums.FileTransferTaskState.ERROR, error: dirResponse.msg };
+      if (!task.isUpload && task.status === FileTransferTaskState.PENDING) {
+        return { ...task, status: FileTransferTaskState.ERROR, error: dirResponse.msg };
       }
       return task;
     });
@@ -635,7 +627,7 @@ const downloadFromRemote = async () => {
       size: file.size,
       transferred: 0,
       isUpload: false,
-      status: enums.FileTransferTaskState.PENDING,
+      status: FileTransferTaskState.PENDING,
     };
 
     transferTasks.value.push(task);
@@ -651,30 +643,11 @@ const downloadFromRemote = async () => {
 
   if (!response.ok) {
     transferTasks.value = transferTasks.value.map(task => {
-      if (!task.isUpload && task.status === enums.FileTransferTaskState.PENDING) {
-        return { ...task, status: enums.FileTransferTaskState.ERROR, error: response.msg };
+      if (!task.isUpload && task.status === FileTransferTaskState.PENDING) {
+        return { ...task, status: FileTransferTaskState.ERROR, error: response.msg };
       }
       return task;
     });
-  }
-};
-
-const createRemoteFolder = async () => {
-  const name = prompt(t('frontend.file_transfer.enter_folder_name'));
-  if (!name) return;
-
-  let folderPath;
-  if (remoteAbsolutePath.value === '') {
-    folderPath = '/' + name;
-  } else {
-    folderPath = `${remoteAbsolutePath.value}/${name}`;
-  }
-
-  const resp = await call(CreateRemoteFolder, {
-    args: [folderPath],
-  });
-  if (resp.ok) {
-    await refreshRemoteFiles();
   }
 };
 
@@ -701,7 +674,7 @@ const handleTransferProgress = (data: any) => {
       size: data.total || 0,
       transferred: data.transferred || 0,
       isUpload: taskType,
-      status: enums.FileTransferTaskState.PROGRESS,
+      status: FileTransferTaskState.PROGRESS,
     };
 
     transferTasks.value.push(newTask);
@@ -709,13 +682,13 @@ const handleTransferProgress = (data: any) => {
   }
 
   if (task) {
-    task.status = enums.FileTransferTaskState.PROGRESS;
+    task.status = FileTransferTaskState.PROGRESS;
     task.transferred = data.transferred || 0;
     task.size = data.total || task.size;
 
     if (data.progress >= 100) {
       setTimeout(() => {
-        task!.status = enums.FileTransferTaskState.COMPLETED;
+        task!.status = FileTransferTaskState.COMPLETED;
       }, 500);
     }
   }
@@ -999,6 +972,16 @@ onBeforeUnmount(() => {
 .time-cell {
   flex: 2;
   min-width: 180px;
+}
+
+.owner-cell {
+  flex: 1;
+  min-width: 100px;
+}
+
+.group-cell {
+  flex: 1;
+  min-width: 100px;
 }
 
 .perm-cell {

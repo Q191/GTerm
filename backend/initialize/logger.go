@@ -1,8 +1,6 @@
 package initialize
 
 import (
-	"context"
-
 	"github.com/wailsapp/wails/v2/pkg/logger"
 
 	"github.com/google/wire"
@@ -20,57 +18,55 @@ type Logger interface {
 }
 
 type LoggerWrapper struct {
-	ctx context.Context
+	appContext *AppContext
 }
 
-func ProvideLogger() Logger {
-	return &LoggerWrapper{}
-}
-
-func (l *LoggerWrapper) SetContext(ctx context.Context) {
-	l.ctx = ctx
+func ProvideLogger(appContext *AppContext) Logger {
+	return &LoggerWrapper{
+		appContext: appContext,
+	}
 }
 
 func (l *LoggerWrapper) SetLogLevel(level logger.LogLevel) {
-	runtime.LogSetLogLevel(l.ctx, level)
+	runtime.LogSetLogLevel(l.appContext.Context(), level)
 }
 
 func (l *LoggerWrapper) Debug(msg string, args ...any) {
 	if len(args) == 0 {
-		runtime.LogDebug(l.ctx, msg)
+		runtime.LogDebug(l.appContext.Context(), msg)
 		return
 	}
-	runtime.LogDebugf(l.ctx, msg, args...)
+	runtime.LogDebugf(l.appContext.Context(), msg, args...)
 }
 
 func (l *LoggerWrapper) Info(msg string, args ...any) {
 	if len(args) == 0 {
-		runtime.LogInfo(l.ctx, msg)
+		runtime.LogInfo(l.appContext.Context(), msg)
 		return
 	}
-	runtime.LogInfof(l.ctx, msg, args...)
+	runtime.LogInfof(l.appContext.Context(), msg, args...)
 }
 
 func (l *LoggerWrapper) Warn(msg string, args ...any) {
 	if len(args) == 0 {
-		runtime.LogWarning(l.ctx, msg)
+		runtime.LogWarning(l.appContext.Context(), msg)
 		return
 	}
-	runtime.LogWarningf(l.ctx, msg, args...)
+	runtime.LogWarningf(l.appContext.Context(), msg, args...)
 }
 
 func (l *LoggerWrapper) Error(msg string, args ...any) {
 	if len(args) == 0 {
-		runtime.LogError(l.ctx, msg)
+		runtime.LogError(l.appContext.Context(), msg)
 		return
 	}
-	runtime.LogErrorf(l.ctx, msg, args...)
+	runtime.LogErrorf(l.appContext.Context(), msg, args...)
 }
 
 func (l *LoggerWrapper) Fatal(msg string, args ...any) {
 	if len(args) == 0 {
-		runtime.LogFatal(l.ctx, msg)
+		runtime.LogFatal(l.appContext.Context(), msg)
 		return
 	}
-	runtime.LogFatalf(l.ctx, msg, args...)
+	runtime.LogFatalf(l.appContext.Context(), msg, args...)
 }

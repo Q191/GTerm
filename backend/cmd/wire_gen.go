@@ -14,8 +14,9 @@ import (
 // Injectors from wire.go:
 
 func NewApp() *App {
+	appContext := initialize.InitDefaultContext()
 	httpListenerPort := initialize.InitHTTPServer()
-	logger := initialize.ProvideLogger()
+	logger := initialize.ProvideLogger(appContext)
 	query := initialize.InitDatabase()
 	connectionSrv := &services.ConnectionSrv{
 		Logger: logger,
@@ -49,8 +50,10 @@ func NewApp() *App {
 	fileTransferSrv := &services.FileTransferSrv{
 		Logger:        logger,
 		ConnectionSrv: connectionSrv,
+		AppContext:    appContext,
 	}
 	app := &App{
+		AppContext:       appContext,
 		HTTPListenerPort: httpListenerPort,
 		Logger:           logger,
 		TerminalSrv:      terminalSrv,
