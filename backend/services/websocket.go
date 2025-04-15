@@ -32,7 +32,7 @@ var ug = websocket.Upgrader{
 			return false
 		}
 		allowedOrigins := []string{
-			"wails://wails.localhost",
+			"wails://wails",
 		}
 		for _, allowed := range allowedOrigins {
 			if strings.HasPrefix(origin, allowed) {
