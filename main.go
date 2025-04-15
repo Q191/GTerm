@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+
 	"github.com/MisakaTAT/GTerm/backend/cmd"
 	"github.com/MisakaTAT/GTerm/backend/consts"
 	"github.com/MisakaTAT/GTerm/backend/pkg/base"

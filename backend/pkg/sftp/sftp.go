@@ -41,10 +41,8 @@ func (h *Handler) Connect(conf *commonssh.Config) error {
 		return errors.New("already connected to SFTP server")
 	}
 
-	h.Logger.Info("Connecting to SFTP server %s:%d", conf.Host, conf.Port)
 	client, err := commonssh.NewSSHClient(conf, h.Logger)
 	if err != nil {
-		h.Logger.Error("SSH connection failed: %v", err)
 		return err
 	}
 	h.SSHClient = client
@@ -53,19 +51,14 @@ func (h *Handler) Connect(conf *commonssh.Config) error {
 	// 预加载权限信息
 	h.PermissionsCache.preloadPermissions(h.SSHClient, h.execAdapter)
 
-	h.Logger.Info("Initializing SFTP client")
 	sftpClient, err := sftp.NewClient(client)
 	if err != nil {
-		if err = h.SSHClient.Close(); err != nil {
-			h.Logger.Error("Failed to close SFTP client: %v", err)
-		}
-		h.Logger.Error("SFTP client initialization failed: %v", err)
+		_ = h.SFTPClient.Close()
 		return err
 	}
 
 	h.SFTPClient = sftpClient
 	h.IsConnected = true
-	h.Logger.Info("SFTP connection successful")
 
 	homeDir, err := h.GetHomeDirectory()
 	if err != nil {
@@ -73,46 +66,29 @@ func (h *Handler) Connect(conf *commonssh.Config) error {
 		h.HomeDir = "/"
 	} else {
 		h.HomeDir = homeDir
-		h.Logger.Info("User home directory: %s", homeDir)
 	}
 
 	return nil
 }
 
-func (h *Handler) Close() error {
+func (h *Handler) Close() {
 	if !h.IsConnected {
-		return nil
+		return
 	}
-
-	var err error
 	if h.SFTPClient != nil {
-		if err = h.SFTPClient.Close(); err != nil {
-			h.Logger.Error("Failed to close SFTP client: %v", err)
-		}
+		_ = h.SFTPClient.Close()
 		h.SFTPClient = nil
 	}
-
 	if h.SSHClient != nil {
-		if err = h.SSHClient.Close(); err != nil {
-			h.Logger.Error("Failed to close SSH client: %v", err)
-		}
+		_ = h.SSHClient.Close()
 		h.SSHClient = nil
 	}
-
 	h.IsConnected = false
-	h.Logger.Info("SFTP connection closed")
-	return err
 }
 
 func (h *Handler) ListRemoteFiles(path string) ([]*types.FileTransferItemInfo, error) {
-	if err := h.checkSFTPConnection(); err != nil {
-		return nil, err
-	}
-
-	h.Logger.Info("Listing remote directory: %s", path)
 	entries, err := h.SFTPClient.ReadDir(path)
 	if err != nil {
-		h.Logger.Error("Failed to list remote directory: %v", err)
 		return nil, err
 	}
 
@@ -135,59 +111,44 @@ func (h *Handler) ListRemoteFiles(path string) ([]*types.FileTransferItemInfo, e
 		files = append(files, info)
 	}
 
-	h.Logger.Info("Found %d files/directories in remote directory %s", len(files), path)
 	return files, nil
 }
 
 func (h *Handler) UploadFile(localPath, remotePath string, progressCallback func(int64, int64)) error {
-	if err := h.checkSFTPConnection(); err != nil {
-		return err
-	}
-
 	localFile, err := os.Open(localPath)
 	if err != nil {
-		h.Logger.Error("Failed to open local file: %v", err)
 		return err
 	}
 	defer func(localFile *os.File) {
-		if err = localFile.Close(); err != nil {
-			h.Logger.Error("Failed to close local file: %v", err)
-		}
+		_ = localFile.Close()
 	}(localFile)
 
 	localFileInfo, err := localFile.Stat()
 	if err != nil {
-		h.Logger.Error("Failed to get local file info: %v", err)
 		return err
 	}
 
 	if localFileInfo.IsDir() {
-		h.Logger.Error("Directory upload not supported")
 		return errors.New("directory upload not supported")
 	}
 
 	totalSize := localFileInfo.Size()
-	h.Logger.Info("Uploading file: %s -> %s, size: %d bytes", localPath, remotePath, totalSize)
 
 	remoteDir := filepath.Dir(remotePath)
 	if remoteDir != "." && remoteDir != "/" {
 		err = h.SFTPClient.MkdirAll(remoteDir)
 		if err != nil {
-			h.Logger.Error("Failed to create remote directory: %v", err)
 			return err
 		}
 	}
 
 	remoteFile, err := h.SFTPClient.Create(remotePath)
 	if err != nil {
-		h.Logger.Error("Failed to create remote file: %v", err)
 		return err
 	}
 
 	defer func(remoteFile *sftp.File) {
-		if err = remoteFile.Close(); err != nil {
-			h.Logger.Error("Failed to close remote file: %v", err)
-		}
+		_ = remoteFile.Close()
 	}(remoteFile)
 
 	_, err = io.Copy(localFile, &ProgressReader{
@@ -197,63 +158,43 @@ func (h *Handler) UploadFile(localPath, remotePath string, progressCallback func
 		ProgressCallback: progressCallback,
 	})
 
-	if err != nil {
-		h.Logger.Error("File upload failed: %v", err)
-		return err
-	}
-
-	h.Logger.Info("File upload successful: %s -> %s", localPath, remotePath)
-	return nil
+	return err
 }
 
 func (h *Handler) DownloadFile(remotePath, localPath string, progressCallback func(int64, int64)) error {
-	if err := h.checkSFTPConnection(); err != nil {
-		return err
-	}
-
 	remoteFileInfo, err := h.SFTPClient.Stat(remotePath)
 	if err != nil {
-		h.Logger.Error("Failed to get remote file info: %v", err)
 		return err
 	}
 
 	if remoteFileInfo.IsDir() {
-		h.Logger.Error("Directory download not supported")
 		return errors.New("directory download not supported")
 	}
 
 	totalSize := remoteFileInfo.Size()
-	h.Logger.Info("Downloading file: %s -> %s, size: %d bytes", remotePath, localPath, totalSize)
 
 	remoteFile, err := h.SFTPClient.Open(remotePath)
 	if err != nil {
-		h.Logger.Error("Failed to open remote file: %v", err)
 		return err
 	}
 	defer func(remoteFile *sftp.File) {
-		if err = remoteFile.Close(); err != nil {
-			h.Logger.Error("Failed to close remote file: %v", err)
-		}
+		_ = remoteFile.Close()
 	}(remoteFile)
 
 	localDir := filepath.Dir(localPath)
 	if localDir != "." {
 		err = os.MkdirAll(localDir, 0755)
 		if err != nil {
-			h.Logger.Error("Failed to create local directory: %v", err)
 			return err
 		}
 	}
 
 	localFile, err := os.Create(localPath)
 	if err != nil {
-		h.Logger.Error("Failed to create local file: %v", err)
 		return err
 	}
 	defer func(localFile *os.File) {
-		if err = localFile.Close(); err != nil {
-			h.Logger.Error("Failed to close local file: %v", err)
-		}
+		_ = localFile.Close()
 	}(localFile)
 
 	_, err = io.Copy(localFile, &ProgressReader{
@@ -263,36 +204,14 @@ func (h *Handler) DownloadFile(remotePath, localPath string, progressCallback fu
 		ProgressCallback: progressCallback,
 	})
 
-	if err != nil {
-		h.Logger.Error("File download failed: %v", err)
-		return err
-	}
-
-	h.Logger.Info("File download successful: %s -> %s", remotePath, localPath)
-	return nil
+	return err
 }
 
 func (h *Handler) CreateRemoteFolder(path string) error {
-	if err := h.checkSFTPConnection(); err != nil {
-		return err
-	}
-
-	h.Logger.Info("Creating remote folder: %s", path)
-	err := h.SFTPClient.MkdirAll(path)
-	if err != nil {
-		h.Logger.Error("Failed to create remote folder: %v", err)
-		return err
-	}
-
-	h.Logger.Info("Remote folder created successfully: %s", path)
-	return nil
+	return h.SFTPClient.MkdirAll(path)
 }
 
 func (h *Handler) GetRemoteFileSize(path string) (int64, error) {
-	if err := h.checkSFTPConnection(); err != nil {
-		return 0, err
-	}
-
 	fileInfo, err := h.SFTPClient.Stat(path)
 	if err != nil {
 		return 0, err
@@ -301,10 +220,6 @@ func (h *Handler) GetRemoteFileSize(path string) (int64, error) {
 }
 
 func (h *Handler) GetHomeDirectory() (string, error) {
-	if err := h.checkSSHConnection(); err != nil {
-		return "", err
-	}
-
 	result := h.execAdapter.Run("pwd")
 	if !result.Success() {
 		h.Logger.Error("Failed to execute pwd command: %v", result.Error())
@@ -312,7 +227,6 @@ func (h *Handler) GetHomeDirectory() (string, error) {
 
 	homeDir := result.Unwrap()
 	if homeDir == "" {
-		h.Logger.Info("pwd command failed, trying $HOME environment variable")
 		result = h.execAdapter.Run("echo $HOME")
 		if !result.Success() {
 			h.Logger.Error("Failed to get HOME environment variable: %v", result.Error())
@@ -321,7 +235,6 @@ func (h *Handler) GetHomeDirectory() (string, error) {
 	}
 
 	if homeDir == "" {
-		h.Logger.Warn("Failed to determine home directory, using / as default")
 		return "/", nil
 	}
 
@@ -333,15 +246,10 @@ func (h *Handler) GetHomeDirectory() (string, error) {
 		homeDir = homeDir[:len(homeDir)-1]
 	}
 
-	h.Logger.Info("Home directory determined: %s", homeDir)
 	return homeDir, nil
 }
 
 func (h *Handler) ProcessPath(path string) (string, error) {
-	if err := h.checkSFTPConnection(); err != nil {
-		return "", err
-	}
-
 	if path == "" {
 		if h.HomeDir != "" {
 			return h.HomeDir, nil
@@ -374,28 +282,6 @@ func (h *Handler) JoinRemotePaths(base, relPath string) (string, error) {
 	}
 
 	return basePath + relPath, nil
-}
-
-func (h *Handler) isSFTPReady() bool {
-	return h.IsConnected && h.SFTPClient != nil
-}
-
-func (h *Handler) isSSHReady() bool {
-	return h.IsConnected && h.SSHClient != nil
-}
-
-func (h *Handler) checkSFTPConnection() error {
-	if !h.isSFTPReady() {
-		return errors.New("not connected to SFTP server")
-	}
-	return nil
-}
-
-func (h *Handler) checkSSHConnection() error {
-	if !h.isSSHReady() {
-		return errors.New("not connected to SSH server")
-	}
-	return nil
 }
 
 type ProgressReader struct {
