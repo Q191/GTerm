@@ -83,21 +83,28 @@ import { LogWarning, LogError, LogInfo } from '@wailsApp/runtime/runtime';
 import { CanvasAddon } from '@xterm/addon-canvas';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
-import { WebglAddon } from '@xterm/addon-webgl';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { useConnectionStore } from '@/stores/connection';
 import { NCode, NCollapse, NCollapseItem, NResult, NSpin, NButton, NSpace, NIcon } from 'naive-ui';
-import { onActivated } from 'vue';
+import { onActivated, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { enums } from '@wailsApp/go/models';
 import { getTranslated } from '@/utils/call';
+import { debounce } from 'lodash';
 
 const { t } = useI18n();
 
 const connectionStore = useConnectionStore();
 const connectionTabs = inject<any>('connectionTabs');
 const activeConn = computed(() => connectionStore.activeConnection);
+const terminalRefs = ref<Record<number, HTMLElement | null>>({});
+const terminals = ref<Record<number, Terminal | undefined>>({});
+const sockets = ref<Record<number, WebSocket | undefined>>({});
+const fitAddons = ref<Record<number, FitAddon | undefined>>({});
+const webLinksAddon = ref<WebLinksAddon>(new WebLinksAddon());
+const canvasAddon = ref<CanvasAddon>(new CanvasAddon());
+const connectedTerminals = ref<Record<number, boolean>>({});
 
 const isTerminalHidden = (connId: number) => {
   return connId !== activeConn.value?.id;
@@ -106,16 +113,6 @@ const isTerminalHidden = (connId: number) => {
 const isTerminalVisible = (conn: any) => {
   return !conn.connectionError && !conn.isConnecting && !conn.isFingerprintConfirm && connectedTerminals.value[conn.id];
 };
-
-const terminalRefs = ref<Record<number, HTMLElement | null>>({});
-const terminals = ref<Record<number, Terminal | undefined>>({});
-const sockets = ref<Record<number, WebSocket | undefined>>({});
-const fitAddons = ref<Record<number, FitAddon | undefined>>({});
-const webLinksAddons = ref<Record<number, WebLinksAddon | undefined>>({});
-const webglAddons = ref<Record<number, WebglAddon | undefined>>({});
-const canvasAddons = ref<Record<number, CanvasAddon | undefined>>({});
-const connectedTerminals = ref<Record<number, boolean>>({});
-const resizeObservers = ref<Record<number, ResizeObserver | undefined>>({});
 
 const updateStatus = (
   id: number,
@@ -177,11 +174,6 @@ const rejectFingerprint = (id: number) => {
   });
 };
 
-const fitXterm = (id: number) => {
-  if (!fitAddons.value[id] || !terminals.value[id]) return;
-  fitAddons.value[id].fit();
-};
-
 const initializeTerminal = async (id: number) => {
   if (terminals.value[id]) return;
 
@@ -196,29 +188,21 @@ const initializeTerminal = async (id: number) => {
     cursorBlink: true,
     cursorStyle: 'bar',
     theme: theme,
+    scrollback: 1000,
   });
+
+  fitAddons.value[id] = new FitAddon();
 };
 
 const initializeXterm = async (id: number) => {
   const terminalEl = terminalRefs.value[id] as HTMLElement;
   const terminal = terminals.value[id];
-  if (!terminalEl || !terminal) return;
+  const fitAddon = fitAddons.value[id];
+  if (!terminalEl || !terminal || !fitAddon) return;
 
-  fitAddons.value[id] = new FitAddon();
-  webLinksAddons.value[id] = new WebLinksAddon();
-  webglAddons.value[id] = new WebglAddon();
-
-  try {
-    fitAddons.value[id].activate(terminal);
-    webLinksAddons.value[id].activate(terminal);
-    webglAddons.value[id].activate(terminal);
-  } catch (e) {
-    LogWarning(`Failed to activate WebGL addon, falling back to Canvas: ${e}`);
-    webglAddons.value[id] = undefined;
-    canvasAddons.value[id] = new CanvasAddon();
-    canvasAddons.value[id].activate(terminal);
-  }
-
+  fitAddon.activate(terminal);
+  webLinksAddon.value.activate(terminal);
+  canvasAddon.value.activate(terminal);
   terminal.attachCustomKeyEventHandler(arg => {
     if (arg.code === 'PageUp' && arg.type === 'keydown') {
       terminal?.scrollPages(-1);
@@ -237,17 +221,6 @@ const initializeXterm = async (id: number) => {
       sockets.value[id]?.send(JSON.stringify({ type: enums.TerminalType.RESIZE, cols, rows }));
     }
   });
-
-  const resizeObserver = new ResizeObserver(() => {
-    if (fitAddons.value[id]) {
-      fitAddons.value[id].fit();
-    }
-  });
-  resizeObserver.observe(terminalEl);
-  resizeObservers.value[id] = resizeObserver;
-
-  await nextTick();
-  fitXterm(id);
 };
 
 const initializeWebsocket = async (id: number, hostId: number) => {
@@ -279,10 +252,6 @@ const initializeWebsocket = async (id: number, hostId: number) => {
 
     socket.onopen = () => {
       updateStatus(id, { isConnecting: false });
-      nextTick(() => {
-        terminals.value[id]?.focus();
-        fitXterm(id);
-      });
     };
 
     socket.onmessage = async (event: MessageEvent) => {
@@ -313,8 +282,9 @@ const initializeWebsocket = async (id: number, hostId: number) => {
             connectionTabs.value.updateTabStatus(id, 'connected');
           }
           nextTick(() => {
+            setXtermDomSize(id);
             terminals.value[id]?.focus();
-            fitXterm(id);
+            fitAddons.value[id]?.fit();
           });
           break;
         case enums.TerminalType.DATA:
@@ -368,8 +338,6 @@ const reconnect = async (id: number) => {
     message: '',
   });
   await initializeWebsocket(id, conn.connId);
-  await nextTick();
-  fitXterm(id);
 };
 
 const closeTerminal = (id: number) => {
@@ -377,11 +345,6 @@ const closeTerminal = (id: number) => {
     sockets.value[id]?.close();
     sockets.value[id] = undefined;
     connectedTerminals.value[id] = false;
-
-    if (resizeObservers.value[id]) {
-      resizeObservers.value[id].disconnect();
-      resizeObservers.value[id] = undefined;
-    }
 
     if (terminals.value[id]) {
       terminals.value[id].onData(() => {});
@@ -394,10 +357,8 @@ const closeTerminal = (id: number) => {
       terminals.value[id] = undefined;
     }
 
+    fitAddons.value[id]?.dispose();
     fitAddons.value[id] = undefined;
-    webLinksAddons.value[id] = undefined;
-    webglAddons.value[id] = undefined;
-    canvasAddons.value[id] = undefined;
 
     updateStatus(id, {
       isConnecting: false,
@@ -410,41 +371,50 @@ const closeTerminal = (id: number) => {
   }
 };
 
-const registerToTabs = async () => {
-  await nextTick();
-  if (connectionTabs?.value && activeConn.value?.id) {
-    const id = activeConn.value.id;
-    const isConnected =
-      !connectionStore.connections.find(c => c.id === id)?.errorCausedClosed &&
-      !connectionStore.connections.find(c => c.id === id)?.isConnecting &&
-      connectedTerminals.value[id];
-    connectionTabs.value.registerTerminal(id, {
-      closeTerminal: () => closeTerminal(id),
-      status: isConnected ? enums.TerminalType.CONNECTED : enums.TerminalType.ERROR,
-    });
+const setXtermDomSize = (id: number) => {
+  const terminalEl = terminalRefs.value[id];
+  const fitAddon = fitAddons.value[id];
+  if (fitAddon && connectedTerminals.value[id] && terminalEl) {
+    const xtermElement = terminalEl.querySelector('.xterm') as HTMLElement;
+    if (xtermElement) {
+      const hight = terminalEl.clientHeight - 16;
+      const weight = terminalEl.clientWidth - 16;
+      xtermElement.style.height = `${hight}px`;
+      xtermElement.style.width = `${weight}px`;
+    }
+    fitAddon.fit();
   }
 };
 
-watchEffect(async () => {
-  const connections = connectionStore.connections;
-  for (const conn of connections) {
-    if (conn.id === activeConn.value?.id && !terminals.value[conn.id]) {
-      await initializeTerminal(conn.id);
-      await nextTick();
-      await initializeXterm(conn.id);
-      if (!sockets.value[conn.id]) {
-        await initializeWebsocket(conn.id, conn.connId);
-      }
-    }
-  }
-});
+const handleResize = debounce(() => {
+  Object.keys(terminals.value).forEach(id => {
+    setXtermDomSize(Number(id));
+  });
+}, 100);
 
-onMounted(async () => {
-  await registerToTabs();
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
 });
 
 onUnmounted(() => {
   Object.keys(terminals.value).forEach(id => closeTerminal(Number(id)));
+  window.removeEventListener('resize', handleResize);
+});
+
+watchEffect(async () => {
+  const connections = connectionStore.connections;
+  const activeConnId = activeConn.value?.id;
+
+  if (!activeConnId) return;
+
+  const conn = connections.find(c => c.id === activeConnId);
+  if (conn && !terminals.value[activeConnId]) {
+    await initializeTerminal(activeConnId);
+    await initializeXterm(activeConnId);
+    if (!sockets.value[activeConnId]) {
+      await initializeWebsocket(activeConnId, conn.connId);
+    }
+  }
 });
 
 onActivated(() => {
@@ -481,7 +451,6 @@ defineOptions({ name: 'Terminal' });
   }
 
   :deep(.xterm) {
-    height: calc(100vh - 54px);
     padding: 8px 16px 8px 8px;
 
     .xterm-screen {
