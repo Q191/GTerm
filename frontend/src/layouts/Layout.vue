@@ -1,10 +1,10 @@
 <template>
   <n-layout class="layout-container">
-    <n-layout-header bordered>
+    <n-layout-header bordered class="header">
       <Header ref="headerRef" />
     </n-layout-header>
 
-    <n-layout :has-sider="!isTerminal">
+    <n-layout :has-sider="!isTerminal" class="content">
       <n-layout-sider v-if="!isTerminal" bordered :width="50">
         <Sider />
       </n-layout-sider>
@@ -39,5 +39,11 @@ provide(
 <style lang="less" scoped>
 .layout-container {
   height: 100vh;
+  .header {
+    height: 38px;
+  }
+  .content {
+    height: calc(100vh - 38px);
+  }
 }
 </style>

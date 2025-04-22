@@ -8,20 +8,28 @@ This is the first development preview version of GTerm. Due to my full-time work
 
 <table>
 <tr>
-<td><img src="docs/preview/main-dark.png" alt="Dark Mode Main Interface" width="400"/></td>
-<td><img src="docs/preview/main-light.png" alt="Light Mode Main Interface" width="400"/></td>
+<td><img src="docs/preview/main-dark.png" width="400"/></td>
+<td><img src="docs/preview/main-light.png" width="400"/></td>
 </tr>
 <tr>
-<td><img src="docs/preview/session-dark.png" alt="Dark Mode Session View" width="400"/></td>
-<td><img src="docs/preview/session-light.png" alt="Light Mode Session View" width="400"/></td>
+<td><img src="docs/preview/session-dark.png" width="400"/></td>
+<td><img src="docs/preview/session-light.png" width="400"/></td>
 </tr>
 <tr>
-<td><img src="docs/preview/cred.png" alt="Credentials Management" width="400"/></td>
-<td><img src="docs/preview/new-session.png" alt="Session Management" width="400"/></td>
+<td><img src="docs/preview/file-dark.png" width="400"/></td>
+<td><img src="docs/preview/file-light.png" width="400"/></td>
 </tr>
 <tr>
-<td><img src="docs/preview/perf.png" alt="Performance Monitoring" width="400"/></td>
-<td><img src="docs/preview/new-session-perf.png" alt="New Session Performance" width="400"/></td>
+<td><img src="docs/preview/cred.png" width="400"/></td>
+<td><img src="docs/preview/new-session.png" width="400"/></td>
+</tr>
+<tr>
+<td><img src="docs/preview/new-session-perf.png" width="400"/></td>
+<td><img src="docs/preview/new-session-advanced.png" width="400"/></td>
+</tr>
+<tr>
+<td><img src="docs/preview/perf-light.png" width="400"/></td>
+<td><img src="docs/preview/perf-dark.png" width="400"/></td>
 </tr>
 </table>
 
@@ -49,4 +57,3 @@ wails dev
 ```bash
 wails build
 ```
-

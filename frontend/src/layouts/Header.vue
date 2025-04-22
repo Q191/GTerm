@@ -112,12 +112,12 @@ onUnmounted(() => {
 .header {
   --wails-draggable: drag;
   width: 100%;
-  height: 38px;
+  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  justify-content: space-between;
 }
 
 .logo-container {

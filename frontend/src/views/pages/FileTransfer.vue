@@ -723,7 +723,7 @@ onBeforeUnmount(() => {
 .file-transfer-container {
   display: flex;
   flex-direction: column;
-  height: calc(calc(100vh - 38px));
+  height: 100%;
   padding: 0;
   background-color: v-bind('themeVars.bodyColor');
 }

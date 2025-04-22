@@ -89,6 +89,23 @@
         "nameRequired": "请输入分组名称"
       }
     },
+    "preferences": {
+      "sidebar": {
+        "title": "设置"
+      },
+      "terminal": {
+        "title": "终端设置",
+        "font_size": "字体大小",
+        "cursor_style": "光标样式"
+      },
+      "shortcuts": {
+        "title": "快捷键",
+        "action": "动作",
+        "key": "按键",
+        "new_tab": "新建标签页",
+        "close_tab": "关闭标签页"
+      }
+    },
     "preferencesModal": {
       "title": "偏好设置",
       "cancel": "取消",

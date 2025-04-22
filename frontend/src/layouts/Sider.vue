@@ -1,5 +1,5 @@
 <template>
-  <div class="sider-container menu-background">
+  <div class="sider-container">
     <div class="top-menu">
       <n-tooltip placement="right" trigger="hover">
         <template #trigger>
@@ -143,7 +143,7 @@ const handleSelect = (key: string) => {
 const handleSettingsSelect = (key: string) => {
   switch (key) {
     case 'preferences':
-      dialogStore.openPreferencesDialog();
+      router.push({ name: 'Preferences' });
       break;
     case 'about':
       dialogStore.openAboutDialog();
@@ -232,9 +232,5 @@ const openGithub = () => {
   &:hover {
     color: v-bind('themeVars.primaryColor');
   }
-}
-
-.menu-background {
-  height: calc(100vh - 38px);
 }
 </style>

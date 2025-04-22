@@ -32,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
             name: 'Credential',
             component: () => import('@/views/pages/Credential.vue'),
           },
+          {
+            path: 'preferences',
+            name: 'Preferences',
+            component: () => import('@/views/pages/Preferences.vue'),
+          },
         ],
       },
     ],

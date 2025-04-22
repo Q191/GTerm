@@ -432,7 +432,7 @@ defineOptions({ name: 'Terminal' });
 
 <style lang="less" scoped>
 .xterm-container {
-  height: calc(100vh - 38px);
+  height: 100%;
   position: relative;
 
   .terminal-hidden {

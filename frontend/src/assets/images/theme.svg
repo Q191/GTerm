@@ -2,22 +2,22 @@
 	<style>
 		/* 默认主题 */
 		:root {
-		--bg-color: #121212;
-		--header-color: #1a1a1a;
-		--sidebar-color: #1e1e1e;
-		--icon-color: #2a2a2a;
-		--text-color: #ffffff;
+			--bg-color: #121212;
+			--header-color: #1a1a1a;
+			--sidebar-color: #1e1e1e;
+			--icon-color: #2a2a2a;
+			--text-color: #ffffff;
 		}
-		
+
 		/* 亮色主题 */
 		@media (prefers-color-scheme: light) {
-		:root {
-		--bg-color: #f9f9f9;
-		--header-color: #eaeaea;
-		--sidebar-color: #dcdcdc;
-		--icon-color: #c0c0c0;
-		--text-color: #000000;
-		}
+			:root {
+				--bg-color: #f9f9f9;
+				--header-color: #eaeaea;
+				--sidebar-color: #dcdcdc;
+				--icon-color: #c0c0c0;
+				--text-color: #000000;
+			}
 		}
 	</style>
 	<!-- Background -->
