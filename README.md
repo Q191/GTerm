@@ -24,12 +24,12 @@ This is the first development preview version of GTerm. Due to my full-time work
 <td><img src="docs/preview/new-session.png" width="400"/></td>
 </tr>
 <tr>
-<td><img src="docs/preview/new-session-perf.png" width="400"/></td>
+<td><img src="docs/preview/new-session-pref.png" width="400"/></td>
 <td><img src="docs/preview/new-session-advanced.png" width="400"/></td>
 </tr>
 <tr>
-<td><img src="docs/preview/perf-light.png" width="400"/></td>
-<td><img src="docs/preview/perf-dark.png" width="400"/></td>
+<td><img src="docs/preview/pref-light.png" width="400"/></td>
+<td><img src="docs/preview/pref-dark.png" width="400"/></td>
 </tr>
 </table>
 
