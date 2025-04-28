@@ -1,4 +1,4 @@
-import { LogWarning, LogError } from '@wailsApp/runtime/runtime';
+import { LogWarning } from '@wailsApp/runtime/runtime';
 
 export interface XTermTheme {
   name: string;
@@ -74,8 +74,7 @@ export const loadTheme = async (themeName: string): Promise<XTermTheme> => {
   try {
     const theme = await module();
     return theme.default;
-  } catch (error) {
-    LogError(`Failed to load theme: ${themeName}, Error: ${error}`);
+  } catch {
     return defaultTheme;
   }
 };

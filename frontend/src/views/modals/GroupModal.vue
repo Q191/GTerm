@@ -1,5 +1,5 @@
 <template>
-  <n-modal
+  <NModal
     v-model:show="visible"
     close-on-esc
     :negative-text="$t('frontend.groupModal.cancel')"
@@ -12,41 +12,40 @@
     transform-origin="center"
     @positive-click="handleConfirm"
   >
-    <n-form ref="formRef" :model="formValue" :rules="rules">
-      <n-form-item path="name" :label="$t('frontend.groupModal.name')">
-        <n-input
+    <NForm ref="formRef" :model="formValue" :rules="rules">
+      <NFormItem path="name" :label="$t('frontend.groupModal.name')">
+        <NInput
           v-model:value="formValue.name"
           clearable
           :placeholder="$t('frontend.groupModal.placeholder.name')"
           :allow-input="value => !/\s/.test(value)"
         />
-      </n-form-item>
-    </n-form>
-  </n-modal>
+      </NFormItem>
+    </NForm>
+  </NModal>
 </template>
 
 <script lang="ts" setup>
-import { model } from '@wailsApp/go/models';
+import type { model } from '@wailsApp/go/models';
 import { CreateGroup, UpdateGroup } from '@wailsApp/go/services/GroupSrv';
-import { FormInst, FormRules, NForm, NFormItem, NInput, NModal } from 'naive-ui';
-import { ref, computed, onMounted, onUpdated } from 'vue';
+import type { FormInst, FormRules } from 'naive-ui';
+import { NForm, NFormItem, NInput, NModal } from 'naive-ui';
+import { computed, onMounted, onUpdated, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useCall } from '@/utils/call';
-
-const { t } = useI18n();
-const formRef = ref<FormInst | null>(null);
-const { call } = useCall();
 
 const props = defineProps<{
   show: boolean;
   isEdit: boolean;
   group?: model.Group;
 }>();
-
 const emit = defineEmits<{
   (e: 'update:show', value: boolean): void;
   (e: 'success'): void;
 }>();
+const { t } = useI18n();
+const formRef = ref<FormInst | null>(null);
+const { call } = useCall();
 
 const visible = computed({
   get: () => props.show,
@@ -106,7 +105,7 @@ const handleConfirm = async () => {
     }
 
     return result.ok;
-  } catch (errors) {
+  } catch {
     return false;
   }
 };

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { languageMap, languageOptions } from '@/locales';
+import { languageOptions } from '@/locales';
 import { i18n } from '@/utils/i18n';
 
 export { languageOptions };

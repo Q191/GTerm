@@ -25,9 +25,9 @@ export const useConnectionStore = defineStore('connection', () => {
       .filter(conn => conn.label.startsWith(baseName))
       .map(conn => {
         const match = conn.label.match(new RegExp(`^${baseName}\\s*\\((\\d+)\\)$`));
-        return match ? parseInt(match[1]) : 0;
+        return match ? Number.parseInt(match[1]) : 0;
       })
-      .filter(num => !isNaN(num));
+      .filter(num => !Number.isNaN(num));
 
     if (existingNumbers.length === 0) return 1;
     return Math.max(...existingNumbers) + 1;

@@ -1,5 +1,5 @@
 <template>
-  <n-modal
+  <NModal
     v-model:show="dialogStore.aboutDialogVisible"
     preset="dialog"
     :close-on-esc="true"
@@ -10,28 +10,28 @@
     :on-close="dialogStore.closeAboutDialog"
     :auto-focus="false"
   >
-    <n-space :size="10" :wrap="false" :wrap-item="false" align="center" vertical>
-      <n-avatar :size="80" :src="iconUrl" color="#0000" />
+    <NSpace :size="10" :wrap="false" :wrap-item="false" align="center" vertical>
+      <NAvatar :size="80" :src="iconUrl" color="#0000" />
       <div class="about-app-title">GTerm</div>
       <n-button text @click="onOpenVersionURL">{{ version }}</n-button>
-      <n-space :size="1" :wrap="false" :wrap-item="false" align="center">
+      <NSpace :size="1" :wrap="false" :wrap-item="false" align="center">
         <n-button text @click="onOpenSource">{{ $t('frontend.about.github') }}</n-button>
-        <n-divider vertical />
+        <NDivider vertical />
         <n-button text @click="onOpenWebsite">{{ $t('frontend.about.website') }}</n-button>
-      </n-space>
+      </NSpace>
       <div :style="{ color: themeVars.textColor3 }" class="about-copyright">
         <span>{{ copyright }}</span>
       </div>
-    </n-space>
-  </n-modal>
+    </NSpace>
+  </NModal>
 </template>
 
 <script setup lang="ts">
+import { Copyright, Version, VersionURL } from '@wailsApp/go/services/PreferencesSrv';
+import { BrowserOpenURL } from '@wailsApp/runtime';
+import { NAvatar, NDivider, NModal, NSpace, useThemeVars } from 'naive-ui';
 import iconUrl from '@/assets/images/icon.png';
 import { useDialogStore } from '@/stores/dialog';
-import { BrowserOpenURL } from '@wailsApp/runtime';
-import { Copyright, Version, VersionURL } from '@wailsApp/go/services/PreferencesSrv';
-import { NAvatar, NDivider, NModal, NSpace, useThemeVars } from 'naive-ui';
 
 const version = ref('');
 const copyright = ref('');
@@ -58,6 +58,7 @@ const onOpenWebsite = () => {
   BrowserOpenURL('https://github.com/MisakaTAT');
 };
 </script>
+
 <style lang="less" scoped>
 .about-app-title {
   font-weight: bold;

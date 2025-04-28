@@ -3,7 +3,7 @@
     <div class="integrated-header">
       <div class="left-section">
         <div class="connection-dropdown">
-          <n-select
+          <NSelect
             v-model:value="selectedConnectionId"
             :options="connectionOptions"
             :placeholder="t('frontend.file_transfer.select_connection')"
@@ -12,113 +12,113 @@
             @update:value="handleConnectionChange"
           />
 
-          <n-tooltip placement="bottom">
+          <NTooltip placement="bottom">
             <template #trigger>
-              <n-button
+              <NButton
                 quaternary
                 circle
                 :disabled="!selectedConnectionId"
-                @click="isConnected ? disconnectSftp() : connectSftp()"
                 :loading="connecting"
                 class="connection-action-btn"
+                @click="isConnected ? disconnectSftp() : connectSftp()"
               >
                 <template #icon>
-                  <n-icon>
-                    <icon :icon="isConnected ? 'ph:link-break-bold' : 'ph:link-bold'" />
-                  </n-icon>
+                  <NIcon>
+                    <Icon :icon="isConnected ? 'ph:link-break-bold' : 'ph:link-bold'" />
+                  </NIcon>
                 </template>
-              </n-button>
+              </NButton>
             </template>
             {{ isConnected ? t('frontend.file_transfer.disconnect') : t('frontend.file_transfer.connect') }}
-          </n-tooltip>
+          </NTooltip>
         </div>
 
-        <n-divider v-if="isConnected" vertical style="height: 20px; margin: 0 8px" />
+        <NDivider v-if="isConnected" vertical style="height: 20px; margin: 0 8px" />
 
         <div v-if="isConnected" class="path-navigator">
           <div class="path-control">
-            <n-tooltip placement="bottom">
+            <NTooltip placement="bottom">
               <template #trigger>
-                <n-button quaternary circle class="path-nav-btn" @click="navigateHome">
+                <NButton quaternary circle class="path-nav-btn" @click="navigateHome">
                   <template #icon>
-                    <n-icon><icon icon="ph:house-bold" /></n-icon>
+                    <NIcon><Icon icon="ph:house-bold" /></NIcon>
                   </template>
-                </n-button>
+                </NButton>
               </template>
               {{ t('frontend.file_transfer.navigate_home') }}
-            </n-tooltip>
+            </NTooltip>
 
-            <n-tooltip placement="bottom" :disabled="!canNavigateUp">
+            <NTooltip placement="bottom" :disabled="!canNavigateUp">
               <template #trigger>
-                <n-button quaternary circle class="path-nav-btn" @click="navigateUp" :disabled="!canNavigateUp">
+                <NButton quaternary circle class="path-nav-btn" :disabled="!canNavigateUp" @click="navigateUp">
                   <template #icon>
-                    <n-icon><icon icon="ph:arrow-up-bold" /></n-icon>
+                    <NIcon><Icon icon="ph:arrow-up-bold" /></NIcon>
                   </template>
-                </n-button>
+                </NButton>
               </template>
               {{ t('frontend.file_transfer.navigate_up') }}
-            </n-tooltip>
+            </NTooltip>
 
-            <n-input class="path-input" v-model:value="remotePathInput" @keydown.enter="navigateToPath">
+            <NInput v-model:value="remotePathInput" class="path-input" @keydown.enter="navigateToPath">
               <template #prefix>
-                <n-icon><icon icon="ph:folder-open-bold" /></n-icon>
+                <NIcon><Icon icon="ph:folder-open-bold" /></NIcon>
               </template>
-            </n-input>
+            </NInput>
 
-            <n-tooltip placement="bottom">
+            <NTooltip placement="bottom">
               <template #trigger>
-                <n-button quaternary class="path-nav-go-btn" @click="navigateToPath">
+                <NButton quaternary class="path-nav-go-btn" @click="navigateToPath">
                   <template #icon>
-                    <n-icon><icon icon="ph:arrow-circle-right-bold" /></n-icon>
+                    <NIcon><Icon icon="ph:arrow-circle-right-bold" /></NIcon>
                   </template>
                   {{ t('frontend.file_transfer.goto') }}
-                </n-button>
+                </NButton>
               </template>
               {{ t('frontend.file_transfer.navigate_to_path') }}
-            </n-tooltip>
+            </NTooltip>
           </div>
         </div>
       </div>
 
       <div v-if="isConnected" class="right-section">
-        <n-button-group size="small">
-          <n-tooltip placement="bottom">
+        <NButtonGroup size="small">
+          <NTooltip placement="bottom">
             <template #trigger>
-              <n-button quaternary @click="refreshRemoteFiles">
+              <NButton quaternary @click="refreshRemoteFiles">
                 <template #icon>
-                  <n-icon><icon icon="ph:arrows-clockwise-bold" /></n-icon>
+                  <NIcon><Icon icon="ph:arrows-clockwise-bold" /></NIcon>
                 </template>
-              </n-button>
+              </NButton>
             </template>
             {{ t('frontend.file_transfer.refresh') }}
-          </n-tooltip>
+          </NTooltip>
 
-          <n-tooltip placement="bottom">
+          <NTooltip placement="bottom">
             <template #trigger>
-              <n-button quaternary @click="uploadToRemote">
+              <NButton quaternary @click="uploadToRemote">
                 <template #icon>
-                  <n-icon><icon icon="ph:arrow-up-bold" /></n-icon>
+                  <NIcon><Icon icon="ph:arrow-up-bold" /></NIcon>
                 </template>
-              </n-button>
+              </NButton>
             </template>
             {{ t('frontend.file_transfer.upload') }}
-          </n-tooltip>
+          </NTooltip>
 
-          <n-tooltip placement="bottom" :disabled="!remoteSelectedFiles.length">
+          <NTooltip placement="bottom" :disabled="!remoteSelectedFiles.length">
             <template #trigger>
-              <n-button quaternary @click="downloadFromRemote" :disabled="!remoteSelectedFiles.length">
+              <NButton quaternary :disabled="!remoteSelectedFiles.length" @click="downloadFromRemote">
                 <template #icon>
-                  <n-icon><icon icon="ph:arrow-down-bold" /></n-icon>
+                  <NIcon><Icon icon="ph:arrow-down-bold" /></NIcon>
                 </template>
-              </n-button>
+              </NButton>
             </template>
             {{ t('frontend.file_transfer.download') }}
-          </n-tooltip>
-        </n-button-group>
+          </NTooltip>
+        </NButtonGroup>
 
-        <n-tooltip placement="bottom">
+        <NTooltip placement="bottom">
           <template #trigger>
-            <n-popover
+            <NPopover
               trigger="click"
               placement="bottom"
               :width="380"
@@ -126,14 +126,14 @@
               @update:show="showTasksPopover = $event"
             >
               <template #trigger>
-                <n-button quaternary circle @click="toggleTasksPopover">
+                <NButton quaternary circle @click="toggleTasksPopover">
                   <template #icon>
-                    <n-icon>
-                      <icon icon="ph:arrows-down-up-bold" />
-                    </n-icon>
-                    <n-badge type="info" :value="activeTasks.length" :show="activeTasks.length > 0" :max="99" />
+                    <NIcon>
+                      <Icon icon="ph:arrows-down-up-bold" />
+                    </NIcon>
+                    <NBadge type="info" :value="activeTasks.length" :show="activeTasks.length > 0" :max="99" />
                   </template>
-                </n-button>
+                </NButton>
               </template>
 
               <div class="tasks-popover-content">
@@ -149,9 +149,9 @@
                   >
                     <div class="task-info">
                       <div class="task-title">
-                        <n-icon class="task-type-icon">
-                          <icon :icon="task.isUpload ? 'ph:arrow-up-bold' : 'ph:arrow-down-bold'" />
-                        </n-icon>
+                        <NIcon class="task-type-icon">
+                          <Icon :icon="task.isUpload ? 'ph:arrow-up-bold' : 'ph:arrow-down-bold'" />
+                        </NIcon>
                         <span class="task-name">{{ getTaskFilename(task) }}</span>
                       </div>
                       <div class="task-details">
@@ -161,7 +161,7 @@
                         <span class="task-status-text">{{ getTaskStatusText(task) }}</span>
                       </div>
                     </div>
-                    <n-progress
+                    <NProgress
                       type="line"
                       :percentage="getTaskPercentage(task)"
                       :processing="task.status === FileTransferTaskState.PROGRESS"
@@ -173,26 +173,26 @@
                   </div>
                 </div>
                 <div class="tasks-actions">
-                  <n-button v-if="hasCompletedTasks" size="small" @click="clearCompletedTasks">
+                  <NButton v-if="hasCompletedTasks" size="small" @click="clearCompletedTasks">
                     {{ $t('frontend.file_transfer.clear_completed') }}
-                  </n-button>
-                  <n-button v-if="transferTasks.length > 0" size="small" @click="clearAllTasks">
+                  </NButton>
+                  <NButton v-if="transferTasks.length > 0" size="small" @click="clearAllTasks">
                     {{ $t('frontend.file_transfer.clear_all') }}
-                  </n-button>
+                  </NButton>
                 </div>
               </div>
-            </n-popover>
+            </NPopover>
           </template>
           {{ t('frontend.file_transfer.transfer_tasks') }}
-        </n-tooltip>
+        </NTooltip>
       </div>
     </div>
 
     <div v-if="!isConnected" class="empty-state">
       <div class="empty-content">
-        <n-icon size="64" class="empty-icon">
-          <icon icon="ph:cloud-slash-bold" />
-        </n-icon>
+        <NIcon size="64" class="empty-icon">
+          <Icon icon="ph:cloud-slash-bold" />
+        </NIcon>
         <div class="empty-text">{{ $t('frontend.file_transfer.no_connection') }}</div>
       </div>
     </div>
@@ -201,7 +201,7 @@
       <div class="file-list-container">
         <div class="file-list-header">
           <div class="file-grid-cell checkbox-cell">
-            <n-checkbox
+            <NCheckbox
               :checked="allRemoteSelected"
               :indeterminate="someRemoteSelected && !allRemoteSelected"
               @update:checked="handleCheckAll"
@@ -216,7 +216,7 @@
         </div>
 
         <div class="file-list-body">
-          <n-scrollbar>
+          <NScrollbar>
             <div class="file-grid">
               <div
                 v-for="file in remoteFiles"
@@ -226,16 +226,16 @@
                 @click="handleRowClick(file)"
               >
                 <div class="file-grid-cell checkbox-cell" @click.stop>
-                  <n-checkbox
+                  <NCheckbox
                     :checked="remoteSelectedFiles.includes(file.name)"
                     @update:checked="checked => handleFileSelect(file, checked)"
                   />
                 </div>
                 <div class="file-grid-cell name-cell">
                   <div class="file-name">
-                    <n-icon class="file-icon" :class="{ 'is-folder': file.isDir }">
-                      <icon :icon="file.isDir ? 'ph:folder-simple-bold' : 'ph:file-bold'" />
-                    </n-icon>
+                    <NIcon class="file-icon" :class="{ 'is-folder': file.isDir }">
+                      <Icon :icon="file.isDir ? 'ph:folder-simple-bold' : 'ph:file-bold'" />
+                    </NIcon>
                     <span class="file-label">{{ file.name }}</span>
                   </div>
                 </div>
@@ -256,7 +256,7 @@
                 </div>
               </div>
             </div>
-          </n-scrollbar>
+          </NScrollbar>
         </div>
       </div>
     </div>
@@ -264,38 +264,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { Icon } from '@iconify/vue';
-import { useI18n } from 'vue-i18n';
-import {
-  NSelect,
-  NButton,
-  NIcon,
-  NProgress,
-  NScrollbar,
-  NCheckbox,
-  NButtonGroup,
-  NInput,
-  NDivider,
-  NPopover,
-  NBadge,
-  useThemeVars,
-  NTooltip,
-} from 'naive-ui';
+import type { types } from '@wailsApp/go/models';
+import { enums } from '@wailsApp/go/models';
+import { ListConnection } from '@wailsApp/go/services/ConnectionSrv';
 import {
   ConnectSFTP,
   DisconnectSFTP,
-  ListRemoteFiles,
-  UploadFiles,
   DownloadFiles,
+  ListRemoteFiles,
   SelectDownloadDirectory,
   SelectUploadFiles,
+  UploadFiles,
 } from '@wailsApp/go/services/FileTransferSrv';
-import { ListConnection } from '@wailsApp/go/services/ConnectionSrv';
-import { EventsOn, EventsOff } from '@wailsApp/runtime';
-import { useCall } from '@/utils/call';
+import { EventsOff, EventsOn } from '@wailsApp/runtime';
+import {
+  NBadge,
+  NButton,
+  NButtonGroup,
+  NCheckbox,
+  NDivider,
+  NIcon,
+  NInput,
+  NPopover,
+  NProgress,
+  NScrollbar,
+  NSelect,
+  NTooltip,
+  useThemeVars,
+} from 'naive-ui';
 import { v4 as uuidv4 } from 'uuid';
-import { enums, types } from '@wailsApp/go/models';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useCall } from '@/utils/call';
 
 const { FileTransferTaskState } = enums;
 const { t } = useI18n();
@@ -395,6 +396,37 @@ const getTaskStatusText = (task: types.FileTransferTask): string => {
   }
 };
 
+const addToHistory = (path: string) => {
+  if (pathHistory.value[pathHistory.value.length - 1] !== path) {
+    pathHistory.value.push(path);
+    currentHistoryIndex.value = pathHistory.value.length - 1;
+  }
+};
+
+const refreshRemoteFiles = async () => {
+  const resp = await call(ListRemoteFiles, {
+    args: [remoteAbsolutePath.value],
+  });
+
+  if (resp.ok) {
+    const response = resp.data as types.FileList;
+    remoteFiles.value = response.files || [];
+    remoteAbsolutePath.value = response.absolutePath || '';
+    remotePathInput.value = remoteAbsolutePath.value;
+    remoteSelectedFiles.value = [];
+  }
+};
+
+const navigateTo = async (path: string, addHistory = true) => {
+  remoteAbsolutePath.value = path;
+
+  if (addHistory) {
+    addToHistory(path);
+  }
+
+  await refreshRemoteFiles();
+};
+
 const clearCompletedTasks = () => {
   transferTasks.value = transferTasks.value.filter(
     task => task.status === FileTransferTaskState.PENDING || task.status === FileTransferTaskState.PROGRESS,
@@ -422,40 +454,9 @@ const connectSftp = async () => {
   connecting.value = false;
 };
 
-const refreshRemoteFiles = async () => {
-  const resp = await call(ListRemoteFiles, {
-    args: [remoteAbsolutePath.value],
-  });
-
-  if (resp.ok) {
-    const response = resp.data as types.FileList;
-    remoteFiles.value = response.files || [];
-    remoteAbsolutePath.value = response.absolutePath || '';
-    remotePathInput.value = remoteAbsolutePath.value;
-    remoteSelectedFiles.value = [];
-  }
-};
-
 const canNavigateUp = computed(() => {
   return remoteAbsolutePath.value !== '' && remoteAbsolutePath.value !== '/';
 });
-
-const addToHistory = (path: string) => {
-  if (pathHistory.value[pathHistory.value.length - 1] !== path) {
-    pathHistory.value.push(path);
-    currentHistoryIndex.value = pathHistory.value.length - 1;
-  }
-};
-
-const navigateTo = async (path: string, addHistory = true) => {
-  remoteAbsolutePath.value = path;
-
-  if (addHistory) {
-    addToHistory(path);
-  }
-
-  await refreshRemoteFiles();
-};
 
 const navigateHome = () => {
   navigateTo('');
@@ -497,14 +498,6 @@ const handleFileClick = (file: types.FileTransferItemInfo) => {
   }
 };
 
-const handleRowClick = (file: types.FileTransferItemInfo) => {
-  if (file.isDir) {
-    handleFileClick(file);
-  } else {
-    handleFileSelect(file, !remoteSelectedFiles.value.includes(file.name));
-  }
-};
-
 const handleFileSelect = (file: types.FileTransferItemInfo, checked: boolean) => {
   if (checked) {
     if (!remoteSelectedFiles.value.includes(file.name)) {
@@ -515,6 +508,14 @@ const handleFileSelect = (file: types.FileTransferItemInfo, checked: boolean) =>
     if (index !== -1) {
       remoteSelectedFiles.value.splice(index, 1);
     }
+  }
+};
+
+const handleRowClick = (file: types.FileTransferItemInfo) => {
+  if (file.isDir) {
+    handleFileClick(file);
+  } else {
+    handleFileSelect(file, !remoteSelectedFiles.value.includes(file.name));
   }
 };
 
@@ -561,7 +562,7 @@ const uploadToRemote = async () => {
 
     const task: types.FileTransferTask = {
       id: uuidv4(),
-      source: source,
+      source,
       destination: `${remoteAbsolutePath.value === '' ? '/' : remoteAbsolutePath.value}/${filename}`,
       size: fileSize,
       transferred: 0,
@@ -622,8 +623,8 @@ const downloadFromRemote = async () => {
 
     const task: types.FileTransferTask = {
       id: uuidv4(),
-      source: source,
-      destination: destination,
+      source,
+      destination,
       size: file.size,
       transferred: 0,
       isUpload: false,

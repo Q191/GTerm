@@ -1,5 +1,5 @@
 <template>
-  <n-modal
+  <NModal
     v-model:show="visible"
     close-on-esc
     :negative-text="$t('frontend.connModal.cancel')"
@@ -12,104 +12,104 @@
     transform-origin="center"
     @positive-click="handleConfirm"
   >
-    <n-tabs animated type="line" placement="left" v-model:value="activeTab">
-      <n-tab-pane name="basic" :tab="$t('frontend.connModal.basicConfig')">
-        <n-scrollbar style="max-height: 70vh; padding-right: 12px">
-          <n-form ref="formRef" :model="formValue" :rules="rules">
-            <n-form-item path="label" :label="$t('frontend.connModal.label')">
-              <n-input
+    <NTabs v-model:value="activeTab" animated type="line" placement="left">
+      <NTabPane name="basic" :tab="$t('frontend.connModal.basicConfig')">
+        <NScrollbar style="max-height: 70vh; padding-right: 12px">
+          <NForm ref="formRef" :model="formValue" :rules="rules">
+            <NFormItem path="label" :label="$t('frontend.connModal.label')">
+              <NInput
                 v-model:value="formValue.label"
                 clearable
                 :placeholder="$t('frontend.connModal.placeholder.label')"
                 :allow-input="value => !/\s/.test(value)"
               />
-            </n-form-item>
+            </NFormItem>
 
-            <n-form-item path="groupID" :label="$t('frontend.connModal.group')">
-              <n-select
+            <NFormItem path="groupID" :label="$t('frontend.connModal.group')">
+              <NSelect
                 v-model:value="formValue.groupID"
                 :options="groupOptions"
                 :placeholder="$t('frontend.connModal.placeholder.group')"
               />
-            </n-form-item>
+            </NFormItem>
 
-            <n-form-item path="connProtocol" :label="$t('frontend.connModal.connProtocol')">
-              <n-select
+            <NFormItem path="connProtocol" :label="$t('frontend.connModal.connProtocol')">
+              <NSelect
                 v-model:value="formValue.connProtocol"
                 :options="connProtocolOptions"
                 :placeholder="$t('frontend.connModal.placeholder.connProtocol')"
               />
-            </n-form-item>
+            </NFormItem>
 
             <template v-if="formValue.connProtocol === ConnProtocol.SERIAL">
-              <n-form-item path="serialPort" :label="$t('frontend.connModal.serialPort')">
-                <n-select
+              <NFormItem path="serialPort" :label="$t('frontend.connModal.serialPort')">
+                <NSelect
                   v-model:value="formValue.serialPort"
                   :options="serialPortsOptions"
                   :placeholder="$t('frontend.connModal.placeholder.serialPort')"
                 />
-              </n-form-item>
+              </NFormItem>
 
-              <n-form-item path="baudRate" :label="$t('frontend.connModal.baudRate')">
-                <n-select
+              <NFormItem path="baudRate" :label="$t('frontend.connModal.baudRate')">
+                <NSelect
                   v-model:value="formValue.baudRate"
                   :options="baudRateOptions"
                   :placeholder="$t('frontend.connModal.placeholder.baudRate')"
                 />
-              </n-form-item>
+              </NFormItem>
 
               <div class="form-row">
-                <n-form-item path="dataBits" :label="$t('frontend.connModal.dataBits')" class="form-item">
-                  <n-select
+                <NFormItem path="dataBits" :label="$t('frontend.connModal.dataBits')" class="form-item">
+                  <NSelect
                     v-model:value="formValue.dataBits"
                     :options="dataBitsOptions"
                     :placeholder="$t('frontend.connModal.placeholder.dataBits')"
                   />
-                </n-form-item>
+                </NFormItem>
 
-                <n-form-item path="stopBits" :label="$t('frontend.connModal.stopBits')" class="form-item">
-                  <n-select
+                <NFormItem path="stopBits" :label="$t('frontend.connModal.stopBits')" class="form-item">
+                  <NSelect
                     v-model:value="formValue.stopBits"
                     :options="stopBitsOptions"
                     :placeholder="$t('frontend.connModal.placeholder.stopBits')"
                   />
-                </n-form-item>
+                </NFormItem>
 
-                <n-form-item path="parity" :label="$t('frontend.connModal.parity')" class="form-item">
-                  <n-select
+                <NFormItem path="parity" :label="$t('frontend.connModal.parity')" class="form-item">
+                  <NSelect
                     v-model:value="formValue.parity"
                     :options="parityOptions"
                     :placeholder="$t('frontend.connModal.placeholder.parity')"
                   />
-                </n-form-item>
+                </NFormItem>
               </div>
             </template>
 
             <template v-if="formValue.connProtocol === ConnProtocol.SSH">
               <div class="form-row">
-                <n-form-item path="host" :label="$t('frontend.connModal.host')" class="form-item">
-                  <n-input
+                <NFormItem path="host" :label="$t('frontend.connModal.host')" class="form-item">
+                  <NInput
                     v-model:value="formValue.host"
                     clearable
                     :placeholder="$t('frontend.connModal.placeholder.host')"
                     :allow-input="value => !/\s/.test(value)"
                   />
-                </n-form-item>
-                <n-form-item path="port" :label="$t('frontend.connModal.port')" class="port-input">
-                  <n-input-number
+                </NFormItem>
+                <NFormItem path="port" :label="$t('frontend.connModal.port')" class="port-input">
+                  <NInputNumber
                     v-model:value="formValue.port"
                     :min="1"
                     :max="65535"
                     :show-button="false"
                     :placeholder="$t('frontend.connModal.placeholder.port')"
                   />
-                </n-form-item>
+                </NFormItem>
               </div>
 
-              <n-form-item :label="$t('frontend.connModal.authType')" path="credential.authMethod">
+              <NFormItem :label="$t('frontend.connModal.authType')" path="credential.authMethod">
                 <div class="auth-type-container">
-                  <n-button-group>
-                    <n-button
+                  <NButtonGroup>
+                    <NButton
                       :type="
                         !formValue.useCommonCredential && formValue.credential?.authMethod === AuthMethod.PASSWORD
                           ? 'primary'
@@ -121,8 +121,8 @@
                         <Icon icon="ph:password" />
                       </template>
                       {{ $t('frontend.connModal.password') }}
-                    </n-button>
-                    <n-button
+                    </NButton>
+                    <NButton
                       :type="
                         !formValue.useCommonCredential && formValue.credential?.authMethod === AuthMethod.PRIVATEKEY
                           ? 'primary'
@@ -134,8 +134,8 @@
                         <Icon icon="ph:key" />
                       </template>
                       {{ $t('frontend.connModal.privateKey') }}
-                    </n-button>
-                    <n-button
+                    </NButton>
+                    <NButton
                       :type="formValue.useCommonCredential ? 'primary' : 'default'"
                       @click="handleCredentialTypeChange(CredentialType.Common)"
                     >
@@ -143,36 +143,36 @@
                         <Icon icon="ph:vault" />
                       </template>
                       {{ $t('frontend.connModal.commonCredentialLib') }}
-                    </n-button>
-                  </n-button-group>
+                    </NButton>
+                  </NButtonGroup>
                 </div>
-              </n-form-item>
+              </NFormItem>
 
               <template v-if="formValue.useCommonCredential">
-                <n-form-item path="credentialID" :label="$t('frontend.connModal.credential')">
-                  <n-select
+                <NFormItem path="credentialID" :label="$t('frontend.connModal.credential')">
+                  <NSelect
                     v-model:value="formValue.credentialID"
                     :options="credentialOptions"
                     clearable
                     :placeholder="$t('frontend.connModal.placeholder.selectCredential')"
                     @update:value="handleSelectCredential"
                   />
-                </n-form-item>
+                </NFormItem>
               </template>
 
               <template v-else>
-                <n-form-item path="credential.username" :label="$t('frontend.connModal.username')">
-                  <n-input
+                <NFormItem path="credential.username" :label="$t('frontend.connModal.username')">
+                  <NInput
                     v-model:value="formValue.credential!.username"
                     clearable
                     :placeholder="$t('frontend.connModal.placeholder.username')"
                     :allow-input="value => !/\s/.test(value)"
                   />
-                </n-form-item>
+                </NFormItem>
 
                 <template v-if="formValue.credential!.authMethod === AuthMethod.PASSWORD">
-                  <n-form-item path="credential.password" :label="$t('frontend.connModal.password')">
-                    <n-input
+                  <NFormItem path="credential.password" :label="$t('frontend.connModal.password')">
+                    <NInput
                       v-model:value="formValue.credential!.password"
                       type="password"
                       show-password-on="click"
@@ -180,12 +180,12 @@
                       :placeholder="$t('frontend.connModal.placeholder.password')"
                       :allow-input="value => !/\s/.test(value)"
                     />
-                  </n-form-item>
+                  </NFormItem>
                 </template>
 
                 <template v-if="formValue.credential!.authMethod === AuthMethod.PRIVATEKEY">
-                  <n-form-item path="credential.privateKey" :label="$t('frontend.connModal.privateKey')">
-                    <n-input
+                  <NFormItem path="credential.privateKey" :label="$t('frontend.connModal.privateKey')">
+                    <NInput
                       v-model:value="formValue.credential!.privateKey"
                       type="textarea"
                       :autosize="{ minRows: 3, maxRows: 3 }"
@@ -193,9 +193,9 @@
                       :placeholder="$t('frontend.connModal.placeholder.privateKey')"
                       :allow-input="value => !/\s/.test(value)"
                     />
-                  </n-form-item>
-                  <n-form-item path="credential.passphrase" :label="$t('frontend.connModal.passphrase')">
-                    <n-input
+                  </NFormItem>
+                  <NFormItem path="credential.passphrase" :label="$t('frontend.connModal.passphrase')">
+                    <NInput
                       v-model:value="formValue.credential!.passphrase"
                       type="password"
                       show-password-on="click"
@@ -203,22 +203,22 @@
                       :placeholder="$t('frontend.connModal.placeholder.passphrase')"
                       :allow-input="value => !/\s/.test(value)"
                     />
-                  </n-form-item>
+                  </NFormItem>
                 </template>
               </template>
             </template>
-          </n-form>
-        </n-scrollbar>
-      </n-tab-pane>
+          </NForm>
+        </NScrollbar>
+      </NTabPane>
 
-      <n-tab-pane name="personal" :tab="$t('frontend.connModal.personalConfig')">
-        <n-form ref="formRef" :model="formValue" :rules="rules">
-          <n-form-item path="theme" :label="$t('frontend.connModal.theme')">
+      <NTabPane name="personal" :tab="$t('frontend.connModal.personalConfig')">
+        <NForm ref="formRef" :model="formValue" :rules="rules">
+          <NFormItem path="theme" :label="$t('frontend.connModal.theme')">
             <div class="theme-section">
               <div class="theme-preview">
-                <theme-preview :theme="selectedTheme" />
+                <ThemePreview :theme="selectedTheme" />
               </div>
-              <n-select
+              <NSelect
                 v-model:value="formValue.theme"
                 :options="themeOptions"
                 :placeholder="t('frontend.connModal.placeholder.selectTheme')"
@@ -226,317 +226,309 @@
                 @update:value="handleThemeChange"
               />
             </div>
-          </n-form-item>
-        </n-form>
-      </n-tab-pane>
+          </NFormItem>
+        </NForm>
+      </NTabPane>
 
-      <n-tab-pane name="advanced" :tab="$t('frontend.connModal.advancedConfig')">
-        <n-scrollbar style="max-height: 70vh; padding-right: 12px">
+      <NTabPane name="advanced" :tab="$t('frontend.connModal.advancedConfig')">
+        <NScrollbar style="max-height: 70vh; padding-right: 12px">
           <template v-if="formValue.connProtocol === ConnProtocol.SSH">
-            <n-form ref="formRef" :model="formValue" :rules="rules">
-              <n-form-item path="sshCharset" :label="$t('frontend.connModal.charset')">
-                <n-select
+            <NForm ref="formRef" :model="formValue" :rules="rules">
+              <NFormItem path="sshCharset" :label="$t('frontend.connModal.charset')">
+                <NSelect
                   v-model:value="formValue.sshCharset"
                   :options="charsetOptions"
                   filterable
                   :placeholder="$t('frontend.connModal.placeholder.charset')"
                 />
-              </n-form-item>
+              </NFormItem>
 
-              <n-collapse accordion>
-                <n-collapse-item name="ciphers">
+              <NCollapse accordion>
+                <NCollapseItem name="ciphers">
                   <template #header>
                     <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
                       <span>{{ $t('frontend.connModal.ciphers') }}</span>
-                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('ciphers')">
+                      <NButton text size="tiny" @click.stop="handleResetAlgorithms('ciphers')">
                         {{ $t('frontend.connModal.resetToDefault') }}
-                      </n-button>
+                      </NButton>
                     </div>
                   </template>
                   <div class="algorithm-container">
-                    <n-list bordered size="small" class="algorithm-list">
-                      <n-list-item v-for="(cipher, index) in formValue.sshCiphers" :key="index" class="compact-item">
+                    <NList bordered size="small" class="algorithm-list">
+                      <NListItem v-for="(cipher, index) in formValue.sshCiphers" :key="index" class="compact-item">
                         <div class="algorithm-item">
-                          <n-text class="algorithm-name">{{ cipher }}</n-text>
+                          <NText class="algorithm-name">{{ cipher }}</NText>
                           <div class="algorithm-actions">
-                            <n-button
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('ciphers', index, -1)"
                               :disabled="index === 0"
+                              @click="handleMoveAlgorithm('ciphers', index, -1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-up" />
                               </template>
-                            </n-button>
-                            <n-button
+                            </NButton>
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('ciphers', index, 1)"
                               :disabled="index === formValue.sshCiphers.length - 1"
+                              @click="handleMoveAlgorithm('ciphers', index, 1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-down" />
                               </template>
-                            </n-button>
+                            </NButton>
                           </div>
                         </div>
-                      </n-list-item>
-                    </n-list>
+                      </NListItem>
+                    </NList>
                   </div>
-                </n-collapse-item>
+                </NCollapseItem>
 
-                <n-collapse-item name="keyExchanges">
+                <NCollapseItem name="keyExchanges">
                   <template #header>
                     <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
                       <span>{{ $t('frontend.connModal.keyExchanges') }}</span>
-                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('keyExchanges')">
+                      <NButton text size="tiny" @click.stop="handleResetAlgorithms('keyExchanges')">
                         {{ $t('frontend.connModal.resetToDefault') }}
-                      </n-button>
+                      </NButton>
                     </div>
                   </template>
                   <div class="algorithm-container">
-                    <n-list bordered size="small" class="algorithm-list">
-                      <n-list-item v-for="(kex, index) in formValue.sshKeyExchanges" :key="index" class="compact-item">
+                    <NList bordered size="small" class="algorithm-list">
+                      <NListItem v-for="(kex, index) in formValue.sshKeyExchanges" :key="index" class="compact-item">
                         <div class="algorithm-item">
-                          <n-text class="algorithm-name">{{ kex }}</n-text>
+                          <NText class="algorithm-name">{{ kex }}</NText>
                           <div class="algorithm-actions">
-                            <n-button
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('keyExchanges', index, -1)"
                               :disabled="index === 0"
+                              @click="handleMoveAlgorithm('keyExchanges', index, -1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-up" />
                               </template>
-                            </n-button>
-                            <n-button
+                            </NButton>
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('keyExchanges', index, 1)"
                               :disabled="index === formValue.sshKeyExchanges.length - 1"
+                              @click="handleMoveAlgorithm('keyExchanges', index, 1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-down" />
                               </template>
-                            </n-button>
+                            </NButton>
                           </div>
                         </div>
-                      </n-list-item>
-                    </n-list>
+                      </NListItem>
+                    </NList>
                   </div>
-                </n-collapse-item>
+                </NCollapseItem>
 
-                <n-collapse-item name="macs">
+                <NCollapseItem name="macs">
                   <template #header>
                     <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
                       <span>{{ $t('frontend.connModal.macs') }}</span>
-                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('macs')">
+                      <NButton text size="tiny" @click.stop="handleResetAlgorithms('macs')">
                         {{ $t('frontend.connModal.resetToDefault') }}
-                      </n-button>
+                      </NButton>
                     </div>
                   </template>
                   <div class="algorithm-container">
-                    <n-list bordered size="small" class="algorithm-list">
-                      <n-list-item v-for="(mac, index) in formValue.sshMACs" :key="index" class="compact-item">
+                    <NList bordered size="small" class="algorithm-list">
+                      <NListItem v-for="(mac, index) in formValue.sshMACs" :key="index" class="compact-item">
                         <div class="algorithm-item">
-                          <n-text class="algorithm-name">{{ mac }}</n-text>
+                          <NText class="algorithm-name">{{ mac }}</NText>
                           <div class="algorithm-actions">
-                            <n-button
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('macs', index, -1)"
                               :disabled="index === 0"
+                              @click="handleMoveAlgorithm('macs', index, -1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-up" />
                               </template>
-                            </n-button>
-                            <n-button
+                            </NButton>
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('macs', index, 1)"
                               :disabled="index === formValue.sshMACs.length - 1"
+                              @click="handleMoveAlgorithm('macs', index, 1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-down" />
                               </template>
-                            </n-button>
+                            </NButton>
                           </div>
                         </div>
-                      </n-list-item>
-                    </n-list>
+                      </NListItem>
+                    </NList>
                   </div>
-                </n-collapse-item>
+                </NCollapseItem>
 
-                <n-collapse-item name="publicKeyAlgorithms">
+                <NCollapseItem name="publicKeyAlgorithms">
                   <template #header>
                     <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
                       <span>{{ $t('frontend.connModal.publicKeyAlgorithms') }}</span>
-                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('publicKeyAlgorithms')">
+                      <NButton text size="tiny" @click.stop="handleResetAlgorithms('publicKeyAlgorithms')">
                         {{ $t('frontend.connModal.resetToDefault') }}
-                      </n-button>
+                      </NButton>
                     </div>
                   </template>
                   <div class="algorithm-container">
-                    <n-list bordered size="small" class="algorithm-list">
-                      <n-list-item
+                    <NList bordered size="small" class="algorithm-list">
+                      <NListItem
                         v-for="(algo, index) in formValue.sshPublicKeyAlgorithms"
                         :key="index"
                         class="compact-item"
                       >
                         <div class="algorithm-item">
-                          <n-text class="algorithm-name">{{ algo }}</n-text>
+                          <NText class="algorithm-name">{{ algo }}</NText>
                           <div class="algorithm-actions">
-                            <n-button
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('publicKeyAlgorithms', index, -1)"
                               :disabled="index === 0"
+                              @click="handleMoveAlgorithm('publicKeyAlgorithms', index, -1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-up" />
                               </template>
-                            </n-button>
-                            <n-button
+                            </NButton>
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('publicKeyAlgorithms', index, 1)"
                               :disabled="index === formValue.sshPublicKeyAlgorithms.length - 1"
+                              @click="handleMoveAlgorithm('publicKeyAlgorithms', index, 1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-down" />
                               </template>
-                            </n-button>
+                            </NButton>
                           </div>
                         </div>
-                      </n-list-item>
-                    </n-list>
+                      </NListItem>
+                    </NList>
                   </div>
-                </n-collapse-item>
+                </NCollapseItem>
 
-                <n-collapse-item name="hostKeyAlgorithms">
+                <NCollapseItem name="hostKeyAlgorithms">
                   <template #header>
                     <div style="display: flex; justify-content: space-between; width: 100%; align-items: center">
                       <span>{{ $t('frontend.connModal.hostKeyAlgorithms') }}</span>
-                      <n-button text size="tiny" @click.stop="handleResetAlgorithms('hostKeyAlgorithms')">
+                      <NButton text size="tiny" @click.stop="handleResetAlgorithms('hostKeyAlgorithms')">
                         {{ $t('frontend.connModal.resetToDefault') }}
-                      </n-button>
+                      </NButton>
                     </div>
                   </template>
                   <div class="algorithm-container">
-                    <n-list bordered size="small" class="algorithm-list">
-                      <n-list-item
+                    <NList bordered size="small" class="algorithm-list">
+                      <NListItem
                         v-for="(algo, index) in formValue.sshHostKeyAlgorithms"
                         :key="index"
                         class="compact-item"
                       >
                         <div class="algorithm-item">
-                          <n-text class="algorithm-name">{{ algo }}</n-text>
+                          <NText class="algorithm-name">{{ algo }}</NText>
                           <div class="algorithm-actions">
-                            <n-button
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('hostKeyAlgorithms', index, -1)"
                               :disabled="index === 0"
+                              @click="handleMoveAlgorithm('hostKeyAlgorithms', index, -1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-up" />
                               </template>
-                            </n-button>
-                            <n-button
+                            </NButton>
+                            <NButton
                               quaternary
                               circle
                               size="tiny"
-                              @click="handleMoveAlgorithm('hostKeyAlgorithms', index, 1)"
                               :disabled="index === formValue.sshHostKeyAlgorithms.length - 1"
+                              @click="handleMoveAlgorithm('hostKeyAlgorithms', index, 1)"
                             >
                               <template #icon>
                                 <Icon icon="ph:arrow-down" />
                               </template>
-                            </n-button>
+                            </NButton>
                           </div>
                         </div>
-                      </n-list-item>
-                    </n-list>
+                      </NListItem>
+                    </NList>
                   </div>
-                </n-collapse-item>
-              </n-collapse>
-            </n-form>
+                </NCollapseItem>
+              </NCollapse>
+            </NForm>
           </template>
 
           <template v-else-if="formValue.connProtocol === ConnProtocol.SERIAL">
-            <n-empty size="small" :description="$t('frontend.connModal.developing')">
+            <NEmpty size="small" :description="$t('frontend.connModal.developing')">
               <template #icon>
                 <Icon icon="ph:code" />
               </template>
-            </n-empty>
+            </NEmpty>
           </template>
 
           <template v-else>
-            <n-space justify="center" align="center" style="height: 200px">
-              <n-text>{{ $t('frontend.connModal.selectProtocolFirst') }}</n-text>
-            </n-space>
+            <NSpace justify="center" align="center" style="height: 200px">
+              <NText>{{ $t('frontend.connModal.selectProtocolFirst') }}</NText>
+            </NSpace>
           </template>
-        </n-scrollbar>
-      </n-tab-pane>
-    </n-tabs>
-  </n-modal>
+        </NScrollbar>
+      </NTabPane>
+    </NTabs>
+  </NModal>
 </template>
 
 <script lang="ts" setup>
-import { enums, model } from '@wailsApp/go/models';
-import { ListGroup } from '@wailsApp/go/services/GroupSrv';
-import { CreateConnection, UpdateConnection, FindConnectionByID } from '@wailsApp/go/services/ConnectionSrv';
 import { Icon } from '@iconify/vue';
-import ThemePreview from '../components/ThemePreview.vue';
-import { themeOptions as xtermThemeOptions, loadTheme, defaultTheme } from '@/themes/xtermjs';
-
+import type { model } from '@wailsApp/go/models';
+import { enums } from '@wailsApp/go/models';
+import { CreateConnection, FindConnectionByID, UpdateConnection } from '@wailsApp/go/services/ConnectionSrv';
+import { ListCredential } from '@wailsApp/go/services/CredentialSrv';
+import { ListGroup } from '@wailsApp/go/services/GroupSrv';
+import { SerialPorts } from '@wailsApp/go/services/TerminalSrv';
+import type { FormInst, FormRules } from 'naive-ui';
 import {
-  FormInst,
-  FormRules,
+  NButton,
+  NButtonGroup,
+  NCollapse,
+  NCollapseItem,
+  NEmpty,
   NForm,
   NFormItem,
   NInput,
   NInputNumber,
-  NModal,
-  NButton,
-  NButtonGroup,
-  NSelect,
-  NTabPane,
-  NTabs,
-  NEmpty,
-  NScrollbar,
-  NSpace,
   NList,
   NListItem,
+  NModal,
+  NScrollbar,
+  NSelect,
+  NSpace,
+  NTabPane,
+  NTabs,
   NText,
-  NCollapse,
-  NCollapseItem,
 } from 'naive-ui';
-import { SelectMixedOption } from 'naive-ui/es/select/src/interface';
-import { ref, computed, onMounted, onUpdated } from 'vue';
+import type { SelectMixedOption } from 'naive-ui/es/select/src/interface';
+import { computed, onMounted, onUpdated, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { SerialPorts } from '@wailsApp/go/services/TerminalSrv';
-import { ListCredential } from '@wailsApp/go/services/CredentialSrv';
+import { defaultTheme, loadTheme, themeOptions as xtermThemeOptions } from '@/themes/xtermjs';
 import { useCall } from '@/utils/call';
-
-const { AuthMethod, ConnProtocol } = enums;
-
-const { t } = useI18n();
-const formRef = ref<FormInst | null>(null);
-const activeTab = ref('basic');
-const { call } = useCall();
+import ThemePreview from '../components/ThemePreview.vue';
 
 const props = defineProps<{
   show: boolean;
@@ -548,6 +540,13 @@ const emit = defineEmits<{
   (e: 'update:show', value: boolean): void;
   (e: 'success'): void;
 }>();
+
+const { AuthMethod, ConnProtocol } = enums;
+
+const { t } = useI18n();
+const formRef = ref<FormInst | null>(null);
+const activeTab = ref('basic');
+const { call } = useCall();
 
 const visible = computed({
   get: () => props.show,
@@ -933,7 +932,7 @@ const handleConfirm = async () => {
     }
 
     return result.ok;
-  } catch (errors) {
+  } catch {
     return false;
   }
 };

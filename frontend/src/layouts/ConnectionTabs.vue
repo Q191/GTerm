@@ -8,29 +8,31 @@
       @click="switchTab(tab.id)"
     >
       <div class="status-dot" :class="tabStatus[tab.id]" />
-      <n-icon size="16" class="terminal-icon">
-        <icon icon="ph:terminal-duotone" />
-      </n-icon>
-      <n-tooltip trigger="hover">
+      <NIcon size="16" class="terminal-icon">
+        <Icon icon="ph:terminal-duotone" />
+      </NIcon>
+      <NTooltip trigger="hover">
         <template #trigger>
           <span class="tab-label">{{ tab.label }}</span>
         </template>
         {{ tab.label }}
-      </n-tooltip>
-      <n-button circle text size="tiny" class="close-btn" @click.stop="closeTab(tab.id)">
+      </NTooltip>
+      <NButton circle text size="tiny" class="close-btn" @click.stop="closeTab(tab.id)">
         <template #icon>
-          <icon icon="ph:x-bold" />
+          <Icon icon="ph:x-bold" />
         </template>
-      </n-button>
+      </NButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NIcon, NButton, NTooltip, useThemeVars } from 'naive-ui';
-import { useConnectionStore } from '@/stores/connection';
+import { NButton, NIcon, NTooltip, useThemeVars } from 'naive-ui';
 import { useRouter } from 'vue-router';
+import { useConnectionStore } from '@/stores/connection';
+
+const router = useRouter();
 
 const connectionStore = useConnectionStore();
 const activeTab = computed(() => connectionStore.activeConnectionId);
@@ -59,8 +61,6 @@ const switchTab = (id: number) => {
     router.push({ name: 'Terminal' });
   }
 };
-
-const router = useRouter();
 
 const closeTab = (id: number) => {
   const terminal = terminalRefs.value.get(id);

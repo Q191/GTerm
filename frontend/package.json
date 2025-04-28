@@ -39,6 +39,7 @@
     "@vxecli/import-unplugin-vue-components": "^1.0.4",
     "eslint": "^9.24.0",
     "eslint-plugin-vue": "^10.0.0",
+    "jiti": "^2.4.2",
     "less": "^4.3.0",
     "naive-ui": "^2.41.0",
     "prettier": "^3.5.3",

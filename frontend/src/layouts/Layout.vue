@@ -1,30 +1,30 @@
 <template>
-  <n-layout class="layout-container">
-    <n-layout-header bordered class="header">
+  <NLayout class="layout-container">
+    <NLayoutHeader bordered class="header">
       <Header ref="headerRef" />
-    </n-layout-header>
+    </NLayoutHeader>
 
-    <n-layout :has-sider="!isTerminal" class="content">
-      <n-layout-sider v-if="!isTerminal" bordered :width="50">
+    <NLayout :has-sider="!isTerminal" class="content">
+      <NLayoutSider v-if="!isTerminal" bordered :width="50">
         <Sider />
-      </n-layout-sider>
-      <n-layout-content>
+      </NLayoutSider>
+      <NLayoutContent>
         <router-view v-slot="{ Component }">
           <keep-alive>
             <component :is="Component" />
           </keep-alive>
         </router-view>
-      </n-layout-content>
-    </n-layout>
-  </n-layout>
+      </NLayoutContent>
+    </NLayout>
+  </NLayout>
 </template>
 
 <script lang="ts" setup>
+import { NLayout, NLayoutContent, NLayoutHeader, NLayoutSider } from 'naive-ui';
+import { computed, provide, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import Header from '@/layouts/Header.vue';
 import Sider from '@/layouts/Sider.vue';
-import { NLayout, NLayoutContent, NLayoutHeader, NLayoutSider } from 'naive-ui';
-import { useRoute } from 'vue-router';
-import { computed, ref, provide } from 'vue';
 
 const route = useRoute();
 const isTerminal = computed(() => route.name === 'Terminal');

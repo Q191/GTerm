@@ -1,9 +1,9 @@
 <template>
   <div class="page-container">
-    <div class="sidebar" ref="sidebarRef" :style="{ width: sidebarWidth + 'px' }">
+    <div ref="sidebarRef" class="sidebar" :style="{ width: `${sidebarWidth}px` }">
       <div class="groups-list">
         <div class="list-header">
-          <n-input
+          <NInput
             v-model:value="searchText"
             size="small"
             clearable
@@ -11,44 +11,44 @@
             :allow-input="value => !/\s/.test(value)"
           >
             <template #prefix>
-              <icon icon="ph:magnifying-glass" />
+              <Icon icon="ph:magnifying-glass" />
             </template>
-          </n-input>
+          </NInput>
           <n-divider vertical />
           <div class="header-right">
-            <n-tooltip trigger="hover">
+            <NTooltip trigger="hover">
               <template #trigger>
-                <n-button text size="large" @click="handleAddGroup">
+                <NButton text size="large" @click="handleAddGroup">
                   <template #icon>
-                    <icon icon="ph:folder-plus" />
+                    <Icon icon="ph:folder-plus" />
                   </template>
-                </n-button>
+                </NButton>
               </template>
               {{ $t('frontend.connection.add.group') }}
-            </n-tooltip>
-            <n-tooltip trigger="hover">
+            </NTooltip>
+            <NTooltip trigger="hover">
               <template #trigger>
-                <n-button text size="large" @click="handleAddConn">
+                <NButton text size="large" @click="handleAddConn">
                   <template #icon>
-                    <icon icon="ph:plus" />
+                    <Icon icon="ph:plus" />
                   </template>
-                </n-button>
+                </NButton>
               </template>
               {{ $t('frontend.connection.add.conn') }}
-            </n-tooltip>
+            </NTooltip>
           </div>
         </div>
         <div class="list-content">
           <!-- 资产列表部分 -->
           <div class="section-header">
             <div class="section-title">{{ $t('frontend.connection.sections.assetList') }}</div>
-            <n-button text size="tiny" @click="assetListCollapsed = !assetListCollapsed">
+            <NButton text size="tiny" @click="assetListCollapsed = !assetListCollapsed">
               <template #icon>
-                <icon :icon="assetListCollapsed ? 'ph:caret-right' : 'ph:caret-down'" />
+                <Icon :icon="assetListCollapsed ? 'ph:caret-right' : 'ph:caret-down'" />
               </template>
-            </n-button>
+            </NButton>
           </div>
-          <div class="asset-list" v-show="!assetListCollapsed">
+          <div v-show="!assetListCollapsed" class="asset-list">
             <div
               v-for="conn in filteredAssets"
               :key="conn.id"
@@ -57,7 +57,7 @@
               @contextmenu="handleConnContextMenu($event, conn)"
             >
               <div class="asset-icon">
-                <icon :icon="getSessionIcon(conn).icon" :class="{ 'text-logo': getSessionIcon(conn).isText }" />
+                <Icon :icon="getSessionIcon(conn).icon" :class="{ 'text-logo': getSessionIcon(conn).isText }" />
               </div>
               <div class="asset-info">
                 <div class="asset-name">{{ conn.label }}</div>
@@ -68,13 +68,13 @@
           <!-- 分组列表部分 -->
           <div class="section-header">
             <div class="section-title">{{ $t('frontend.connection.sections.groupList') }}</div>
-            <n-button text size="tiny" @click="groupListCollapsed = !groupListCollapsed">
+            <NButton text size="tiny" @click="groupListCollapsed = !groupListCollapsed">
               <template #icon>
-                <icon :icon="groupListCollapsed ? 'ph:caret-right' : 'ph:caret-down'" />
+                <Icon :icon="groupListCollapsed ? 'ph:caret-right' : 'ph:caret-down'" />
               </template>
-            </n-button>
+            </NButton>
           </div>
-          <div class="group-list" v-show="!groupListCollapsed">
+          <div v-show="!groupListCollapsed" class="group-list">
             <div
               v-for="group in filteredGroups"
               :key="group.id"
@@ -84,7 +84,7 @@
               @contextmenu="handleGroupContextMenu($event, group)"
             >
               <div class="group-icon">
-                <icon :icon="getGroupConnCount(group) > 0 ? 'ph:folders-duotone' : 'ph:folder-dashed-duotone'" />
+                <Icon :icon="getGroupConnCount(group) > 0 ? 'ph:folders-duotone' : 'ph:folder-dashed-duotone'" />
               </div>
               <div class="group-info">
                 <div class="group-name">{{ group.name }}</div>
@@ -93,7 +93,7 @@
             </div>
           </div>
 
-          <n-dropdown
+          <NDropdown
             trigger="manual"
             placement="bottom-start"
             :show="showDropdown"
@@ -107,22 +107,22 @@
       </div>
     </div>
 
-    <div class="resize-handle" :style="{ left: sidebarWidth + 'px' }" @mousedown="startResize"></div>
+    <div class="resize-handle" :style="{ left: `${sidebarWidth}px` }" @mousedown="startResize"></div>
 
     <div class="main-content">
       <div class="content-header">
         <div class="header-left">
           <h2>{{ selectedGroup ? selectedGroup.name : $t('frontend.sider.assets') }}</h2>
-          <n-badge :value="filteredConns.length" show-zero type="success" />
+          <NBadge :value="filteredConns.length" show-zero type="success" />
         </div>
       </div>
 
-      <div class="conns-grid" v-if="filteredConns.length > 0">
+      <div v-if="filteredConns.length > 0" class="conns-grid">
         <div v-for="conn in filteredConns" :key="conn.id" class="conn-card" @click="toTerminal(conn)">
           <div class="card-header">
             <div class="card-left">
               <div class="os-icon" :class="{ 'text-logo': getSessionIcon(conn).isText }">
-                <icon :icon="getSessionIcon(conn).icon" />
+                <Icon :icon="getSessionIcon(conn).icon" />
               </div>
               <div class="card-info">
                 <div class="conn-name">{{ conn.label }}</div>
@@ -134,45 +134,45 @@
                 </div>
               </div>
             </div>
-            <n-button circle text size="small" class="edit-btn" @click.stop="handleEditConn(conn)">
+            <NButton circle text size="small" class="edit-btn" @click.stop="handleEditConn(conn)">
               <template #icon>
-                <icon icon="ph:pencil-simple" class="edit-icon" />
+                <Icon icon="ph:pencil-simple" class="edit-icon" />
               </template>
-            </n-button>
+            </NButton>
           </div>
 
           <div class="card-footer">
             <div class="protocol-info">
-              <icon :icon="getProtocolIcon(conn)" />
+              <Icon :icon="getProtocolIcon(conn)" />
               <span>{{ conn.connProtocol }}</span>
             </div>
             <div class="connection-tags" style="margin-left: auto">
-              <n-tooltip trigger="hover" v-if="getConnCount(conn) > 0">
+              <NTooltip v-if="getConnCount(conn) > 0" trigger="hover">
                 <template #trigger>
                   <div>
-                    <n-tag size="tiny" type="success">
+                    <NTag size="tiny" type="success">
                       {{ getConnCount(conn) }}
-                    </n-tag>
+                    </NTag>
                   </div>
                 </template>
                 {{ $t('frontend.connection.connection.active') }}
-              </n-tooltip>
-              <n-tooltip trigger="hover" v-if="getErrorConnCount(conn) > 0">
+              </NTooltip>
+              <NTooltip v-if="getErrorConnCount(conn) > 0" trigger="hover">
                 <template #trigger>
                   <div>
-                    <n-tag size="tiny" type="error">
+                    <NTag size="tiny" type="error">
                       {{ getErrorConnCount(conn) }}
-                    </n-tag>
+                    </NTag>
                   </div>
                 </template>
                 {{ $t('frontend.connection.connection.disconnected') }}
-              </n-tooltip>
+              </NTooltip>
             </div>
           </div>
         </div>
       </div>
-      <div class="empty-state" v-else>
-        <n-result
+      <div v-else class="empty-state">
+        <NResult
           status="404"
           :title="$t('frontend.connection.empty.title')"
           :description="
@@ -184,35 +184,31 @@
       </div>
     </div>
 
-    <connection-modal
+    <ConnectionModal
       v-model:show="showConnModal"
       :is-edit="isEditConn"
       :connection-id="connectionId"
       @success="handleConnSuccess"
     />
-    <group-modal
-      v-model:show="showGroupModal"
-      :is-edit="isEditGroup"
-      :group="editGroup"
-      @success="handleGroupSuccess"
-    />
+    <GroupModal v-model:show="showGroupModal" :is-edit="isEditGroup" :group="editGroup" @success="handleGroupSuccess" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NButton, NTag, NTooltip, NDropdown, NResult, NBadge, NInput, useThemeVars, useDialog } from 'naive-ui';
+import type { model } from '@wailsApp/go/models';
+import { enums } from '@wailsApp/go/models';
+import { DeleteConnection, ListConnection } from '@wailsApp/go/services/ConnectionSrv';
+import { DeleteGroup, ListGroup } from '@wailsApp/go/services/GroupSrv';
+import { NBadge, NButton, NDropdown, NInput, NResult, NTag, NTooltip, useDialog, useThemeVars } from 'naive-ui';
 import type { DropdownOption } from 'naive-ui';
-import { ListGroup, DeleteGroup } from '@wailsApp/go/services/GroupSrv';
-import { ListConnection, DeleteConnection } from '@wailsApp/go/services/ConnectionSrv';
-import { enums, model } from '@wailsApp/go/models';
-import { useConnectionStore } from '@/stores/connection';
-import { useRouter } from 'vue-router';
-import { h, ref, computed, onMounted, onUnmounted } from 'vue';
+import { computed, h, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useConnectionStore } from '@/stores/connection';
+import { useCall } from '@/utils/call';
 import ConnectionModal from '@/views/modals/ConnectionModal.vue';
 import GroupModal from '@/views/modals/GroupModal.vue';
-import { useCall } from '@/utils/call';
 
 const router = useRouter();
 const connStore = useConnectionStore();
@@ -274,36 +270,6 @@ const updateDropdownOptions = (type: 'group' | 'conn') => {
   }
 };
 
-const handleDropdownSelect = async (key: string) => {
-  showDropdown.value = false;
-  if (!currentContextNode.value) return;
-
-  const connId = parseInt(currentContextNode.value.key.replace('conn-', ''));
-
-  switch (key) {
-    case 'edit-group':
-      handleEditGroup();
-      break;
-    case 'delete-group':
-      await handleDeleteGroup();
-      break;
-    case 'edit-conn':
-      const conn = conns.value?.find(h => h.id === connId);
-      if (conn) handleEditConn(conn);
-      break;
-    case 'delete-conn':
-      const result = await call(DeleteConnection, {
-        args: [connId],
-      });
-
-      if (result.ok) {
-        await fetchData();
-      }
-      break;
-  }
-  currentContextNode.value = null;
-};
-
 const handleClickoutside = () => {
   showDropdown.value = false;
 };
@@ -324,6 +290,22 @@ const toTerminal = (conn: model.Connection) => {
   };
   connStore.addConnection(connection);
   router.push({ name: 'Terminal' });
+};
+
+const fetchGroups = async () => {
+  const result = await call(ListGroup);
+  return result.data || [];
+};
+
+const fetchConns = async () => {
+  const result = await call(ListConnection);
+  return result.data || [];
+};
+
+const fetchData = async () => {
+  const [groupsData, connsData] = await Promise.all([fetchGroups(), fetchConns()]);
+  groups.value = groupsData;
+  conns.value = connsData;
 };
 
 const handleEditConn = (conn: model.Connection) => {
@@ -350,7 +332,7 @@ const handleAddGroup = () => {
 
 const handleEditGroup = () => {
   if (!currentContextNode.value) return;
-  const groupId = parseInt(currentContextNode.value.key.replace('group-', ''));
+  const groupId = Number.parseInt(currentContextNode.value.key.replace('group-', ''));
   const group = groups.value?.find(g => g.id === groupId);
   if (group) {
     isEditGroup.value = true;
@@ -361,22 +343,6 @@ const handleEditGroup = () => {
 
 const handleGroupSuccess = () => {
   fetchData();
-};
-
-const fetchGroups = async () => {
-  const result = await call(ListGroup);
-  return result.data || [];
-};
-
-const fetchConns = async () => {
-  const result = await call(ListConnection);
-  return result.data || [];
-};
-
-const fetchData = async () => {
-  const [groupsData, connsData] = await Promise.all([fetchGroups(), fetchConns()]);
-  groups.value = groupsData;
-  conns.value = connsData;
 };
 
 const vendorIconMap: Record<string, string> = {
@@ -571,7 +537,7 @@ const handleGroupContextMenu = (event: MouseEvent, group: model.Group) => {
 
 const handleDeleteGroup = async () => {
   if (!currentContextNode.value) return;
-  const groupId = parseInt(currentContextNode.value.key.replace('group-', ''));
+  const groupId = Number.parseInt(currentContextNode.value.key.replace('group-', ''));
   const group = groups.value?.find(g => g.id === groupId);
   if (!group) return;
 
@@ -590,6 +556,40 @@ const handleDeleteGroup = async () => {
       }
     },
   });
+};
+
+const handleDropdownSelect = async (key: string) => {
+  showDropdown.value = false;
+  if (!currentContextNode.value) return;
+
+  const connId = Number.parseInt(currentContextNode.value.key.replace('conn-', ''));
+
+  switch (key) {
+    case 'edit-group': {
+      handleEditGroup();
+      break;
+    }
+    case 'delete-group': {
+      await handleDeleteGroup();
+      break;
+    }
+    case 'edit-conn': {
+      const conn = conns.value?.find(h => h.id === connId);
+      if (conn) handleEditConn(conn);
+      break;
+    }
+    case 'delete-conn': {
+      const result = await call(DeleteConnection, {
+        args: [connId],
+      });
+
+      if (result.ok) {
+        await fetchData();
+      }
+      break;
+    }
+  }
+  currentContextNode.value = null;
 };
 </script>
 

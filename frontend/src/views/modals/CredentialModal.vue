@@ -1,5 +1,5 @@
 <template>
-  <n-modal
+  <NModal
     v-model:show="visible"
     close-on-esc
     :negative-text="$t('frontend.credentialModal.cancel')"
@@ -12,21 +12,21 @@
     style="width: 600px"
     @positive-click="handleConfirm"
   >
-    <n-scrollbar style="max-height: 70vh; padding-right: 12px">
-      <n-form ref="formRef" :model="formValue" :rules="rules">
-        <n-form-item path="label" :label="$t('frontend.credentialModal.label')">
-          <n-input
+    <NScrollbar style="max-height: 70vh; padding-right: 12px">
+      <NForm ref="formRef" :model="formValue" :rules="rules">
+        <NFormItem path="label" :label="$t('frontend.credentialModal.label')">
+          <NInput
             v-model:value="formValue.label"
             clearable
             :placeholder="$t('frontend.credentialModal.placeholder.label')"
             :allow-input="value => !/\s/.test(value)"
           />
-        </n-form-item>
+        </NFormItem>
 
-        <n-form-item :label="$t('frontend.credentialModal.authType')" path="authMethod">
+        <NFormItem :label="$t('frontend.credentialModal.authType')" path="authMethod">
           <div class="auth-type-container">
-            <n-button-group>
-              <n-button
+            <NButtonGroup>
+              <NButton
                 :type="formValue.authMethod === AuthMethod.PASSWORD ? 'primary' : 'default'"
                 @click="handleAuthTypeChange(AuthMethod.PASSWORD)"
               >
@@ -34,8 +34,8 @@
                   <Icon icon="ph:password" />
                 </template>
                 {{ $t('frontend.credentialModal.password') }}
-              </n-button>
-              <n-button
+              </NButton>
+              <NButton
                 :type="formValue.authMethod === AuthMethod.PRIVATEKEY ? 'primary' : 'default'"
                 @click="handleAuthTypeChange(AuthMethod.PRIVATEKEY)"
               >
@@ -43,23 +43,23 @@
                   <Icon icon="ph:key" />
                 </template>
                 {{ $t('frontend.credentialModal.privateKey') }}
-              </n-button>
-            </n-button-group>
+              </NButton>
+            </NButtonGroup>
           </div>
-        </n-form-item>
+        </NFormItem>
 
-        <n-form-item path="username" :label="$t('frontend.credentialModal.username')">
-          <n-input
+        <NFormItem path="username" :label="$t('frontend.credentialModal.username')">
+          <NInput
             v-model:value="formValue.username"
             clearable
             :placeholder="$t('frontend.credentialModal.placeholder.username')"
             :allow-input="value => !/\s/.test(value)"
           />
-        </n-form-item>
+        </NFormItem>
 
         <template v-if="formValue.authMethod === AuthMethod.PASSWORD">
-          <n-form-item path="password" :label="$t('frontend.credentialModal.password')">
-            <n-input
+          <NFormItem path="password" :label="$t('frontend.credentialModal.password')">
+            <NInput
               v-model:value="formValue.password"
               type="password"
               show-password-on="click"
@@ -67,21 +67,21 @@
               :placeholder="$t('frontend.credentialModal.placeholder.password')"
               :allow-input="value => !/\s/.test(value)"
             />
-          </n-form-item>
+          </NFormItem>
         </template>
 
         <template v-if="formValue.authMethod === AuthMethod.PRIVATEKEY">
-          <n-form-item path="privateKey" :label="$t('frontend.credentialModal.privateKey')">
-            <n-input
+          <NFormItem path="privateKey" :label="$t('frontend.credentialModal.privateKey')">
+            <NInput
               v-model:value="formValue.privateKey"
               type="textarea"
               :autosize="{ minRows: 3, maxRows: 3 }"
               clearable
               :placeholder="$t('frontend.credentialModal.placeholder.privateKey')"
             />
-          </n-form-item>
-          <n-form-item path="passphrase" :label="$t('frontend.credentialModal.passphrase')">
-            <n-input
+          </NFormItem>
+          <NFormItem path="passphrase" :label="$t('frontend.credentialModal.passphrase')">
+            <NInput
               v-model:value="formValue.passphrase"
               type="password"
               show-password-on="click"
@@ -89,35 +89,23 @@
               :placeholder="$t('frontend.credentialModal.placeholder.passphrase')"
               :allow-input="value => !/\s/.test(value)"
             />
-          </n-form-item>
+          </NFormItem>
         </template>
-      </n-form>
-    </n-scrollbar>
-  </n-modal>
+      </NForm>
+    </NScrollbar>
+  </NModal>
 </template>
 
 <script lang="ts" setup>
-import { enums, model } from '@wailsApp/go/models';
-import { CreateCredential, FindCredentialByID, UpdateCredential } from '@wailsApp/go/services/CredentialSrv';
 import { Icon } from '@iconify/vue';
-
-import {
-  FormInst,
-  FormRules,
-  NForm,
-  NFormItem,
-  NInput,
-  NModal,
-  NButton,
-  NButtonGroup,
-  useMessage,
-  NScrollbar,
-} from 'naive-ui';
-import { ref, computed, onMounted, onUpdated } from 'vue';
+import type { model } from '@wailsApp/go/models';
+import { enums } from '@wailsApp/go/models';
+import { CreateCredential, FindCredentialByID, UpdateCredential } from '@wailsApp/go/services/CredentialSrv';
+import type { FormInst, FormRules } from 'naive-ui';
+import { NButton, NButtonGroup, NForm, NFormItem, NInput, NModal, NScrollbar } from 'naive-ui';
+import { computed, onMounted, onUpdated, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useCall } from '@/utils/call';
-
-const { AuthMethod } = enums;
 
 const props = defineProps<{
   show: boolean;
@@ -129,6 +117,8 @@ const emit = defineEmits<{
   (e: 'update:show', value: boolean): void;
   (e: 'success'): void;
 }>();
+
+const { AuthMethod } = enums;
 
 const { t } = useI18n();
 const formRef = ref<FormInst | null>(null);
@@ -230,7 +220,7 @@ const handleConfirm = async () => {
     }
 
     return result.ok;
-  } catch (errors) {
+  } catch {
     return false;
   }
 };

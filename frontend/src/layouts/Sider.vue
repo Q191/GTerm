@@ -1,54 +1,54 @@
 <template>
   <div class="sider-container">
     <div class="top-menu">
-      <n-tooltip placement="right" trigger="hover">
+      <NTooltip placement="right" trigger="hover">
         <template #trigger>
           <div
             class="menu-item top-menu-item"
             :class="{ active: selectedKey === 'Connection' }"
             @click="handleSelect('Connection')"
           >
-            <n-icon size="x-large">
-              <icon icon="ph:hard-drives" />
-            </n-icon>
+            <NIcon size="x-large">
+              <Icon icon="ph:hard-drives" />
+            </NIcon>
           </div>
         </template>
         {{ $t('frontend.sider.assets') }}
-      </n-tooltip>
+      </NTooltip>
 
-      <n-tooltip placement="right" trigger="hover">
+      <NTooltip placement="right" trigger="hover">
         <template #trigger>
           <div
             class="menu-item top-menu-item"
             :class="{ active: selectedKey === 'FileTransfer' }"
             @click="handleSelect('FileTransfer')"
           >
-            <n-icon size="x-large">
-              <icon icon="ph:folders" />
-            </n-icon>
+            <NIcon size="x-large">
+              <Icon icon="ph:folders" />
+            </NIcon>
           </div>
         </template>
         {{ $t('frontend.sider.file_transfer') }}
-      </n-tooltip>
+      </NTooltip>
 
-      <n-tooltip placement="right" trigger="hover">
+      <NTooltip placement="right" trigger="hover">
         <template #trigger>
           <div
             class="menu-item top-menu-item"
             :class="{ active: selectedKey === 'Credential' }"
             @click="handleSelect('Credential')"
           >
-            <n-icon size="x-large">
-              <icon icon="ph:vault" />
-            </n-icon>
+            <NIcon size="x-large">
+              <Icon icon="ph:vault" />
+            </NIcon>
           </div>
         </template>
         {{ $t('frontend.sider.credentials') }}
-      </n-tooltip>
+      </NTooltip>
     </div>
 
     <div class="bottom-menu">
-      <n-dropdown
+      <NDropdown
         :options="[
           {
             label: $t('frontend.sider.menu.preferences'),
@@ -71,51 +71,51 @@
         placement="right"
         @select="handleSettingsSelect"
       >
-        <n-tooltip placement="right" trigger="hover">
+        <NTooltip placement="right" trigger="hover">
           <template #trigger>
             <div class="menu-item bottom-menu-item">
-              <n-icon size="x-large">
-                <icon icon="ph:gear-six" />
-              </n-icon>
+              <NIcon size="x-large">
+                <Icon icon="ph:gear-six" />
+              </NIcon>
             </div>
           </template>
           {{ $t('frontend.sider.settings') }}
-        </n-tooltip>
-      </n-dropdown>
+        </NTooltip>
+      </NDropdown>
 
-      <n-tooltip placement="right" trigger="hover">
+      <NTooltip placement="right" trigger="hover">
         <template #trigger>
           <div class="menu-item bottom-menu-item" @click="toggleTheme">
-            <n-icon size="x-large">
-              <icon :icon="prefStore.isDark ? 'ph:sun' : 'ph:moon'" />
-            </n-icon>
+            <NIcon size="x-large">
+              <Icon :icon="prefStore.isDark ? 'ph:sun' : 'ph:moon'" />
+            </NIcon>
           </div>
         </template>
         {{ prefStore.isDark ? $t('frontend.sider.theme.toggle_light') : $t('frontend.sider.theme.toggle_dark') }}
-      </n-tooltip>
+      </NTooltip>
 
-      <n-tooltip placement="right" trigger="hover">
+      <NTooltip placement="right" trigger="hover">
         <template #trigger>
           <div class="menu-item bottom-menu-item" @click="openGithub">
-            <n-icon size="x-large">
-              <icon icon="ph:github-logo" />
-            </n-icon>
+            <NIcon size="x-large">
+              <Icon icon="ph:github-logo" />
+            </NIcon>
           </div>
         </template>
         {{ $t('frontend.sider.github') }}
-      </n-tooltip>
+      </NTooltip>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { NIcon, NDropdown, NTooltip, useThemeVars } from 'naive-ui';
-import { usePreferencesStore } from '@/stores/preferences';
-import { useRouter, useRoute } from 'vue-router';
 import { BrowserOpenURL } from '@wailsApp/runtime';
-import { useDialogStore } from '@/stores/dialog';
+import { NDropdown, NIcon, NTooltip, useThemeVars } from 'naive-ui';
 import { onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useDialogStore } from '@/stores/dialog';
+import { usePreferencesStore } from '@/stores/preferences';
 
 const router = useRouter();
 const route = useRoute();

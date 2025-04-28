@@ -5,34 +5,34 @@
         <span>{{ $t('frontend.credential.title') }}</span>
       </div>
       <div class="actions">
-        <n-input-group>
-          <n-input :placeholder="$t('frontend.credential.search')" :allow-input="value => !/\s/.test(value)">
+        <NInputGroup>
+          <NInput :placeholder="$t('frontend.credential.search')" :allow-input="value => !/\s/.test(value)">
             <template #prefix>
-              <icon icon="ph:magnifying-glass" />
+              <Icon icon="ph:magnifying-glass" />
             </template>
-          </n-input>
-          <n-button type="primary" ghost @click="handleAdd">
+          </NInput>
+          <NButton type="primary" ghost @click="handleAdd">
             <template #icon>
-              <icon icon="ph:plus-bold" />
+              <Icon icon="ph:plus-bold" />
             </template>
             {{ $t('frontend.credential.add') }}
-          </n-button>
-        </n-input-group>
+          </NButton>
+        </NInputGroup>
       </div>
     </div>
 
-    <n-scrollbar class="content">
+    <NScrollbar class="content">
       <div class="content-wrapper">
-        <n-list v-if="creds?.length" hoverable clickable class="credential-list">
-          <n-list-item v-for="v in creds" :key="v.id">
+        <NList v-if="creds?.length" hoverable clickable class="credential-list">
+          <NListItem v-for="v in creds" :key="v.id">
             <div class="credential-item">
-              <n-thing>
+              <NThing>
                 <template #avatar>
                   <div
                     class="credential-type"
                     :class="v.authMethod === enums.AuthMethod.PASSWORD ? 'success' : 'warning'"
                   >
-                    <icon :icon="v.authMethod === enums.AuthMethod.PASSWORD ? 'ph:password' : 'ph:key'" />
+                    <Icon :icon="v.authMethod === enums.AuthMethod.PASSWORD ? 'ph:password' : 'ph:key'" />
                   </div>
                 </template>
                 <template #header>
@@ -43,24 +43,24 @@
                 <template #description>
                   <div class="credential-info">
                     <span class="info-item">
-                      <icon icon="ph:user" />
+                      <Icon icon="ph:user" />
                       {{ v.username }}
                     </span>
                     <span class="info-item">
-                      <icon icon="ph:clock" />
+                      <Icon icon="ph:clock" />
                       {{ formatTime(v.createdAt) }}
                     </span>
                   </div>
                 </template>
-              </n-thing>
+              </NThing>
               <div class="credential-actions">
                 <n-tooltip trigger="hover">
                   <template #trigger>
-                    <n-button circle text @click="handleCopy(v)">
+                    <NButton circle text @click="handleCopy(v)">
                       <template #icon>
-                        <icon :icon="v.authMethod === enums.AuthMethod.PASSWORD ? 'ph:copy' : 'ph:file-text'" />
+                        <Icon :icon="v.authMethod === enums.AuthMethod.PASSWORD ? 'ph:copy' : 'ph:file-text'" />
                       </template>
-                    </n-button>
+                    </NButton>
                   </template>
                   {{
                     v.authMethod === enums.AuthMethod.PASSWORD
@@ -70,33 +70,33 @@
                 </n-tooltip>
                 <n-tooltip trigger="hover">
                   <template #trigger>
-                    <n-button circle text @click="handleEdit(v)">
+                    <NButton circle text @click="handleEdit(v)">
                       <template #icon>
-                        <icon icon="ph:pencil-simple" />
+                        <Icon icon="ph:pencil-simple" />
                       </template>
-                    </n-button>
+                    </NButton>
                   </template>
                   {{ $t('frontend.credential.actions.edit') }}
                 </n-tooltip>
                 <n-tooltip trigger="hover">
                   <template #trigger>
-                    <n-button circle text type="error" @click="handleDelete(v)">
+                    <NButton circle text type="error" @click="handleDelete(v)">
                       <template #icon>
-                        <icon icon="ph:trash" />
+                        <Icon icon="ph:trash" />
                       </template>
-                    </n-button>
+                    </NButton>
                   </template>
                   {{ $t('frontend.credential.actions.delete') }}
                 </n-tooltip>
               </div>
             </div>
-          </n-list-item>
-        </n-list>
-        <n-empty v-else class="credential-empty" :description="$t('frontend.credential.empty')" />
+          </NListItem>
+        </NList>
+        <NEmpty v-else class="credential-empty" :description="$t('frontend.credential.empty')" />
       </div>
-    </n-scrollbar>
+    </NScrollbar>
 
-    <credential-modal
+    <CredentialModal
       v-model:show="showModal"
       :is-edit="isEdit"
       :credential-id="credentialId"
@@ -107,25 +107,26 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
+import type { model } from '@wailsApp/go/models';
+import { enums } from '@wailsApp/go/models';
+import { DeleteCredential, ListCredential } from '@wailsApp/go/services/CredentialSrv';
+import dayjs from 'dayjs';
 import {
   NButton,
+  NEmpty,
   NInput,
   NInputGroup,
   NList,
   NListItem,
-  NThing,
   NScrollbar,
-  useThemeVars,
+  NThing,
   useMessage,
-  NEmpty,
+  useThemeVars,
 } from 'naive-ui';
-import { ref, onMounted } from 'vue';
-import { ListCredential, DeleteCredential } from '@wailsApp/go/services/CredentialSrv';
-import { enums, model } from '@wailsApp/go/models';
-import dayjs from 'dayjs';
-import CredentialModal from '@/views/modals/CredentialModal.vue';
-import { useCall } from '@/utils/call';
+import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useCall } from '@/utils/call';
+import CredentialModal from '@/views/modals/CredentialModal.vue';
 
 const { t } = useI18n();
 const message = useMessage();
@@ -139,7 +140,7 @@ const handleCopy = async (credential: model.Credential) => {
     try {
       await navigator.clipboard.writeText(credential.password);
       message.success(t('frontend.credential.messages.passwordCopied'));
-    } catch (err) {
+    } catch {
       message.error(t('frontend.credential.messages.copyFailed'));
     }
   }
@@ -149,6 +150,16 @@ const handleEdit = (credential: model.Credential) => {
   isEdit.value = true;
   credentialId.value = credential.id;
   showModal.value = true;
+};
+
+const creds = ref<model.Credential[]>();
+
+const fetchCredentials = async () => {
+  const result = await call(ListCredential);
+  if (result.ok) {
+    creds.value = result.data;
+  }
+  return result.data;
 };
 
 const handleDelete = async (credential: model.Credential) => {
@@ -169,16 +180,6 @@ const handleAdd = () => {
 
 const formatTime = (time: string) => {
   return dayjs(time).format('YYYY-MM-DD HH:mm');
-};
-
-const creds = ref<model.Credential[]>();
-
-const fetchCredentials = async () => {
-  const result = await call(ListCredential);
-  if (result.ok) {
-    creds.value = result.data;
-  }
-  return result.data;
 };
 
 const handleSuccess = () => {

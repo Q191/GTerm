@@ -1,5 +1,5 @@
 <template>
-  <div ref="widthRef" class="header" @dblclick="toggleFullscreen">
+  <div class="header" @dblclick="toggleFullscreen">
     <div
       class="logo-container"
       :class="{
@@ -19,36 +19,36 @@
 
     <div v-if="!isDarwin" class="window-controls">
       <div class="window-control-btn" @click="WindowMinimise">
-        <n-icon size="16"><icon icon="ph:minus-bold" /></n-icon>
+        <NIcon size="16"><Icon icon="ph:minus-bold" /></NIcon>
       </div>
       <div class="window-control-btn" @click="toggleMaximize">
-        <n-icon size="16">
-          <icon :icon="windowIsMaximised ? 'ph:corners-in-bold' : 'ph:corners-out-bold'" />
-        </n-icon>
+        <NIcon size="16">
+          <Icon :icon="windowIsMaximised ? 'ph:corners-in-bold' : 'ph:corners-out-bold'" />
+        </NIcon>
       </div>
       <div class="window-control-btn close-btn" @click="Quit">
-        <n-icon size="16"><icon icon="ph:x-bold" /></n-icon>
+        <NIcon size="16"><Icon icon="ph:x-bold" /></NIcon>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {
-  WindowMinimise,
-  Quit,
-  WindowIsMaximised,
-  WindowMaximise,
-  WindowUnmaximise,
-  WindowIsFullscreen,
-  WindowFullscreen,
-  WindowUnfullscreen,
-  EventsOn,
-  EventsOff,
-} from '@wailsApp/runtime';
-import { NIcon } from 'naive-ui';
 import { Icon } from '@iconify/vue';
 import { IsDarwin } from '@wailsApp/go/services/PreferencesSrv';
+import {
+  EventsOff,
+  EventsOn,
+  Quit,
+  WindowFullscreen,
+  WindowIsFullscreen,
+  WindowIsMaximised,
+  WindowMaximise,
+  WindowMinimise,
+  WindowUnfullscreen,
+  WindowUnmaximise,
+} from '@wailsApp/runtime';
+import { NIcon } from 'naive-ui';
 import ConnectionTabs from '@/layouts/ConnectionTabs.vue';
 import { useConnectionStore } from '@/stores/connection';
 
@@ -76,6 +76,10 @@ const toggleMaximize = async () => {
   isMaximised ? WindowUnmaximise() : WindowMaximise();
 };
 
+const checkFullscreenStatus = async () => {
+  isFullscreen.value = await WindowIsFullscreen();
+};
+
 const toggleFullscreen = async () => {
   const fullscreen = await WindowIsFullscreen();
   if (fullscreen) {
@@ -84,10 +88,6 @@ const toggleFullscreen = async () => {
     WindowFullscreen();
   }
   await checkFullscreenStatus();
-};
-
-const checkFullscreenStatus = async () => {
-  isFullscreen.value = await WindowIsFullscreen();
 };
 
 const updateWindowState = async () => {

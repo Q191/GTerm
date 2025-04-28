@@ -1,6 +1,6 @@
 <template>
   <div class="page-container">
-    <div class="settings-sidebar" ref="sidebarRef">
+    <div ref="sidebarRef" class="settings-sidebar">
       <div class="menu-items">
         <div
           v-for="(item, index) in menuItems"
@@ -9,15 +9,15 @@
           :class="{ active: selectedMenu === item.key }"
           @click="selectedMenu = item.key"
         >
-          <icon :icon="item.icon" class="menu-icon" />
+          <Icon :icon="item.icon" class="menu-icon" />
           <span>{{ item.label }}</span>
         </div>
       </div>
     </div>
 
     <div class="content-container">
-      <n-scrollbar>
-        <div class="settings-panel" v-if="selectedMenu === 'general'">
+      <NScrollbar>
+        <div v-if="selectedMenu === 'general'" class="settings-panel">
           <div class="setting-section">
             <div>
               <h2 class="section-title">{{ $t('frontend.preferencesModal.theme.title') }}</h2>
@@ -60,7 +60,7 @@
               <p class="section-description">设置应用界面的显示语言</p>
             </div>
 
-            <n-select
+            <NSelect
               v-model:value="prefStore.language"
               :options="languageOptions"
               size="medium"
@@ -76,7 +76,7 @@
             </div>
 
             <div class="sidebar-width-control">
-              <n-slider
+              <NSlider
                 v-model:value="prefStore.sidebarWidth"
                 :min="260"
                 :max="380"
@@ -86,25 +86,25 @@
               />
               <div class="sidebar-width-actions">
                 <div class="width-display">{{ prefStore.sidebarWidth }}px</div>
-                <n-button text type="primary" size="small" @click="prefStore.resetSidebarWidth">
+                <NButton text type="primary" size="small" @click="prefStore.resetSidebarWidth">
                   {{ $t('frontend.preferencesModal.sidebar.reset') }}
-                </n-button>
+                </NButton>
               </div>
             </div>
           </div>
         </div>
-      </n-scrollbar>
+      </NScrollbar>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Icon } from '@iconify/vue';
-import { NButton, NSelect, NSlider, NScrollbar, useThemeVars } from 'naive-ui';
-import { usePreferencesStore, languageOptions } from '@/stores/preferences';
-import ThemeSvg from '@/assets/images/theme.svg?raw';
+import { NButton, NScrollbar, NSelect, NSlider, useThemeVars } from 'naive-ui';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import AutoThemeSvg from '@/assets/images/auto_theme.svg?raw';
+import ThemeSvg from '@/assets/images/theme.svg?raw';
+import { languageOptions, usePreferencesStore } from '@/stores/preferences';
 
 const prefStore = usePreferencesStore();
 const themeVars = useThemeVars();
@@ -129,11 +129,6 @@ const menuItems = computed(() => [
     icon: 'ph:keyboard',
   },
 ]);
-
-const getSelectedMenuLabel = () => {
-  const item = menuItems.value.find(item => item.key === selectedMenu.value);
-  return item ? item.label : '';
-};
 
 const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 

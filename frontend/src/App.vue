@@ -1,21 +1,21 @@
 <template>
-  <n-config-provider :theme="currentTheme" :theme-overrides="currentThemeOverrides" :hljs="hljs">
-    <n-message-provider placement="bottom-right">
-      <n-dialog-provider>
+  <NConfigProvider :theme="currentTheme" :theme-overrides="currentThemeOverrides" :hljs="hljs">
+    <NMessageProvider placement="bottom-right">
+      <NDialogProvider>
         <router-view />
-      </n-dialog-provider>
-      <about-modal />
-    </n-message-provider>
-  </n-config-provider>
+      </NDialogProvider>
+      <AboutModal />
+    </NMessageProvider>
+  </NConfigProvider>
 </template>
 
 <script lang="ts" setup>
+import hljs from 'highlight.js/lib/core';
+import bash from 'highlight.js/lib/languages/bash';
+import { darkTheme, NConfigProvider, NDialogProvider, NMessageProvider } from 'naive-ui';
 import { usePreferencesStore } from '@/stores/preferences';
 import { darkThemeOverrides, themeOverrides } from '@/themes/naive-theme';
 import AboutModal from '@/views/modals/AboutModal.vue';
-import { darkTheme, NConfigProvider, NMessageProvider, NDialogProvider } from 'naive-ui';
-import hljs from 'highlight.js/lib/core';
-import bash from 'highlight.js/lib/languages/bash';
 
 hljs.registerLanguage('bash', bash);
 

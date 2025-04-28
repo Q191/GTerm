@@ -1,26 +1,26 @@
 <template>
   <div class="xterm-container">
     <template v-for="conn in connectionStore.connections" :key="conn.id">
-      <n-result
+      <NResult
         v-if="conn.errorCausedClosed"
         :status="conn.errorCausedClosed ? 'error' : 'warning'"
         :title="conn.message"
         :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
       >
         <template #footer>
-          <n-button @click="() => reconnect(conn.id)" type="primary">{{ $t('frontend.terminal.reconnect') }}</n-button>
+          <NButton type="primary" @click="() => reconnect(conn.id)">{{ $t('frontend.terminal.reconnect') }}</NButton>
         </template>
         <template #default>
           <div v-if="conn.details">
-            <n-collapse>
-              <n-collapse-item :title="$t('frontend.terminal.error.details')" name="details">
-                <n-code :code="conn.details" language="bash" :word-wrap="true" />
-              </n-collapse-item>
-            </n-collapse>
+            <NCollapse>
+              <NCollapseItem :title="$t('frontend.terminal.error.details')" name="details">
+                <NCode :code="conn.details" language="bash" :word-wrap="true" />
+              </NCollapseItem>
+            </NCollapse>
           </div>
         </template>
-      </n-result>
-      <n-result
+      </NResult>
+      <NResult
         v-else-if="conn.isFingerprintConfirm"
         status="warning"
         :title="$t('frontend.terminal.fingerprint.confirm')"
@@ -28,19 +28,19 @@
         :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
       >
         <template #icon>
-          <n-icon size="48">
-            <icon icon="ph:fingerprint" />
-          </n-icon>
+          <NIcon size="48">
+            <Icon icon="ph:fingerprint" />
+          </NIcon>
         </template>
         <template #footer>
-          <n-space>
-            <n-button @click="() => rejectFingerprint(conn.id)" type="error">
+          <NSpace>
+            <NButton type="error" @click="() => rejectFingerprint(conn.id)">
               {{ $t('frontend.terminal.fingerprint.reject') }}
-            </n-button>
-            <n-button @click="() => acceptFingerprint(conn.id)" type="primary">
+            </NButton>
+            <NButton type="primary" @click="() => acceptFingerprint(conn.id)">
               {{ $t('frontend.terminal.fingerprint.accept') }}
-            </n-button>
-          </n-space>
+            </NButton>
+          </NSpace>
         </template>
         <template #default>
           <div class="fingerprint-details">
@@ -50,11 +50,11 @@
             <p>
               <strong>{{ $t('frontend.terminal.fingerprint.fingerprint') }}:</strong>
             </p>
-            <n-code :code="conn.hostFingerprint || ''" language="bash" :word-wrap="true" />
+            <NCode :code="conn.hostFingerprint || ''" language="bash" :word-wrap="true" />
           </div>
         </template>
-      </n-result>
-      <n-result
+      </NResult>
+      <NResult
         v-else-if="conn.isConnecting || !connectedTerminals[conn.id]"
         status="info"
         :title="$t('frontend.terminal.connecting')"
@@ -62,13 +62,13 @@
         :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
       >
         <template #icon>
-          <n-spin size="large" />
+          <NSpin size="large" />
         </template>
-      </n-result>
+      </NResult>
       <div
         v-show="isTerminalVisible(conn)"
-        :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
         :ref="el => el && (terminalRefs[conn.id] = el as HTMLElement)"
+        :class="{ 'terminal-hidden': isTerminalHidden(conn.id) }"
         class="xterm-wrapper"
       />
     </template>
@@ -76,22 +76,24 @@
 </template>
 
 <script setup lang="ts">
+import '@xterm/xterm/css/xterm.css';
 import { Icon } from '@iconify/vue';
-import { loadTheme } from '@/themes/xtermjs';
+import { enums } from '@wailsApp/go/models';
 import { WebsocketPort } from '@wailsApp/go/services/TerminalSrv';
-import { LogWarning, LogError, LogInfo } from '@wailsApp/runtime/runtime';
+import { LogInfo } from '@wailsApp/runtime/runtime';
 import { CanvasAddon } from '@xterm/addon-canvas';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Terminal } from '@xterm/xterm';
-import '@xterm/xterm/css/xterm.css';
-import { useConnectionStore } from '@/stores/connection';
-import { NCode, NCollapse, NCollapseItem, NResult, NSpin, NButton, NSpace, NIcon } from 'naive-ui';
+import { debounce } from 'lodash';
+import { NButton, NCode, NCollapse, NCollapseItem, NIcon, NResult, NSpace, NSpin } from 'naive-ui';
 import { onActivated, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { enums } from '@wailsApp/go/models';
+import { useConnectionStore } from '@/stores/connection';
+import { loadTheme } from '@/themes/xtermjs';
 import { getTranslated } from '@/utils/call';
-import { debounce } from 'lodash';
+
+defineOptions({ name: 'Terminal' });
 
 const { t } = useI18n();
 
@@ -174,6 +176,21 @@ const rejectFingerprint = (id: number) => {
   });
 };
 
+const setXtermDomSize = (id: number) => {
+  const terminalEl = terminalRefs.value[id];
+  const fitAddon = fitAddons.value[id];
+  if (fitAddon && connectedTerminals.value[id] && terminalEl) {
+    const xtermElement = terminalEl.querySelector('.xterm') as HTMLElement;
+    if (xtermElement) {
+      const hight = terminalEl.clientHeight - 16;
+      const weight = terminalEl.clientWidth - 16;
+      xtermElement.style.height = `${hight}px`;
+      xtermElement.style.width = `${weight}px`;
+    }
+    fitAddon.fit();
+  }
+};
+
 const initializeTerminal = async (id: number) => {
   if (terminals.value[id]) return;
 
@@ -187,7 +204,7 @@ const initializeTerminal = async (id: number) => {
     fontSize: 16,
     cursorBlink: true,
     cursorStyle: 'bar',
-    theme: theme,
+    theme,
     scrollback: 1000,
   });
 
@@ -341,49 +358,26 @@ const reconnect = async (id: number) => {
 };
 
 const closeTerminal = (id: number) => {
-  try {
-    sockets.value[id]?.close();
-    sockets.value[id] = undefined;
-    connectedTerminals.value[id] = false;
+  sockets.value[id]?.close();
+  sockets.value[id] = undefined;
+  connectedTerminals.value[id] = false;
 
-    if (terminals.value[id]) {
-      terminals.value[id].onData(() => {});
-      terminals.value[id].onResize(() => {});
-      try {
-        terminals.value[id].dispose();
-      } catch (e) {
-        LogWarning(`Error disposing terminal: ${e}`);
-      }
-      terminals.value[id] = undefined;
-    }
-
-    fitAddons.value[id]?.dispose();
-    fitAddons.value[id] = undefined;
-
-    updateStatus(id, {
-      isConnecting: false,
-      errorCausedClosed: false,
-      message: '',
-      details: '',
-    });
-  } catch (e) {
-    LogError(`Error in close terminal: ${e}`);
+  if (terminals.value[id]) {
+    terminals.value[id].onData(() => {});
+    terminals.value[id].onResize(() => {});
+    terminals.value[id].dispose();
+    terminals.value[id] = undefined;
   }
-};
 
-const setXtermDomSize = (id: number) => {
-  const terminalEl = terminalRefs.value[id];
-  const fitAddon = fitAddons.value[id];
-  if (fitAddon && connectedTerminals.value[id] && terminalEl) {
-    const xtermElement = terminalEl.querySelector('.xterm') as HTMLElement;
-    if (xtermElement) {
-      const hight = terminalEl.clientHeight - 16;
-      const weight = terminalEl.clientWidth - 16;
-      xtermElement.style.height = `${hight}px`;
-      xtermElement.style.width = `${weight}px`;
-    }
-    fitAddon.fit();
-  }
+  fitAddons.value[id]?.dispose();
+  fitAddons.value[id] = undefined;
+
+  updateStatus(id, {
+    isConnecting: false,
+    errorCausedClosed: false,
+    message: '',
+    details: '',
+  });
 };
 
 const handleResize = debounce(() => {
@@ -427,7 +421,6 @@ onActivated(() => {
 });
 
 defineExpose({ closeTerminal });
-defineOptions({ name: 'Terminal' });
 </script>
 
 <style lang="less" scoped>
