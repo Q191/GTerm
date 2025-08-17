@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/MisakaTAT/GTerm/backend/enums"
-	"github.com/MisakaTAT/GTerm/backend/utils/encrypt"
+	"github.com/Q191/GTerm/backend/enums"
+	"github.com/Q191/GTerm/backend/utils/encrypt"
 	"gorm.io/gorm"
 )
 

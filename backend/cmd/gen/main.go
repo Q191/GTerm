@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/MisakaTAT/GTerm/backend/dal/model"
-	"gorm.io/gen"
 	"os"
+
+	"github.com/Q191/GTerm/backend/dal/model"
+	"gorm.io/gen"
 )
 
 func models() []any {

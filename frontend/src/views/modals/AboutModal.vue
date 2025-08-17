@@ -51,11 +51,11 @@ const onOpenVersionURL = () => {
 };
 
 const onOpenSource = () => {
-  BrowserOpenURL('https://github.com/MisakaTAT/GTerm');
+  BrowserOpenURL('https://github.com/Q191/GTerm');
 };
 
 const onOpenWebsite = () => {
-  BrowserOpenURL('https://github.com/MisakaTAT');
+  BrowserOpenURL('https://github.com/Q191');
 };
 </script>
 

@@ -1,4 +1,4 @@
-module github.com/MisakaTAT/GTerm
+module github.com/Q191/GTerm
 
 go 1.24.1
 
@@ -11,7 +11,7 @@ require (
 	github.com/pkg/sftp v1.13.9
 	github.com/skeema/knownhosts v1.3.1
 	github.com/vrischmann/userdir v0.0.0-20151206171402-20f291cebd68
-	github.com/wailsapp/wails/v2 v2.10.1
+	github.com/wailsapp/wails/v2 v2.10.2
 	go.bug.st/serial v1.6.4
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.37.0

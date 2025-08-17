@@ -6,9 +6,9 @@ import (
 
 	"github.com/wailsapp/wails/v2/pkg/logger"
 
-	"github.com/MisakaTAT/GTerm/backend/enums"
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/services"
+	"github.com/Q191/GTerm/backend/enums"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/services"
 	"github.com/google/wire"
 )
 

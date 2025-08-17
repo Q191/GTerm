@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/pkg/base"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/pkg/base"
 	"github.com/google/wire"
 )
 
@@ -25,7 +25,7 @@ func (s *PreferencesSrv) VersionURL() string {
 }
 
 func (s *PreferencesSrv) Copyright() string {
-	return fmt.Sprintf("Copyright © 2024-%d MisakaTAT.\nAll rights reserved.", time.Now().Year())
+	return fmt.Sprintf("Copyright © 2025-%d Q191.\nAll rights reserved.", time.Now().Year())
 }
 
 func (s *PreferencesSrv) GOOS() string {

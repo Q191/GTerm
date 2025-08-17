@@ -6,8 +6,7 @@ import (
 )
 
 const (
-	commitPrefix  = "https://github.com/MisakaTAT/GTerm/commit/"
-	releasePrefix = "https://github.com/MisakaTAT/Shiro/releases/tag/"
+	commitPrefix = "https://github.com/Q191/GTerm/commit/"
 )
 
 var (
@@ -51,5 +50,5 @@ func init() {
 		VersionURL = commitPrefix + fullCommitHash
 		return
 	}
-	VersionURL = releasePrefix + Version
+	VersionURL = Version
 }

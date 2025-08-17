@@ -1,11 +1,11 @@
 package services
 
 import (
-	"github.com/MisakaTAT/GTerm/backend/consts/messages"
-	"github.com/MisakaTAT/GTerm/backend/dal/model"
-	"github.com/MisakaTAT/GTerm/backend/dal/query"
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/utils/resp"
+	"github.com/Q191/GTerm/backend/consts/messages"
+	"github.com/Q191/GTerm/backend/dal/model"
+	"github.com/Q191/GTerm/backend/dal/query"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/utils/resp"
 	"github.com/google/wire"
 )
 

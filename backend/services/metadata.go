@@ -1,12 +1,12 @@
 package services
 
 import (
-	"github.com/MisakaTAT/GTerm/backend/dal/model"
-	"github.com/MisakaTAT/GTerm/backend/dal/query"
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/pkg/exec"
-	"github.com/MisakaTAT/GTerm/backend/pkg/metadata"
-	commonssh "github.com/MisakaTAT/GTerm/backend/pkg/ssh"
+	"github.com/Q191/GTerm/backend/dal/model"
+	"github.com/Q191/GTerm/backend/dal/query"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/pkg/exec"
+	"github.com/Q191/GTerm/backend/pkg/metadata"
+	commonssh "github.com/Q191/GTerm/backend/pkg/ssh"
 	"github.com/google/wire"
 	"go.uber.org/zap"
 )

@@ -4,12 +4,12 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/MisakaTAT/GTerm/backend/consts/messages"
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/pkg/sftp"
-	commonssh "github.com/MisakaTAT/GTerm/backend/pkg/ssh"
-	"github.com/MisakaTAT/GTerm/backend/types"
-	"github.com/MisakaTAT/GTerm/backend/utils/resp"
+	"github.com/Q191/GTerm/backend/consts/messages"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/pkg/sftp"
+	commonssh "github.com/Q191/GTerm/backend/pkg/ssh"
+	"github.com/Q191/GTerm/backend/types"
+	"github.com/Q191/GTerm/backend/utils/resp"
 	"github.com/google/wire"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )

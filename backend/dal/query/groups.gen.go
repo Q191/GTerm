@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/MisakaTAT/GTerm/backend/dal/model"
+	"github.com/Q191/GTerm/backend/dal/model"
 )
 
 func newGroup(db *gorm.DB, opts ...gen.DOOption) group {

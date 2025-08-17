@@ -3,8 +3,8 @@ package terminal
 import (
 	"sync"
 
-	"github.com/MisakaTAT/GTerm/backend/enums"
-	"github.com/MisakaTAT/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/enums"
+	"github.com/Q191/GTerm/backend/initialize"
 	"github.com/gorilla/websocket"
 )
 

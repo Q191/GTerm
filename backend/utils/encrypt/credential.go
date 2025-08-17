@@ -7,11 +7,12 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
-	"github.com/MisakaTAT/GTerm/backend/consts"
-	"github.com/denisbrodbeck/machineid"
-	"golang.org/x/crypto/pbkdf2"
 	"io"
 	"sync"
+
+	"github.com/Q191/GTerm/backend/consts"
+	"github.com/denisbrodbeck/machineid"
+	"golang.org/x/crypto/pbkdf2"
 )
 
 const (

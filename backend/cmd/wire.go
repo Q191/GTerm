@@ -3,8 +3,8 @@
 package cmd
 
 import (
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/services"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/services"
 	"github.com/google/wire"
 )
 

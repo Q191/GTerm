@@ -5,9 +5,9 @@ import (
 	"embed"
 	"fmt"
 
-	"github.com/MisakaTAT/GTerm/backend/cmd"
-	"github.com/MisakaTAT/GTerm/backend/consts"
-	"github.com/MisakaTAT/GTerm/backend/pkg/base"
+	"github.com/Q191/GTerm/backend/cmd"
+	"github.com/Q191/GTerm/backend/consts"
+	"github.com/Q191/GTerm/backend/pkg/base"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"

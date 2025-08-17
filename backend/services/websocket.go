@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MisakaTAT/GTerm/backend/consts/messages"
-	"github.com/MisakaTAT/GTerm/backend/enums"
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/types"
+	"github.com/Q191/GTerm/backend/consts/messages"
+	"github.com/Q191/GTerm/backend/enums"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/types"
 	"github.com/google/wire"
 	"github.com/gorilla/websocket"
 )
@@ -33,6 +33,7 @@ var ug = websocket.Upgrader{
 		}
 		allowedOrigins := []string{
 			"wails://wails",
+			"http://wails",
 		}
 		for _, allowed := range allowedOrigins {
 			if strings.HasPrefix(origin, allowed) {

@@ -5,13 +5,14 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/pkg/exec"
-	commonssh "github.com/MisakaTAT/GTerm/backend/pkg/ssh"
-	"github.com/MisakaTAT/GTerm/backend/types"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/pkg/exec"
+	commonssh "github.com/Q191/GTerm/backend/pkg/ssh"
+	"github.com/Q191/GTerm/backend/types"
 
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
@@ -53,7 +54,9 @@ func (h *Handler) Connect(conf *commonssh.Config) error {
 
 	sftpClient, err := sftp.NewClient(client)
 	if err != nil {
-		_ = h.SFTPClient.Close()
+		if h.SFTPClient != nil {
+			_ = h.SFTPClient.Close()
+		}
 		return err
 	}
 
@@ -87,12 +90,19 @@ func (h *Handler) Close() {
 }
 
 func (h *Handler) ListRemoteFiles(path string) ([]*types.FileTransferItemInfo, error) {
+	if h.SFTPClient == nil {
+		return nil, errors.New("SFTP client is not connected")
+	}
 	entries, err := h.SFTPClient.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
 
-	files := make([]*types.FileTransferItemInfo, 0, len(entries))
+	files := make([]*types.FileTransferItemInfo, 0)
+	slices.SortFunc(entries, func(a, b os.FileInfo) int {
+		return strings.Compare(strings.ToLower(strings.TrimLeft(a.Name(), ".")),
+			strings.ToLower(strings.TrimLeft(b.Name(), ".")))
+	})
 	for _, entry := range entries {
 		info := &types.FileTransferItemInfo{
 			Name:        entry.Name(),

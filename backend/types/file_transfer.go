@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/MisakaTAT/GTerm/backend/enums"
+	"github.com/Q191/GTerm/backend/enums"
 )
 
 type FileTransferItemInfo struct {

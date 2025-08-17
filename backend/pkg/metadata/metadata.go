@@ -3,7 +3,7 @@ package metadata
 import (
 	"strings"
 
-	"github.com/MisakaTAT/GTerm/backend/pkg/exec"
+	"github.com/Q191/GTerm/backend/pkg/exec"
 	"golang.org/x/crypto/ssh"
 )
 

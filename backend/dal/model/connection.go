@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/MisakaTAT/GTerm/backend/enums"
+	"github.com/Q191/GTerm/backend/enums"
 	"go.bug.st/serial"
 )
 

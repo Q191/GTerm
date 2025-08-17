@@ -3,10 +3,10 @@ package adapter
 import (
 	"encoding/json"
 
-	"github.com/MisakaTAT/GTerm/backend/enums"
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/pkg/terminal"
-	"github.com/MisakaTAT/GTerm/backend/types"
+	"github.com/Q191/GTerm/backend/enums"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/pkg/terminal"
+	"github.com/Q191/GTerm/backend/types"
 	"github.com/gorilla/websocket"
 	"go.bug.st/serial"
 )

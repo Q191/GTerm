@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/MisakaTAT/GTerm/backend/initialize"
-	"github.com/MisakaTAT/GTerm/backend/pkg/exec"
+	"github.com/Q191/GTerm/backend/initialize"
+	"github.com/Q191/GTerm/backend/pkg/exec"
 	"golang.org/x/crypto/ssh"
 )
 

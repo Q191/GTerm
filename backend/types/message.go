@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	"github.com/MisakaTAT/GTerm/backend/enums"
+	"github.com/Q191/GTerm/backend/enums"
 )
 
 type Message struct {

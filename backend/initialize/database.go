@@ -2,10 +2,11 @@ package initialize
 
 import (
 	"fmt"
-	"github.com/MisakaTAT/GTerm/backend/consts"
-	"github.com/MisakaTAT/GTerm/backend/dal/model"
-	"github.com/MisakaTAT/GTerm/backend/dal/query"
-	"github.com/MisakaTAT/GTerm/backend/pkg/storage"
+
+	"github.com/Q191/GTerm/backend/consts"
+	"github.com/Q191/GTerm/backend/dal/model"
+	"github.com/Q191/GTerm/backend/dal/query"
+	"github.com/Q191/GTerm/backend/pkg/storage"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )

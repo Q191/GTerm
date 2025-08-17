@@ -5,11 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/MisakaTAT/GTerm/backend/initialize"
 	"strings"
 	"time"
 
-	commonssh "github.com/MisakaTAT/GTerm/backend/pkg/ssh"
+	"github.com/Q191/GTerm/backend/initialize"
+
+	commonssh "github.com/Q191/GTerm/backend/pkg/ssh"
 	"golang.org/x/crypto/ssh"
 )
 

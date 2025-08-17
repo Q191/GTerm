@@ -1,7 +1,7 @@
 package resp
 
 import (
-	"github.com/MisakaTAT/GTerm/backend/consts/messages"
+	"github.com/Q191/GTerm/backend/consts/messages"
 )
 
 type Resp struct {

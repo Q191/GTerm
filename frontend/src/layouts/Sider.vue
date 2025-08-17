@@ -94,7 +94,7 @@
         {{ prefStore.isDark ? $t('frontend.sider.theme.toggle_light') : $t('frontend.sider.theme.toggle_dark') }}
       </NTooltip>
 
-      <NTooltip placement="right" trigger="hover">
+      <!-- <NTooltip placement="right" trigger="hover">
         <template #trigger>
           <div class="menu-item bottom-menu-item" @click="openGithub">
             <NIcon size="x-large">
@@ -103,7 +103,7 @@
           </div>
         </template>
         {{ $t('frontend.sider.github') }}
-      </NTooltip>
+      </NTooltip> -->
     </div>
   </div>
 </template>
