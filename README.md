@@ -6,30 +6,22 @@ This is the first development preview version of GTerm. Due to my full-time work
 
 ## Screenshots
 
+1，终端用dom，不用canvas，windows字体发虚；
+
+2，添加复制粘贴快捷键；
+
+3，文件按linux默认排序；
+
+4，标题栏修改，完整显示，不要居中。
+
+基本的文件右键还没有，后续改成原始js，不用vue。
+
 <table>
 <tr>
-<td><img src="docs/preview/main-dark.png" width="400"/></td>
-<td><img src="docs/preview/main-light.png" width="400"/></td>
-</tr>
-<tr>
-<td><img src="docs/preview/session-dark.png" width="400"/></td>
-<td><img src="docs/preview/session-light.png" width="400"/></td>
-</tr>
-<tr>
-<td><img src="docs/preview/file-dark.png" width="400"/></td>
-<td><img src="docs/preview/file-light.png" width="400"/></td>
-</tr>
-<tr>
-<td><img src="docs/preview/cred.png" width="400"/></td>
-<td><img src="docs/preview/new-session.png" width="400"/></td>
-</tr>
-<tr>
-<td><img src="docs/preview/new-session-pref.png" width="400"/></td>
-<td><img src="docs/preview/new-session-advanced.png" width="400"/></td>
-</tr>
-<tr>
-<td><img src="docs/preview/pref-light.png" width="400"/></td>
-<td><img src="docs/preview/pref-dark.png" width="400"/></td>
+<td><img width="1200" height="800" alt="image" src="https://github.com/user-attachments/assets/83bd5be2-07fe-4e94-ae48-04ae1817037d" />
+</td>
+<td><img width="1200" height="800" alt="image" src="https://github.com/user-attachments/assets/92d8e853-b8db-4137-856d-9367d210bfe3" />
+</td>
 </tr>
 </table>
 
