@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="list-content">
-          <!-- 资产列表部分 -->
+          <!-- 主机列表部分 -->
           <div class="section-header">
             <div class="section-title">{{ $t('frontend.connection.sections.assetList') }}</div>
             <NButton text size="tiny" @click="assetListCollapsed = !assetListCollapsed">
@@ -84,7 +84,7 @@
               @contextmenu="handleGroupContextMenu($event, group)"
             >
               <div class="group-icon">
-                <Icon :icon="getGroupConnCount(group) > 0 ? 'ph:folders-duotone' : 'ph:folder-dashed-duotone'" />
+                <Icon :icon="getGroupConnCount(group) > 0 ? 'ph:folders-thin' : 'ph:folder-dashed-thin'" />
               </div>
               <div class="group-info">
                 <div class="group-name">{{ group.name }}</div>
@@ -419,17 +419,17 @@ const getProtocolIcon = (conn: model.Connection) => {
   const protocol = conn.connProtocol;
   switch (protocol) {
     case enums.ConnProtocol.SSH:
-      return 'ph:terminal-duotone';
+      return 'ph:terminal';
     case enums.ConnProtocol.TELNET:
-      return 'ph:broadcast-duotone';
+      return 'ph:broadcast';
     case enums.ConnProtocol.RDP:
-      return 'ph:desktop-duotone';
+      return 'ph:desktop';
     case enums.ConnProtocol.VNC:
-      return 'ph:monitor-duotone';
+      return 'ph:monitor';
     case enums.ConnProtocol.SERIAL:
-      return 'ph:plug-duotone';
+      return 'ph:plug';
     default:
-      return 'ph:gconn-duotone';
+      return 'ph:gconn';
   }
 };
 

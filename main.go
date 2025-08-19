@@ -43,11 +43,17 @@ func main() {
 		},
 		Bind:     app.Bind(),
 		EnumBind: app.Enums(),
+		DragAndDrop: &options.DragAndDrop{
+			EnableFileDrop:     false,
+			DisableWebViewDrop: true,
+			CSSDropProperty:    "--wails-drop-target",
+			CSSDropValue:       "drop",
+		},
 		Windows: &windows.Options{
 			WebviewIsTransparent:              true,
 			WindowIsTranslucent:               true,
 			DisableFramelessWindowDecorations: false,
-			BackdropType:                      windows.Tabbed,
+			BackdropType:                      windows.None,
 		},
 		Mac: &mac.Options{
 			TitleBar: mac.TitleBarHiddenInset(),

@@ -5,7 +5,7 @@
       :class="{
         'padding-left-small': !isDarwin,
         'padding-left-large': isDarwin,
-        'center-position': !hasConnections && !isFullscreen,
+        //'center-position': !hasConnections && !isFullscreen,
         'left-position': hasConnections || isFullscreen,
         fullscreen: isFullscreen,
       }"

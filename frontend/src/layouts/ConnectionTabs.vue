@@ -9,7 +9,7 @@
     >
       <div class="status-dot" :class="tabStatus[tab.id]" />
       <NIcon size="16" class="terminal-icon">
-        <Icon icon="ph:terminal-duotone" />
+        <Icon icon="ph:terminal" />
       </NIcon>
       <NTooltip trigger="hover">
         <template #trigger>
@@ -102,8 +102,8 @@ defineExpose({
   transition: background-color 0.2s ease;
   display: flex;
   align-items: center;
-  width: 160px;
-  min-width: 160px;
+  width: auto;
+  //min-width: 160px;
   height: 40px;
   padding: 0 12px;
   cursor: pointer;

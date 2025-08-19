@@ -148,7 +148,7 @@
       }
     },
     "sider": {
-      "assets": "资产管理",
+      "assets": "主机管理",
       "credentials": "凭据管理",
       "file_transfer": "文件传输",
       "settings": "系统设置",
@@ -164,7 +164,7 @@
       }
     },
     "connection": {
-      "search": "搜索资产",
+      "search": "搜索主机",
       "add": {
         "group": "新建分组",
         "conn": "新建连接"
@@ -193,8 +193,8 @@
         }
       },
       "sections": {
-        "assetList": "资产列表",
-        "groupList": "资产分组"
+        "assetList": "主机列表",
+        "groupList": "主机分组"
       }
     },
     "file_transfer": {

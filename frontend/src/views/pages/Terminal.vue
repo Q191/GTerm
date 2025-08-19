@@ -81,7 +81,6 @@ import { Icon } from '@iconify/vue';
 import { enums } from '@wailsApp/go/models';
 import { WebsocketPort } from '@wailsApp/go/services/TerminalSrv';
 import { LogInfo } from '@wailsApp/runtime/runtime';
-import { CanvasAddon } from '@xterm/addon-canvas';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Terminal } from '@xterm/xterm';
@@ -105,7 +104,6 @@ const terminals = ref<Record<number, Terminal | undefined>>({});
 const sockets = ref<Record<number, WebSocket | undefined>>({});
 const fitAddons = ref<Record<number, FitAddon | undefined>>({});
 const webLinksAddon = ref<WebLinksAddon>(new WebLinksAddon());
-const canvasAddon = ref<CanvasAddon>(new CanvasAddon());
 const connectedTerminals = ref<Record<number, boolean>>({});
 
 const isTerminalHidden = (connId: number) => {
@@ -199,15 +197,16 @@ const initializeTerminal = async (id: number) => {
 
   const theme = await loadTheme(conn.theme || 'Default');
   terminals.value[id] = new Terminal({
+    fontFamily: 'Consolas, Monaco, "DejaVu Sans Mono", "Monospace"',
     convertEol: true,
     disableStdin: false,
     fontSize: 16,
     cursorBlink: true,
     cursorStyle: 'bar',
-    theme,
-    scrollback: 1000,
+    theme: theme,
+    scrollback: 100000,
+    letterSpacing: 1,
   });
-
   fitAddons.value[id] = new FitAddon();
 };
 
@@ -219,13 +218,20 @@ const initializeXterm = async (id: number) => {
 
   fitAddon.activate(terminal);
   webLinksAddon.value.activate(terminal);
-  canvasAddon.value.activate(terminal);
   terminal.attachCustomKeyEventHandler(arg => {
     if (arg.code === 'PageUp' && arg.type === 'keydown') {
-      terminal?.scrollPages(-1);
+      terminal.scrollPages(-1);
       return false;
     } else if (arg.code === 'PageDown' && arg.type === 'keydown') {
-      terminal?.scrollPages(1);
+      terminal.scrollPages(1);
+      return false;
+    } else if (arg.ctrlKey && arg.code === 'KeyC' && arg.type === 'keydown') {
+      if (terminal.getSelection().length > 0) {
+        navigator.clipboard.writeText(terminal.getSelection());
+        terminal.clearSelection();
+        return false;
+      }
+    } else if (arg.ctrlKey && arg.code === 'KeyV' && arg.type === 'keydown') {
       return false;
     }
     return true;
@@ -447,10 +453,6 @@ defineExpose({ closeTerminal });
     padding: 8px 16px 8px 8px;
 
     .xterm-screen {
-      width: 100% !important;
-      height: 100% !important;
-    }
-    canvas {
       width: 100% !important;
       height: 100% !important;
     }
